@@ -1,0 +1,134 @@
+==========================================================
+  CHÚ THÍCH CÁC MỤC TRONG DỰ ÁN "MÔ PHỎNG ĐỒ THỊ"
+==========================================================
+
+1. CẤU TRÚC THƯ MỤC
+----------------------------------------------------------
+mo-phong-do-thi/
+  index.html        Giao diện: màn hình chọn loại + màn hình chính
+  css/style.css     Toàn bộ giao diện (3 theme: Light, Premium, Neon)
+  js/config.js      Hằng số, tên 5 loại đồ thị, bảng màu
+  js/state.js       Biến trạng thái dùng chung
+  js/validate.js    Kiểm tra dữ liệu nhập
+  js/ui.js          Chọn loại, đổi theme, áp dụng màu
+  js/edges.js       Tạo đồ thị, thêm / xóa / sửa cạnh
+  js/draw.js        Vẽ đồ thị bằng SVG, kéo đỉnh
+  js/matrix.js      Ma trận kề, ma trận trọng số
+  js/info.js        Danh sách đỉnh/cạnh, bậc của đỉnh
+  chu-thich.txt     File này
+
+Thứ tự nạp script trong index.html (không được đổi):
+config -> state -> validate -> ui -> edges -> draw -> matrix -> info
+
+
+2. NĂM LOẠI ĐỒ THỊ (biến "loai" = 1..5)
+----------------------------------------------------------
+loai 1  Đơn đồ thị vô hướng
+        - Không vòng khuyên, không cạnh song song, không mũi tên.
+loai 2  Đa đồ thị vô hướng
+        - Cho phép cạnh song song, không vòng khuyên.
+loai 3  Giả đồ thị vô hướng
+        - Cho phép cạnh song song và vòng khuyên (nhiều vòng trên 1 đỉnh).
+loai 4  Đơn đồ thị có hướng
+        - Không vòng khuyên, mỗi chiều x->y chỉ 1 cạnh, có mũi tên.
+        - x->y và y->x là hai cạnh khác nhau, nhập được cả hai.
+loai 5  Đa đồ thị có hướng
+        - Cho phép cạnh song song cùng chiều, không vòng khuyên, có mũi tên.
+
+loai 1-3 là vô hướng, loai 4-5 là có hướng (hàm coHuong() trong state.js).
+
+
+3. CHI TIẾT TỪNG FILE
+----------------------------------------------------------
+[index.html]
+  - #chonLoai      : màn hình đầu, các nút chọn 1 trong 5 loại.
+  - #manHinhChinh  : màn hình chính.
+  - Khung "Điều khiển" (bên trái): chọn loại, theme, màu đỉnh/cạnh,
+    số đỉnh, số cạnh, nút Tạo đồ thị, thêm / xóa / sửa cạnh, sắp xếp lại.
+  - Khung "graph-area" (bên phải): <svg id="svg"> để vẽ đồ thị và
+    <div id="thongTin"> để hiện danh sách, bậc, ma trận.
+
+[js/config.js]
+  - $            : viết tắt của document.getElementById.
+  - TEN_LOAI     : tên 5 loại đồ thị.
+  - EMOJI        : biểu tượng số trên nút chọn loại.
+  - PALETTES     : bảng màu cho 3 theme (node, border, edge, glow).
+  - COLOR_INPUTS : liên kết màu với các ô chọn màu.
+
+[js/state.js]
+  - n            : số đỉnh hiện tại.
+  - edges        : danh sách cạnh, mỗi cạnh dạng {x, y} hoặc {x, y, w}.
+  - nodes        : vị trí (x, y) của từng đỉnh trên màn hình.
+  - draggingNode : đỉnh đang được kéo bằng chuột.
+  - graphPalette : màu đang dùng để vẽ.
+  - loaiHienTai(), coHuong() : loại đang chọn, có hướng hay không.
+
+[js/validate.js]
+  - kiemTraDinh  : đỉnh phải là số nguyên từ 0 đến n-1.
+  - kiemTraCanh  : trả về chuỗi lỗi hoặc null nếu hợp lệ.
+        * Vòng khuyên (x = y) chỉ cho phép ở loai 3.
+        * Cạnh trùng chỉ bị chặn ở đơn đồ thị (loai 1, 4).
+  - docTrongSo   : để trống -> undefined, không phải số -> NaN.
+  - taoCanh      : tạo đối tượng cạnh (có hoặc không có trọng số).
+
+[js/ui.js]
+  - Tạo các nút chọn loại và danh sách chọn loại.
+  - chonGiaoDien(mode)  : đổi theme light / premium / dark.
+  - apDungMauDoThi()    : áp dụng 4 màu người dùng chọn.
+  - chonLoaiDoThi(loai) : vào màn hình chính với loại đã chọn.
+  - hieuUng()           : hiệu ứng nhấp nháy khi bấm.
+
+[js/edges.js]
+  - taoDoThi()  : hỏi từng cạnh bằng hộp thoại (dạng "x y" hoặc "x y w"),
+                  kiểm tra, rồi dựng đồ thị mới.
+  - capNhat()   : vẽ lại và cập nhật thông tin.
+  - themCanh()  : thêm cạnh theo luật của loại đang chọn.
+  - timCanh()   : tìm cạnh khớp đúng thứ tự (x, y).
+  - xoaCanh()   : xóa 1 cạnh. Đồ thị vô hướng phải nhập đúng thứ tự
+                  đã thêm (x y), nhập y x sẽ báo không tìm thấy.
+  - suaCanh()   : đổi đỉnh / trọng số của cạnh (trọng số trống = giữ cũ).
+
+[js/draw.js]
+  - sapXep()    : xếp các đỉnh đều trên một vòng tròn.
+  - el()        : hàm tạo phần tử SVG.
+  - veDoThi()   : xóa và vẽ lại toàn bộ (cạnh trước, đỉnh sau).
+  - veCanh()    : vẽ 1 cạnh
+        * Vòng khuyên: elip phía trên đỉnh; vòng thứ 2, 3... to dần lên.
+        * Cạnh song song: cong ra hai bên để không chồng nhau.
+        * Có hướng: thêm mũi tên, đầu mũi tên nằm ngoài đỉnh.
+        * Nhãn: (x,y) hoặc (x,y) · w ở giữa cạnh.
+  - veDinh()    : vẽ hình tròn đỉnh + số hiệu, kéo được bằng chuột.
+  - Sự kiện mousemove / mouseup: kéo thả đỉnh.
+
+[js/matrix.js]
+  - bangMa()            : vẽ ma trận n x n thành bảng HTML.
+  - htmlMaTranKe()      : ma trận kề, ô [i][j] = số cạnh nối i với j.
+        * Vô hướng: đối xứng; vòng khuyên ghi 1 trên đường chéo.
+        * Có hướng: hàng = đỉnh xuất phát, cột = đỉnh đích.
+  - htmlMaTranTrongSo() : 0 khi i trùng j; w nếu có cạnh; ∞ nếu không.
+        Cạnh không nhập trọng số tính w = 1; nhiều cạnh song song lấy
+        trọng số nhỏ nhất; vòng khuyên bị bỏ qua.
+
+[js/info.js]
+  - htmlDinhCanh()   : liệt kê đỉnh và cạnh (e1, e2, ...).
+  - htmlBac()        : bậc của đỉnh.
+        * Vô hướng: vòng khuyên tính bậc 2; liệt kê đỉnh treo (bậc 1)
+          và đỉnh cô lập (bậc 0).
+        * Có hướng: deg = deg- + deg+, kèm bảng bán bậc ra / bán bậc vào.
+  - hienThiThongTin(): ghép danh sách + bậc + 2 ma trận vào khung thông tin.
+
+[css/style.css]
+  - Biến màu :root cho theme Light; body.theme-premium và body.theme-dark
+    ghi đè cho 2 theme còn lại.
+  - Các nhóm: màn hình chọn loại, khung điều khiển, vùng vẽ SVG
+    (.node, .edge, .edge-label), bảng ma trận, bảng bán bậc.
+
+
+4. CÁCH TÌM NHANH TRONG CODE
+----------------------------------------------------------
+  "loai ===" hoặc "coHuong()"  -> chỗ xử lý riêng từng loại đồ thị
+  "x === y"                    -> xử lý vòng khuyên
+  "choPhepSongSong"            -> luật cho phép cạnh song song
+  "veCanh"                     -> cách vẽ cạnh, mũi tên, vòng khuyên
+  "htmlMaTran"                 -> các bảng ma trận
+  "htmlBac"                    -> tính bậc của đỉnh

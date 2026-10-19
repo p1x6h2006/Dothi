@@ -47,14 +47,13 @@ function taoNhan(x, y, text) {
 //   - Có hướng (coHuong())     : thêm mũi tên ở đầu y               (loai 4, 5)
 function veCanh(x, y, index) {
     const p1 = nodes[x], p2 = nodes[y], P = graphPalette;
-    const glowFilter = "drop-shadow(0 0 12px rgba(147, 197, 253, 0.9))";
 
     // --- Vòng khuyên (chỉ loai 3 mới có) ---
     if (x === y) {
         // Nhiều vòng khuyên trên cùng một đỉnh: vòng thứ k vẽ to dần lên phía trên để không chồng nhau
         const k = edges.slice(0, index).filter(e => e.x === x && e.y === y).length;
         const cy = p1.y - 35 - k * 25, ex = k * 15, ey = k * 25;
-        el("ellipse", { cx: p1.x, cy, rx: 39 + ex, ry: 54 + ey, fill: "none", stroke: P.glow, "stroke-width": 9, opacity: 0.35 }).style.filter = glowFilter;
+        el("ellipse", { cx: p1.x, cy, rx: 39 + ex, ry: 54 + ey, fill: "none", stroke: P.glow, "stroke-width": 15, opacity: 0.25 });   // quầng sáng: nét to mờ, không dùng filter
         const loop = el("ellipse", { cx: p1.x, cy, rx: 35 + ex, ry: 50 + ey, class: "edge", stroke: P.edge, "stroke-width": 4, fill: "none" });
         if (coHuong()) loop.setAttribute("marker-end", "url(#arrow)");
         taoNhan(p1.x, p1.y - 90 - k * 50, nhanCanh(index));
@@ -76,8 +75,7 @@ function veCanh(x, y, index) {
     const bez = (t, a, b, c) => diem(a, b, t) + t * t * c;                       // điểm trên đường cong bậc hai
     const d = `M ${p1.x} ${p1.y} Q ${cx} ${cy} ${p2.x} ${p2.y}`;
 
-    el("path", { d, fill: "none", stroke: P.glow, "stroke-width": 8, opacity: 0.35, "stroke-linecap": "round" })
-        .style.filter = "drop-shadow(0 0 10px rgba(147, 197, 253, 0.9))";
+    el("path", { d, fill: "none", stroke: P.glow, "stroke-width": 14, opacity: 0.25, "stroke-linecap": "round" });   // quầng sáng: nét to mờ, không dùng filter
     const path = el("path", { d, class: "edge", stroke: P.edge, "stroke-width": 4, fill: "none" });
 
     // --- Mũi tên cho đồ thị có hướng (loai 4, 5) ---
@@ -103,18 +101,21 @@ function veCanh(x, y, index) {
 // Vẽ một đỉnh (hình tròn + số hiệu), có thể kéo bằng chuột
 function veDinh(i) {
     const p = nodes[i], g = el("g");
+    el("circle", { cx: p.x, cy: p.y + 7, r: 32, fill: "rgba(59, 130, 246, 0.22)", "pointer-events": "none" }, g);   // bóng đổ nhẹ, thay cho drop-shadow
     const c = el("circle", { cx: p.x, cy: p.y, r: 30, class: "node", fill: graphPalette.node, stroke: graphPalette.border, "stroke-width": 3 }, g);
-    c.style.filter = "drop-shadow(0 10px 18px rgba(59, 130, 246, 0.28))";
     c.addEventListener("mousedown", e => { draggingNode = i; e.preventDefault(); });
     el("text", { x: p.x, y: p.y, class: "node-text" }, g).textContent = i;
 }
 
 // Kéo đỉnh bằng chuột
+let veCho = false;   // gom nhiều lần di chuột thành 1 lần vẽ lại mỗi khung hình
 svg.addEventListener("mousemove", e => {
     if (draggingNode === null) return;
     const rect = svg.getBoundingClientRect();
     nodes[draggingNode].x = e.clientX - rect.left;
     nodes[draggingNode].y = e.clientY - rect.top;
-    veDoThi();
+    if (veCho) return;
+    veCho = true;
+    requestAnimationFrame(() => { veCho = false; veDoThi(); });
 });
 document.addEventListener("mouseup", () => { draggingNode = null; });

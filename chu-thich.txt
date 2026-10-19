@@ -133,3 +133,20 @@ loai 1-3 là vô hướng, loai 4-5 là có hướng (hàm coHuong() trong state
   "veCanh"                     -> cách vẽ cạnh, mũi tên, vòng khuyên
   "htmlMaTran"                 -> các bảng ma trận
   "htmlBac"                    -> tính bậc của đỉnh
+
+
+5. GHI CHÚ TỐI ƯU HIỆU NĂNG (giữ nguyên hiệu ứng kiếm bay)
+----------------------------------------------------------
+  Kiếm (index.html, cuối file):
+    - Quầng sáng của kiếm vẽ sẵn 1 lần vào canvas phụ (hết shadowBlur mỗi khung hình).
+    - COUNT = 8 kiếm ở màn hình chọn loại, HCOUNT = 4 kiếm ở màn hình chính
+      (muốn dày hơn thì tăng 2 hằng số này, bản gốc là 12 và 6).
+    - TRAIL = 12 (gốc 16), bỏ đoạn đuôi quá mờ; độ phân giải canvas tối đa 1.5x.
+    - Dải bay ngang lưu sẵn, không đo layout mỗi khung hình.
+  CSS:
+    - Bỏ blur(30px) ở nền aurora; giảm backdrop-filter (22px -> 10px, 20px -> 8px),
+      khung đồ thị vốn đã nền đặc.
+    - Bỏ các hiệu ứng lặp vô hạn trên khung chọn loại và tiêu đề (floaty, spin, shine).
+  SVG đồ thị (js/draw.js):
+    - Bỏ drop-shadow trên từng cạnh/đỉnh, thay bằng nét to mờ và vòng bóng nhẹ.
+    - Kéo đỉnh: gom các lần di chuột, mỗi khung hình chỉ vẽ lại 1 lần.

@@ -96,7 +96,7 @@
     <script src="js/matrix.js"></script>
     <script src="js/info.js"></script>
 
-    <!-- Nền: 12 thanh phi kiếm (cùng kiểu kiếm của Luu_Tru_Ca_Nhan), 6 màu, bay rất nhanh phía sau; né vùng vẽ đồ thị -->
+    <!-- Nền: 12 thanh phi kiếm (cùng kiểu kiếm của Luu_Tru_Ca_Nhan), 6 màu, bay phía sau, xuyên qua lớp kính mờ của khung đồ thị -->
     <canvas id="swordBg" aria-hidden="true" style="position:fixed;left:0;top:0;width:100%;height:100%;z-index:-1;pointer-events:none"></canvas>
     <script>
     (function () {
@@ -105,7 +105,7 @@
         var COUNT = 12;                          // tổng số kiếm
         var HUES = [0, 55, 110, 170, 230, 290];  // 6 màu: xoay màu gốc (xanh lơ) đi từng góc này, mỗi màu 2 kiếm
         var SPEED_MIN = 350, SPEED_MAX = 600;    // px/giây
-        var SIZE = 128, THICK = .68, TRAIL = 16, PAD = 24;   // cỡ kiếm, độ dày khi bay, độ dài vệt, khoảng cách giữ với vùng đồ thị
+        var SIZE = 128, THICK = .68, TRAIL = 16;   // cỡ kiếm, độ dày khi bay, độ dài vệt
         var W = 0, H = 0, S = [], last = 0, sprites = [], ready = false;
 
         /* Màu: xoay sắc độ (giống CSS hue-rotate) cho từng màu trong kiếm gốc */
@@ -163,33 +163,35 @@
             resize(); S = [];
             for (var i = 0; i < COUNT; i++) {
                 var k = i % HUES.length;
-                S.push({ x: rnd(0, W), y: rnd(0, H), a: rnd(0, 6.2832), v: rnd(SPEED_MIN, SPEED_MAX), w: 0, wt: 0, k: k, col: GLOW[k], pts: [] });
+                S.push({ x: rnd(0, W), y: rnd(0, H), a: rnd(0, 6.2832), v: rnd(SPEED_MIN, SPEED_MAX), w: 0, wn: 0, wt: 0, bias: Math.random() < .5 ? -1 : 1, k: k, col: GLOW[k], pts: [] });
             }
         }
-        function graphRect() {            // vùng vẽ đồ thị (toạ độ khung nhìn)
-            var el = document.querySelector('.graph-area') || document.getElementById('svg');
-            if (!el) return null;
-            var r = el.getBoundingClientRect();
-            return (r.width > 4 && r.height > 4) ? r : null;
-        }
-        function step(o, dt, R) {
+        var WMAX = 3.2, DW = 24;          // tốc độ bẻ lái tối đa (rad/giây) và độ nhạy đổi hướng: bẻ từ từ, không giật
+        function step(o, dt) {
+            var m = SIZE * .45, Z = Math.min(o.v / WMAX * 3.4, Math.min(W, H) * .46);   // vùng báo tường: bắt đầu cua từ xa
+            var hx = Math.cos(o.a), hy = Math.sin(o.a), vx = 0, vy = 0, t;
+            t = (Z - (o.x - m)) / Z; if (t > 0) vx += Math.min(t, 1);        // lực đẩy khỏi 4 mép, mạnh dần khi tới gần
+            t = (Z - (W - m - o.x)) / Z; if (t > 0) vx -= Math.min(t, 1);
+            t = (Z - (o.y - m)) / Z; if (t > 0) vy += Math.min(t, 1);
+            t = (Z - (H - m - o.y)) / Z; if (t > 0) vy -= Math.min(t, 1);
+            var vm = Math.hypot(vx, vy);
             o.wt -= dt;
-            if (o.wt <= 0) { o.w = rnd(-2.2, 2.2); o.wt = rnd(.3, 1.1); }   // uốn lượn ngẫu nhiên
-            o.a += o.w * dt;
-            o.x += Math.cos(o.a) * o.v * dt; o.y += Math.sin(o.a) * o.v * dt;
-            var m = SIZE * .35;
-            if (o.x < m) { o.x = m; o.a = Math.PI - o.a; } else if (o.x > W - m) { o.x = W - m; o.a = Math.PI - o.a; }
-            if (o.y < m) { o.y = m; o.a = -o.a; } else if (o.y > H - m) { o.y = H - m; o.a = -o.a; }
-            if (R) {                       // chạm vùng đồ thị thì bật ra, không bay đè lên
-                var l = R.left - PAD, r = R.right + PAD, t = R.top - PAD, b = R.bottom + PAD;
-                if (o.x > l && o.x < r && o.y > t && o.y < b) {
-                    var dl = o.x - l, dr = r - o.x, dtp = o.y - t, db = b - o.y, mn = Math.min(dl, dr, dtp, db);
-                    if (mn === dl) { o.x = l; o.a = Math.PI - o.a; }
-                    else if (mn === dr) { o.x = r; o.a = Math.PI - o.a; }
-                    else if (mn === dtp) { o.y = t; o.a = -o.a; }
-                    else { o.y = b; o.a = -o.a; }
-                }
+            if (o.wt <= 0) { o.wn = rnd(-1.4, 1.4); o.wt = rnd(.5, 1.4); }   // uốn lượn nhẹ nhàng khi ở chỗ thoáng
+            var target = o.wn;
+            if (vm > 0) {
+                var cr = hx * vy - hy * vx, dot = hx * vx + hy * vy;
+                var avoid = WMAX * Math.max(-1, Math.min(1, 3 * cr + 3 * o.bias * Math.max(0, -dot)));   // đối đầu tường thì rẽ về một bên đã chọn
+                var ww = Math.min(1, vm * 9);
+                target = o.wn * (1 - ww) + avoid * ww;
             }
+            target = Math.max(-WMAX, Math.min(WMAX, target));
+            var dw = DW * dt; o.w += Math.max(-dw, Math.min(dw, target - o.w));   // tốc độ xoay đổi từ từ: không có góc gấp
+            o.a += o.w * dt;
+            var sp = o.v * (1 - .45 * Math.min(1, vm * 1.5));   // gần tường thì chậm lại một chút để cua gọn hơn
+            o.x += Math.cos(o.a) * sp * dt; o.y += Math.sin(o.a) * sp * dt;
+            var e = SIZE * .3;             // chỉ để phòng hờ khi đổi cỡ cửa sổ đột ngột
+            if (o.x < e) o.x = e; else if (o.x > W - e) o.x = W - e;
+            if (o.y < e) o.y = e; else if (o.y > H - e) o.y = H - e;
             var bx = o.x - Math.cos(o.a) * SIZE * .3, by = o.y - Math.sin(o.a) * SIZE * .3;   // vệt bám phía sau chuôi kiếm
             o.pts.push(bx, by); if (o.pts.length > TRAIL * 2) o.pts.splice(0, 2);
         }
@@ -217,11 +219,10 @@
             requestAnimationFrame(frame);
             if (document.hidden) { last = now; return; }
             var dt = Math.min(.05, (now - last) / 1000 || .016); last = now;
-            var R = graphRect(), i;
-            for (i = 0; i < S.length; i++) step(S[i], dt, R);
+            var i;
+            for (i = 0; i < S.length; i++) step(S[i], dt);
             ctx.clearRect(0, 0, W, H);
             ctx.save();
-            if (R) { ctx.beginPath(); ctx.rect(0, 0, W, H); ctx.rect(R.left, R.top, R.width, R.height); ctx.clip('evenodd'); }  // đảm bảo không vẽ đè lên đồ thị
             for (i = 0; i < S.length; i++) drawTrail(S[i]);
             for (i = 0; i < S.length; i++) drawSword(S[i]);
             ctx.restore();

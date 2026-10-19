@@ -95,6 +95,7 @@ loai 1-3 là vô hướng, loai 4-5 là có hướng (hàm coHuong() trong state
   - veCanh()    : vẽ 1 cạnh
         * Vòng khuyên: elip phía trên đỉnh; vòng thứ 2, 3... to dần lên.
         * Cạnh song song: cong ra hai bên để không chồng nhau.
+          Cạnh ngược chiều (1,4) và (4,1) cũng tách thành 2 đường cong riêng.
         * Có hướng: thêm mũi tên, đầu mũi tên nằm ngoài đỉnh.
         * Nhãn: (x,y) hoặc (x,y) · w ở giữa cạnh.
   - veDinh()    : vẽ hình tròn đỉnh + số hiệu, kéo được bằng chuột.

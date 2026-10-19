@@ -65,7 +65,10 @@ function veCanh(x, y, index) {
     // Độ cong: các cạnh song song được tách ra hai bên
     const same = edges.filter(e => (e.x === x && e.y === y) || (e.x === y && e.y === x));
     const offset = (same.indexOf(edges[index]) - (same.length - 1) / 2) * 50;
-    const dx = p2.x - p1.x, dy = p2.y - p1.y, len = Math.hypot(dx, dy);
+    // Pháp tuyến luôn tính theo chiều CỐ ĐỊNH (đỉnh nhỏ -> đỉnh lớn), không phụ thuộc chiều cạnh.
+    // Nhờ vậy (1,4) và (4,1) cong về HAI PHÍA KHÁC NHAU thành 2 đường riêng, thay vì chồng lên nhau.
+    const [pa, pb] = x < y ? [p1, p2] : [p2, p1];
+    const dx = pb.x - pa.x, dy = pb.y - pa.y, len = Math.hypot(dx, dy);
     const cx = (p1.x + p2.x) / 2 + (-dy / len) * offset;
     const cy = (p1.y + p2.y) / 2 + (dx / len) * offset;
 

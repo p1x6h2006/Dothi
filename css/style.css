@@ -312,18 +312,3 @@ svg {
 @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation: none !important; transition: none !important; }
 }
-
-/* =====================================================
-   KHUNG ĐỒ THỊ TRONG MỜ: nhìn xuyên được thấy các thanh phi kiếm bay phía sau
-===================================================== */
-.graph-area {
-    background: color-mix(in srgb, var(--panel) 38%, transparent);
-    -webkit-backdrop-filter: blur(3px) saturate(130%); backdrop-filter: blur(3px) saturate(130%);
-}
-svg { background:
-        linear-gradient(var(--grid-line) 1px, transparent 1px) 0 0 / 32px 32px,
-        linear-gradient(90deg, var(--grid-line) 1px, transparent 1px) 0 0 / 32px 32px,
-        var(--svg-bg-glass, var(--svg-bg)); }
-:root { --svg-bg-glass: radial-gradient(circle at 50% 40%, rgba(255,255,255,.55), rgba(224,231,255,.28)); }
-body.theme-dark { --svg-bg-glass: radial-gradient(circle at 50% 40%, rgba(34,22,70,.42), rgba(5,8,22,.50)); }
-body.theme-premium { --svg-bg-glass: radial-gradient(circle at 50% 40%, rgba(30,41,59,.42), rgba(10,15,31,.52)); }

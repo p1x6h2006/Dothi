@@ -2,6 +2,7 @@
 // MA TRẬN: ma trận kề và ma trận trọng số
 // =====================================================
 
+// [Mục] Hàm tiện ích dùng chung (ghiChu cũng được list.js dùng lại)
 const ghiChu = s => `<div class="adjacency-matrix-note">${s}</div>`;
 const dsDinh = () => Array.from({ length: n }, (_, i) => i);
 const loaiDoThi = () => (coHuong() ? "có hướng" : "vô hướng");

@@ -1,6 +1,7 @@
 // =====================================================
 // CẠNH: tạo đồ thị, thêm / xóa / sửa cạnh
 // =====================================================
+// [Mục] TẠO ĐỒ THỊ MỚI: đọc số đỉnh/cạnh -> hỏi từng cạnh bằng prompt -> kiểm tra -> dựng đồ thị
 function taoDoThi() {
     const soDinh = parseInt($("soDinh").value);
     const m = parseInt($("soCanh").value);
@@ -40,6 +41,7 @@ function taoDoThi() {
     hienThiThongTin();
 }
 
+// [Mục] Vẽ lại hình + cập nhật phần thông tin (dùng sau mỗi lần thêm/xóa/sửa)
 function capNhat() {
     veDoThi();
     hienThiThongTin();

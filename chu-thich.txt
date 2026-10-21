@@ -150,3 +150,22 @@ loai 1-3 là vô hướng, loai 4-5 là có hướng (hàm coHuong() trong state
   SVG đồ thị (js/draw.js):
     - Bỏ drop-shadow trên từng cạnh/đỉnh, thay bằng nét to mờ và vòng bóng nhẹ.
     - Kéo đỉnh: gom các lần di chuột, mỗi khung hình chỉ vẽ lại 1 lần.
+
+
+6. MỚI: DANH SÁCH KỀ (js/list.js)
+----------------------------------------------------------
+  Danh sách kề: với MỖI ĐỈNH, lưu danh sách các đỉnh kề với nó.
+  Hiển thị: [đỉnh] → [kề] → [kề] → NULL (nằm giữa phần Bậc và Ma trận kề).
+  [js/list.js]
+    - xayDanhSachKe() : dựng dữ liệu từ mảng edges (xếp tăng dần).
+    - htmlDanhSachKe(): vẽ HTML + ghi chú giải thích theo loại đồ thị.
+  Cách lưu theo loại:
+    loai 1  Đơn vô hướng : 2 chiều, không trùng.
+    loai 2  Đa vô hướng  : 2 chiều, đỉnh kề lặp lại nếu có cạnh song song.
+    loai 3  Giả vô hướng : như loai 2; vòng khuyên x-x ghi 2 lần (bậc 2).
+    loai 4  Đơn có hướng : 1 chiều (x→y chỉ lưu y trong ds của x).
+    loai 5  Đa có hướng  : 1 chiều, đỉnh kề lặp lại nếu cạnh song song.
+  Kiểm tra nhanh: tổng phần tử = 2 × số cạnh (vô hướng) hoặc = số cạnh (có hướng).
+  Có trọng số: ô kề hiện thêm w=... ; di chuột vào ô để xem đó là cạnh e mấy.
+  Thứ tự nạp script mới: config -> state -> validate -> ui -> edges -> draw -> matrix -> list -> info
+  CSS: cuối style.css, nhóm .adj-list-wrap / .adj-row / .adj-head / .adj-node / .adj-arrow / .adj-null.

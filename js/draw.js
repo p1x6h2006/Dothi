@@ -1,6 +1,7 @@
 // =====================================================
 // VẼ ĐỒ THỊ: bố trí đỉnh, vẽ cạnh và đỉnh bằng SVG, kéo đỉnh
 // =====================================================
+// [Mục] SẮP XẾP: đặt các đỉnh đều trên một vòng tròn
 function sapXep() {
     const cx = svg.clientWidth / 2, cy = svg.clientHeight / 2;
     const r = Math.min(svg.clientWidth, svg.clientHeight) * 0.35;
@@ -22,6 +23,7 @@ function el(tag, attrs = {}, parent = svg) {
     return e;
 }
 
+// [Mục] VẼ TOÀN BỘ: xóa svg -> tạo mũi tên -> vẽ cạnh (trước) -> vẽ đỉnh (sau, nằm đè lên)
 function veDoThi() {
     svg.innerHTML = "";
     const marker = el("marker", { id: "arrow", markerWidth: 10, markerHeight: 10, refX: 9, refY: 3, orient: "auto", fill: graphPalette.edge }, el("defs"));
@@ -31,6 +33,7 @@ function veDoThi() {
     for (const i in nodes) veDinh(Number(i));
 }
 
+// [Mục] Nhãn của cạnh: "(x,y)" hoặc "(x,y) · w"
 function nhanCanh(index) {
     const { x, y, w } = edges[index];
     return w !== undefined ? `(${x},${y}) · ${w}` : `(${x},${y})`;

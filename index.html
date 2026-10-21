@@ -9,6 +9,7 @@
 </head>
 
 <body>
+    <!-- ===== MÀN HÌNH 1: CHỌN LOẠI ĐỒ THỊ (5 nút do js/ui.js tạo vào #loaiGrid) ===== -->
     <div id="chonLoai">
         <div class="chon-box">
             <h2> MÔ PHỎNG ĐỒ THỊ</h2>
@@ -18,23 +19,27 @@
         </div>
     </div>
 
+    <!-- ===== MÀN HÌNH 2: MÀN HÌNH CHÍNH (hiện sau khi chọn loại) ===== -->
     <div id="manHinhChinh">
         <h1> MÔ PHỎNG ĐỒ THỊ</h1>
         <div class="selected-type">
             Đang chọn: <span id="loaiDangChon">Chưa chọn</span>
         </div>
         <div class="container">
+            <!-- ---- CỘT TRÁI: KHUNG ĐIỀU KHIỂN ---- -->
             <div class="control">
                 <h2> Điều khiển</h2>
                 <label>Loại đồ thị:</label>
                 <select id="loai" onchange="hienThiThongTin()"></select>
 
+                <!-- [Mục] Đổi giao diện: Light / Premium / Neon (chonGiaoDien trong ui.js) -->
                 <div class="theme-switch">
                     <button class="theme-btn active" id="lightThemeBtn" onclick="chonGiaoDien('light')">☀️ Light</button>
                     <button class="theme-btn" id="premiumThemeBtn" onclick="chonGiaoDien('premium')">✨ Premium</button>
                     <button class="theme-btn" id="darkThemeBtn" onclick="chonGiaoDien('dark')">🌙 Neon</button>
                 </div>
 
+                <!-- [Mục] Chọn màu đỉnh, cạnh, viền, glow (apDungMauDoThi trong ui.js) -->
                 <div class="color-row">
                     <div class="color-box"><label for="nodeColor">Màu đỉnh</label><input type="color" id="nodeColor" value="#60a5fa"></div>
                     <div class="color-box"><label for="edgeColor">Màu cạnh</label><input type="color" id="edgeColor" value="#2563eb"></div>
@@ -45,6 +50,7 @@
                 </div>
                 <button class="info" onclick="apDungMauDoThi()" style="margin-top: 12px;">🎨 Áp dụng màu đồ thị</button>
 
+                <!-- [Mục] Tạo đồ thị mới: nhập số đỉnh, số cạnh (taoDoThi trong edges.js) -->
                 <label>Số đỉnh:</label>
                 <input type="number" id="soDinh" min="1" value="5">
                 <label>Số cạnh:</label>
@@ -55,6 +61,7 @@
                 </div>
                 <hr>
 
+                <!-- [Mục] Thêm cạnh (themCanh) -->
                 <h3>➕ Thêm cạnh</h3>
                 <input type="number" id="themX" placeholder="Đỉnh x">
                 <input type="number" id="themY" placeholder="Đỉnh y">
@@ -62,11 +69,13 @@
                 <button class="success" onclick="themCanh()">Thêm cạnh</button>
                 <div class="note hint">Ví dụ: 0 1 để nối đỉnh 0 với đỉnh 1.</div>
 
+                <!-- [Mục] Xóa cạnh (xoaCanh) -->
                 <h3>🗑️ Xóa cạnh</h3>
                 <input type="number" id="xoaX" placeholder="Đỉnh x">
                 <input type="number" id="xoaY" placeholder="Đỉnh y">
                 <button class="danger" onclick="xoaCanh()">Xóa cạnh</button>
 
+                <!-- [Mục] Sửa cạnh (suaCanh) -->
                 <h3>✏️ Sửa cạnh</h3>
                 <input type="number" id="cuX" placeholder="Đỉnh x cũ">
                 <input type="number" id="cuY" placeholder="Đỉnh y cũ">
@@ -78,6 +87,8 @@
                 <button class="info" onclick="sapXep()">🔄 Sắp xếp lại</button>
             </div>
 
+            <!-- ---- CỘT PHẢI: VÙNG ĐỒ THỊ ----
+                 svg = hình vẽ đồ thị (draw.js) | #thongTin = đỉnh/cạnh, bậc, DANH SÁCH KỀ, ma trận (info.js) -->
             <div class="graph-area">
                 <svg id="svg"></svg>
                 <div id="thongTin">Chưa có đồ thị</div>
@@ -86,7 +97,7 @@
         </div>
     </div>
 
-    <!-- Nạp các module theo đúng thứ tự (config -> state -> ... -> info) -->
+    <!-- ===== NẠP SCRIPT (KHÔNG ĐỔI THỨ TỰ): config -> state -> validate -> ui -> edges -> draw -> matrix -> list -> info ===== -->
     <script src="js/config.js"></script>
     <script src="js/state.js"></script>
     <script src="js/validate.js"></script>
@@ -94,9 +105,11 @@
     <script src="js/edges.js"></script>
     <script src="js/draw.js"></script>
     <script src="js/matrix.js"></script>
+    <script src="js/list.js"></script>   <!-- MỚI: danh sách kề -->
     <script src="js/info.js"></script>
 
-    <!-- Nền: 12 thanh phi kiếm (cùng kiểu kiếm của Luu_Tru_Ca_Nhan), 6 màu, bay phía sau, xuyên qua lớp kính mờ của khung đồ thị -->
+    <!-- ===== HIỆU ỨNG NỀN: phi kiếm bay (chỉ trang trí, không liên quan đồ thị) ===== -->
+    <!-- Nền: 8 thanh phi kiếm (màn chọn loại) + 4 thanh bay ngang (màn chính); gốc: 12 (cùng kiểu kiếm của Luu_Tru_Ca_Nhan), 6 màu, bay phía sau, xuyên qua lớp kính mờ của khung đồ thị -->
     <canvas id="swordBg" aria-hidden="true" style="position:fixed;left:0;top:0;width:100%;height:100%;z-index:-1;pointer-events:none"></canvas>
     <script>
     (function () {

@@ -38,7 +38,8 @@ function htmlBac() {
     return text;
 }
 
-// Ghép tất cả vào khung thông tin bên dưới đồ thị
+// Ghép tất cả vào khung thông tin bên dưới đồ thị. Thứ tự hiển thị:
+//   1) Đỉnh/cạnh  2) Bậc  3) DANH SÁCH KỀ (list.js)  4) Ma trận kề  5) Ma trận trọng số
 function hienThiThongTin() {
-    $("thongTin").innerHTML = htmlDinhCanh() + htmlBac() + htmlMaTranKe() + htmlMaTranTrongSo();
+    $("thongTin").innerHTML = htmlDinhCanh() + htmlBac() + htmlDanhSachKe() + htmlMaTranKe() + htmlMaTranTrongSo();
 }

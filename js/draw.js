@@ -35,6 +35,9 @@ function veDoThi() {
 
     edges.forEach((e, index) => veCanh(e.x, e.y, index));
     for (const i in nodes) veDinh(Number(i));
+
+    // Thông báo bước Euler đang chạy (euler.js), đặt góc trên bên trái hình
+    if (eulerHL && eulerHL.msg) el("text", { x: 16, y: 26, class: "edge-label", style: "text-anchor:start;font-size:15px" }).textContent = eulerHL.msg;
 }
 
 // [Mục] Nhãn của cạnh: "(x,y)" hoặc "(x,y) · w"

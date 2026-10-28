@@ -93,12 +93,22 @@ function phanTichEuler() {
 }
 
 // ---- Tô màu / mô phỏng trên hình ----
-function trangThaiEuler(r, k) {
+// Ghi lời giải thích bước hiện tại: hiện ở khung thông tin VÀ ngay trên hình (vì khi mô phỏng trang đã cuộn lên chỗ đồ thị)
+function datThongBaoEuler(msg) {
+    if (eulerHL) eulerHL.msg = msg;
     const t = $("eulerStatus");
-    if (!t) return;
-    if (k === 0) t.textContent = `Bắt đầu tại đỉnh ${r.vs[0]}.`;
-    else if (k < r.es.length) t.textContent = `Bước ${k}/${r.es.length}: đi ${r.vs[k - 1]} → ${r.vs[k]} qua cạnh e${r.es[k - 1] + 1}.`;
-    else t.textContent = `Xong: đã đi hết ${r.es.length} cạnh và quay về đỉnh ${r.vs[k]}.`;
+    if (t) t.textContent = msg;
+}
+
+// Cuộn trang lên chỗ đồ thị để xem luôn, khỏi phải lướt
+function cuonDenDoThi() {
+    svg.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function trangThaiEuler(r, k) {
+    if (k === 0) datThongBaoEuler(`Bắt đầu tại đỉnh ${r.vs[0]}.`);
+    else if (k < r.es.length) datThongBaoEuler(`Bước ${k}/${r.es.length}: đi ${r.vs[k - 1]} → ${r.vs[k]} qua cạnh e${r.es[k - 1] + 1}.`);
+    else datThongBaoEuler(`Xong: đã đi hết ${r.es.length} cạnh và quay về đỉnh ${r.vs[k]}.`);
 }
 
 function chayEuler() {
@@ -106,16 +116,17 @@ function chayEuler() {
     if (!r.ok) return;
     resetEuler();
     eulerHL = { order: {}, cur: r.vs[0] };
-    veDoThi();
     trangThaiEuler(r, 0);
+    veDoThi();
+    cuonDenDoThi();
     let k = 0;
     eulerTimer = setInterval(() => {
         if (k >= r.es.length) { clearInterval(eulerTimer); eulerTimer = null; return; }
         eulerHL.order[r.es[k]] = k + 1;
         k++;
         eulerHL.cur = r.vs[k];
-        veDoThi();
         trangThaiEuler(r, k);
+        veDoThi();
     }, 800);
 }
 
@@ -125,9 +136,9 @@ function hienEuler() {
     resetEuler();
     eulerHL = { order: {}, cur: null };
     r.es.forEach((id, i) => { eulerHL.order[id] = i + 1; });
+    datThongBaoEuler(`Đã tô cả ${r.es.length} cạnh, số trên cạnh là thứ tự đi.`);
     veDoThi();
-    const t = $("eulerStatus");
-    if (t) t.textContent = `Đã tô cả ${r.es.length} cạnh, số trên cạnh là thứ tự đi.`;
+    cuonDenDoThi();
 }
 
 function boEuler() {

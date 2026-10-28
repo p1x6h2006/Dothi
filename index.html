@@ -29,6 +29,13 @@
             <!-- ---- CỘT TRÁI: KHUNG ĐIỀU KHIỂN ---- -->
             <div class="control">
                 <h2> Điều khiển</h2>
+
+                <!-- [Mục] Lưu / Reset (storage.js): đồ thị tự động lưu; Reset để về ban đầu -->
+                <div class="save-row">
+                    <button class="success" onclick="luuNgay(true)">💾 Lưu</button>
+                    <button class="danger" onclick="resetDoThi()">↺ Reset</button>
+                </div>
+                <div class="save-status" id="luuTrangThai">Đồ thị được tự động lưu</div>
                 <label>Loại đồ thị:</label>
                 <select id="loai" onchange="hienThiThongTin()"></select>
 
@@ -103,7 +110,7 @@
         </div>
     </div>
 
-    <!-- ===== NẠP SCRIPT (KHÔNG ĐỔI THỨ TỰ): config -> state -> validate -> ui -> edges -> draw -> matrix -> list -> euler -> postman -> info ===== -->
+    <!-- ===== NẠP SCRIPT (KHÔNG ĐỔI THỨ TỰ): config -> state -> validate -> ui -> edges -> draw -> matrix -> list -> euler -> postman -> info -> storage ===== -->
     <script src="js/config.js"></script>
     <script src="js/state.js"></script>
     <script src="js/validate.js"></script>
@@ -115,6 +122,7 @@
     <script src="js/euler.js"></script>  <!-- MỚI: chu trình Euler -->
     <script src="js/postman.js"></script>  <!-- MỚI: bài toán người phát thư -->
     <script src="js/info.js"></script>
+    <script src="js/storage.js"></script>  <!-- MỚI: tự động lưu / khôi phục / reset (nạp sau cùng) -->
 
     <!-- ===== HIỆU ỨNG NỀN: phi kiếm bay (chỉ trang trí, không liên quan đồ thị) ===== -->
     <!-- Nền: 8 thanh phi kiếm (màn chọn loại) + 4 thanh bay ngang (màn chính); gốc: 12 (cùng kiểu kiếm của Luu_Tru_Ca_Nhan), 6 màu, bay phía sau, xuyên qua lớp kính mờ của khung đồ thị -->

@@ -97,13 +97,25 @@ function giaiNguoiPhatThu() {
     cuonDenKetQuaNPT();   // nhảy thẳng xuống bảng kết quả
 }
 
-// Cạnh gốc rẻ nhất nối u-v (để sao chép trọng số khi thêm cạnh)
-function canhGocGiua(u, v) {
+// Cạnh rẻ nhất nối u-v trong danh sách goc (để sao chép trọng số khi thêm cạnh)
+function canhGocGiua(goc, u, v) {
     let tot = null;
-    npt.goc.forEach(e => {
+    goc.forEach(e => {
         if (((e.x === u && e.y === v) || (e.x === v && e.y === u)) && (!tot || trongSoCanh(e) < trongSoCanh(tot))) tot = e;
     });
     return tot;
+}
+
+// Các cạnh cần thêm (sao chép dọc đường đi ngắn nhất của từng cặp) theo phân hoạch p; dùng chung với euler.js
+function canhThemTheoPhanHoach(goc, p) {
+    const out = [];
+    p.pairs.forEach(pr => {
+        for (let t = 0; t + 1 < pr.path.length; t++) {
+            const u = pr.path[t], v = pr.path[t + 1], g = canhGocGiua(goc, u, v);
+            out.push(taoCanh(u, v, g.w));
+        }
+    });
+    return out;
 }
 
 // ---- Xem / áp dụng phân hoạch Pi: dựng lại đồ thị = gốc + các cạnh dọc đường đi ngắn nhất ----
@@ -111,12 +123,9 @@ function apDungPhanHoach(i) {
     if (!npt || npt.loi || !npt.ds[i]) return;
     edges = npt.goc.map(e => ({ ...e }));
     canhThemNPT = new Set();
-    npt.ds[i].pairs.forEach(pr => {
-        for (let t = 0; t + 1 < pr.path.length; t++) {
-            const u = pr.path[t], v = pr.path[t + 1], g = canhGocGiua(u, v);
-            canhThemNPT.add(edges.length);
-            edges.push(taoCanh(u, v, g.w));
-        }
+    canhThemTheoPhanHoach(npt.goc, npt.ds[i]).forEach(e => {
+        canhThemNPT.add(edges.length);
+        edges.push(e);
     });
     if (npt.loaiGoc === 1) { $("loai").value = 2; capNhatTenLoai(); }   // có cạnh song song -> đa đồ thị
     npt.daApDung = i;

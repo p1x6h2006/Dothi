@@ -45,6 +45,7 @@ function veDoThi() {
         t.textContent = nptThongBao;
         t.addEventListener("click", cuonDenKetQuaNPT);
     }
+    if (typeof luuTuDong === "function") luuTuDong();   // tự động lưu (storage.js)
 }
 
 // [Mục] Nhãn của cạnh: "(x,y)" hoặc "(x,y) · w"

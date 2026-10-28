@@ -18,10 +18,11 @@ mo-phong-do-thi/
   js/euler.js       Chu trình Euler (kiểm tra, tìm, mô phỏng)
   js/postman.js     Bài toán người phát thư
   js/info.js        Danh sách đỉnh/cạnh, bậc của đỉnh
+  js/storage.js     Tự động lưu / khôi phục / reset (localStorage)
   chu-thich.txt     File này
 
 Thứ tự nạp script trong index.html (không được đổi):
-config -> state -> validate -> ui -> edges -> draw -> matrix -> info
+config -> state -> validate -> ui -> edges -> draw -> matrix -> list -> euler -> postman -> info -> storage
 
 
 2. NĂM LOẠI ĐỒ THỊ (biến "loai" = 1..5)
@@ -219,3 +220,27 @@ loai 1-3 là vô hướng, loai 4-5 là có hướng (hàm coHuong() trong state
     Quá 6 đỉnh lẻ (hơn 15 phân hoạch) chỉ hiện phân hoạch nhỏ nhất.
   Thứ tự nạp script mới: config -> state -> validate -> ui -> edges -> draw -> matrix -> list -> euler -> postman -> info
   CSS: cuối style.css, nhóm .npt-wrap / .npt-card / .npt-best / .npt-m / .npt-total / .npt-btns.
+
+
+9. MỚI: EULER = HÀNH TRÌNH NGẮN NHẤT, BỎ TÔ MÀU, LƯU / RESET
+----------------------------------------------------------
+  a) Bấm "Bỏ tô màu" (euler.js: boEuler) -> tự cuộn lên chỗ đồ thị.
+  b) Mục Chu trình Euler (euler.js):
+     - Đồ thị VÔ HƯỚNG liên thông nhưng có đỉnh bậc lẻ: không còn chỉ báo "Không có chu trình Euler".
+       Vẫn nêu lý do, rồi TỰ TÍNH hành trình ngắn nhất đi qua mọi cạnh rồi quay về (bài toán người phát thư,
+       dùng lại tinhNguoiPhatThu() của postman.js): hiện dãy đỉnh - cạnh (cạnh phải đi lặp có dấu *),
+       độ dài = Σw(e) + m(G).
+     - Bấm "Mô phỏng" / "Tô cả chu trình": tự thêm các cạnh lặp (xanh lá) vào đồ thị (apDungPhanHoach của phân hoạch nhỏ nhất)
+       rồi đi theo hành trình (chuanBiEuler). "Trả lại đồ thị gốc" ở mục Người phát thư để về đồ thị ban đầu.
+     - Đồ thị đã có chu trình Euler: hiện thêm độ dài hành trình = Σw(e) (cạnh không có w tính 1).
+     - Đồ thị CÓ HƯỚNG không có chu trình Euler: vẫn chỉ báo lý do (chưa hỗ trợ hành trình ngắn nhất cho đồ thị có hướng).
+     - Giới hạn như người phát thư: không trọng số âm, tối đa 12 đỉnh bậc lẻ.
+  c) [js/storage.js] Lưu / Reset (khung Điều khiển, trên cùng: nút 💾 Lưu và ↺ Reset):
+     - TỰ ĐỘNG LƯU vào localStorage sau mỗi lần vẽ lại (veDoThi) / dựng lại thông tin (hienThiThongTin) và khi thoát trang.
+       Lưu: loại đồ thị, theme, 4 màu, số đỉnh/cạnh, vị trí đỉnh, phần tô màu Euler, cạnh thêm xanh lá, kết quả người phát thư.
+     - Mở lại trang: tự khôi phục (khoiPhuc) và vào thẳng màn hình chính. Mô phỏng Euler đang chạy dở được giữ nguyên
+       phần đã tô nhưng không tự chạy tiếp.
+     - Nút 💾 Lưu: lưu ngay và báo giờ lưu. Nút ↺ Reset (resetDoThi): xác nhận rồi xóa đồ thị, màu, tô Euler, kết quả
+       người phát thư và dữ liệu đã lưu, về theme Light mặc định.
+     - Dữ liệu nằm trong trình duyệt đang dùng (theo địa chỉ trang), khóa "moPhongDoThi.v1".
+  Thứ tự nạp script mới: config -> state -> validate -> ui -> edges -> draw -> matrix -> list -> euler -> postman -> info -> storage

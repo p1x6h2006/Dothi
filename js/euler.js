@@ -52,6 +52,7 @@ function phanTichEuler() {
     }
 
     // Không có chu trình: xét xem có ĐƯỜNG ĐI Euler không (để báo thêm 1 dòng)
+    let canhEuler = edges;   // danh sách cạnh đem đi tìm chu trình (có thể thêm cạnh sao chép ở chế độ người phát thư)
     if (r.lyDo.length) {
         if (lienThong) {
             if (!huong && le.length === 2) r.coDuongDi = `từ đỉnh ${le[0]} đến đỉnh ${le[1]}`;
@@ -60,19 +61,29 @@ function phanTichEuler() {
                 if (le.length === 2 && dau.length === 1 && cuoi.length === 1) r.coDuongDi = `từ đỉnh ${dau[0]} đến đỉnh ${cuoi[0]}`;
             }
         }
-        return r;
+        // Vô hướng + liên thông: không có chu trình Euler thì tìm HÀNH TRÌNH NGẮN NHẤT đi qua mọi cạnh (bài toán người phát thư, postman.js)
+        if (!huong && lienThong) {
+            const k = tinhNguoiPhatThu();
+            if (k.loi) r.postmanLoi = k.loi;
+            else if (k.ds.length) {
+                r.postman = { kq: k, extra: canhThemTheoPhanHoach(k.goc, k.ds[k.best]) };
+                canhEuler = edges.concat(r.postman.extra);
+            }
+        }
+        if (!r.postman) return r;
     }
 
     // ---- Bước 2: Hierholzer ----
+    const E = canhEuler, mE = E.length;
     const adj = dsDinh().map(() => []);
-    edges.forEach((e, id) => {
+    E.forEach((e, id) => {
         adj[e.x].push({ to: e.y, id });
         if (!huong) adj[e.y].push({ to: e.x, id });   // vô hướng: lưu cả 2 chiều (vòng khuyên: 2 lần, cùng id)
     });
     adj.forEach(l => l.sort((a, b) => a.to - b.to || a.id - b.id));
 
     const s = coCanh.includes(eulerStart) ? eulerStart : coCanh[0];
-    const used = Array(m).fill(false), ptr = Array(n).fill(0);
+    const used = Array(mE).fill(false), ptr = Array(n).fill(0);
     const stV = [s], stE = [-1], resV = [], resE = [];
     while (stV.length) {
         const v = stV[stV.length - 1], l = adj[v];
@@ -86,9 +97,10 @@ function phanTichEuler() {
         }
     }
     r.vs = resV.reverse();              // dãy đỉnh: s, ..., s (m + 1 phần tử)
-    r.es = resE.reverse().slice(1);     // dãy cạnh (chỉ số trong edges): m phần tử
+    r.es = resE.reverse().slice(1);     // dãy cạnh (chỉ số trong canhEuler; cạnh thêm đánh số tiếp sau cạnh gốc)
     r.start = s;
-    r.ok = r.es.length === m;           // phòng hờ
+    r.ok = r.es.length === mE;          // phòng hờ
+    r.tong = E.reduce((t, e) => t + trongSoCanh(e), 0);   // độ dài hành trình = tổng trọng số các cạnh đã đi (cạnh không có w tính 1)
     return r;
 }
 
@@ -111,8 +123,19 @@ function trangThaiEuler(r, k) {
     else datThongBaoEuler(`Xong: đã đi hết ${r.es.length} cạnh và quay về đỉnh ${r.vs[k]}.`);
 }
 
+// Chế độ người phát thư: muốn tô / mô phỏng thì phải thêm các cạnh sao chép (màu xanh lá) vào đồ thị trước, rồi phân tích lại
+function chuanBiEuler() {
+    let r = phanTichEuler();
+    if (r.ok && r.postman) {
+        npt = r.postman.kq;
+        apDungPhanHoach(npt.best);   // thêm cạnh + vẽ lại + dựng lại bảng thông tin
+        r = phanTichEuler();
+    }
+    return r;
+}
+
 function chayEuler() {
-    const r = phanTichEuler();
+    const r = chuanBiEuler();
     if (!r.ok) return;
     resetEuler();
     eulerHL = { order: {}, cur: r.vs[0] };
@@ -131,7 +154,7 @@ function chayEuler() {
 }
 
 function hienEuler() {
-    const r = phanTichEuler();
+    const r = chuanBiEuler();
     if (!r.ok) return;
     resetEuler();
     eulerHL = { order: {}, cur: null };
@@ -146,6 +169,7 @@ function boEuler() {
     veDoThi();
     const t = $("eulerStatus");
     if (t) t.textContent = "";
+    cuonDenDoThi();   // nhảy lên chỗ đồ thị để xem luôn
 }
 
 function doiDinhEuler(v) {
@@ -154,31 +178,67 @@ function doiDinhEuler(v) {
 }
 
 // ---- Bước 3: vẽ phần Euler vào khung thông tin ----
+// Dãy đỉnh – cạnh của hành trình; cạnh thêm (sao chép) ghi dấu * (chỉ có ở chế độ người phát thư)
+function htmlDayEuler(r, soCanhGoc) {
+    const huong = coHuong(), gach = huong ? "→" : "–";
+    return '<div class="euler-seq">' + r.vs.map((v, i) =>
+        `<span class="euler-v">${v}</span>` + (i < r.es.length
+            ? `<span class="euler-e" title="cạnh e${r.es[i] + 1}${r.es[i] >= soCanhGoc ? " (cạnh thêm)" : ""}">${gach} e${r.es[i] + 1}${r.es[i] >= soCanhGoc ? "*" : ""} ${gach}</span>` : "")
+    ).join("") + "</div>" +
+    `<div class="euler-line">${r.vs.join(" → ")}</div>`;
+}
+
+function htmlNutEuler() {
+    return '<div class="euler-btns"><button onclick="chayEuler()">▶ Mô phỏng</button><button class="success" onclick="hienEuler()">Tô cả chu trình</button><button class="danger" onclick="boEuler()">Bỏ tô màu</button></div>' +
+        '<div class="euler-status" id="eulerStatus"></div>';
+}
+
 function htmlEuler() {
     const r = phanTichEuler(), huong = coHuong();
     let text = `<h3 class="adjacency-matrix-heading">Chu trình Euler (đồ thị ${loaiDoThi()})</h3><div class="euler-wrap">`;
+    const chonDinh = () => `<div class="euler-start">Đỉnh bắt đầu: <select onchange="doiDinhEuler(this.value)">${
+        r.coCanh.map(i => `<option value="${i}"${i === r.start ? " selected" : ""}>${i}</option>`).join("")}</select></div>`;
 
+    // --- Không có chu trình Euler ---
     if (!r.ok) {
         text += '<div class="euler-no">✖ Không có chu trình Euler</div>';
         text += r.lyDo.map(s => `<div class="euler-reason">${s}</div>`).join("");
         if (r.coDuongDi) text += `<div class="euler-path">Nhưng có <b>đường đi Euler</b> ${r.coDuongDi}.</div>`;
+        if (r.postmanLoi) text += `<div class="euler-reason">Không tính được hành trình ngắn nhất: ${r.postmanLoi}</div>`;
         text += "</div>";
         text += ghiChu(huong
-            ? "Điều kiện: liên thông yếu và mọi đỉnh có deg⁺ = deg⁻."
+            ? "Điều kiện: liên thông yếu và mọi đỉnh có deg⁺ = deg⁻. (Hành trình ngắn nhất qua mọi cạnh cho đồ thị có hướng chưa được hỗ trợ.)"
             : "Điều kiện: liên thông và mọi đỉnh có bậc chẵn (vòng khuyên tính bậc 2).");
         return text;
     }
 
-    const chon = r.coCanh.map(i => `<option value="${i}"${i === r.start ? " selected" : ""}>${i}</option>`).join("");
+    // --- Không có chu trình Euler thật, nhưng có HÀNH TRÌNH NGẮN NHẤT đi qua mọi cạnh (người phát thư) ---
+    if (r.postman) {
+        const k = r.postman.kq, soGoc = edges.length;
+        text += '<div class="euler-no">✖ Không có chu trình Euler</div>';
+        text += r.lyDo.map(s => `<div class="euler-reason">${s}</div>`).join("");
+        text += '<div class="euler-yes" style="margin-top:12px">✔ Hành trình ngắn nhất đi qua mọi cạnh rồi quay về (người phát thư)</div>';
+        text += `<div class="euler-reason">Phải đi lặp lại một số cạnh (cạnh có dấu *, tô xanh lá khi thêm vào đồ thị) để mọi đỉnh có bậc chẵn: nối ${k.ds[k.best].pairs.map(q => `[${q.path.join("→")}]`).join(" và ")}.</div>`;
+        text += chonDinh();
+        text += htmlDayEuler(r, soGoc);
+        text += `<div class="npt-total">Độ dài ngắn nhất = Σw(e) + m(G) = ${fmt(k.tong)} + ${fmt(k.m)} = ${fmt(r.tong)}</div>`;
+        text += htmlNutEuler() + "</div>";
+        text += ghiChu("Bấm “Mô phỏng” hoặc “Tô cả chu trình” sẽ tự thêm các cạnh lặp vào đồ thị (xem chi tiết các phân hoạch ở mục Bài toán người phát thư bên dưới), rồi đi theo hành trình này.");
+        if (k.goc.some(e => e.w === undefined)) text += ghiChu("Cạnh nhập không có trọng số được tính w = 1.");
+        return text;
+    }
+
+    // --- Có chu trình Euler ---
     text += '<div class="euler-yes">✔ Có chu trình Euler</div>';
-    text += `<div class="euler-start">Đỉnh bắt đầu: <select onchange="doiDinhEuler(this.value)">${chon}</select></div>`;
-    text += '<div class="euler-seq">' + r.vs.map((v, i) =>
-        `<span class="euler-v">${v}</span>` + (i < r.es.length ? `<span class="euler-e" title="cạnh e${r.es[i] + 1}">${huong ? "→" : "–"} e${r.es[i] + 1} ${huong ? "→" : "–"}</span>` : "")
-    ).join("") + "</div>";
-    text += `<div class="euler-line">${r.vs.join(" → ")}</div>`;
-    text += '<div class="euler-btns"><button onclick="chayEuler()">▶ Mô phỏng</button><button class="success" onclick="hienEuler()">Tô cả chu trình</button><button class="danger" onclick="boEuler()">Bỏ tô màu</button></div>';
-    text += '<div class="euler-status" id="eulerStatus"></div></div>';
+    text += chonDinh();
+    text += htmlDayEuler(r, edges.length);
+    const daThem = npt && npt.daApDung !== null && canhThemNPT.size > 0;
+    text += daThem
+        ? `<div class="npt-total">Độ dài ngắn nhất (đã thêm ${canhThemNPT.size} cạnh lặp) = ${fmt(r.tong)}</div>`
+        : `<div class="npt-total">Độ dài hành trình = Σw(e) = ${fmt(r.tong)}</div>`;
+    text += htmlNutEuler() + "</div>";
     text += ghiChu(`Chu trình đi qua đủ ${edges.length} cạnh, mỗi cạnh đúng 1 lần, rồi quay về đỉnh xuất phát. Thuật toán Hierholzer.`);
+    if (!huong && !daThem) text += ghiChu("Mọi đỉnh đều bậc chẵn nên đây cũng là hành trình ngắn nhất qua mọi cạnh (m(G) = 0).");
     if (r.coCanh.length < n) text += ghiChu("Các đỉnh cô lập (không có cạnh) được bỏ qua khi xét liên thông.");
     return text;
 }

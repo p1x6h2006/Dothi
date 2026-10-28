@@ -43,4 +43,5 @@ function htmlBac() {
 function hienThiThongTin() {
     if (eulerHL) { resetEuler(); veDoThi(); }   // dựng lại thông tin thì bỏ tô màu Euler cũ
     $("thongTin").innerHTML = htmlDinhCanh() + htmlBac() + htmlDanhSachKe() + htmlMaTranKe() + htmlMaTranTrongSo() + htmlEuler() + htmlNguoiPhatThu();
+    if (typeof luuTuDong === "function") luuTuDong();   // tự động lưu (storage.js)
 }

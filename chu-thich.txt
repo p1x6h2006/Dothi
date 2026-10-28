@@ -17,12 +17,13 @@ mo-phong-do-thi/
   js/list.js        Danh sách kề
   js/euler.js       Chu trình Euler (kiểm tra, tìm, mô phỏng)
   js/postman.js     Bài toán người phát thư
+  js/giai.js        Cách giải chi tiết (khung bấm mới xổ ra) cho từng mục
   js/info.js        Danh sách đỉnh/cạnh, bậc của đỉnh
   js/storage.js     Tự động lưu / khôi phục / reset (localStorage)
   chu-thich.txt     File này
 
 Thứ tự nạp script trong index.html (không được đổi):
-config -> state -> validate -> ui -> edges -> draw -> matrix -> list -> euler -> postman -> info -> storage
+config -> state -> validate -> ui -> edges -> draw -> matrix -> list -> euler -> postman -> giai -> info -> storage
 
 
 2. NĂM LOẠI ĐỒ THỊ (biến "loai" = 1..5)
@@ -243,4 +244,4 @@ loai 1-3 là vô hướng, loai 4-5 là có hướng (hàm coHuong() trong state
      - Nút 💾 Lưu: lưu ngay và báo giờ lưu. Nút ↺ Reset (resetDoThi): xác nhận rồi xóa đồ thị, màu, tô Euler, kết quả
        người phát thư và dữ liệu đã lưu, về theme Light mặc định.
      - Dữ liệu nằm trong trình duyệt đang dùng (theo địa chỉ trang), khóa "moPhongDoThi.v1".
-  Thứ tự nạp script mới: config -> state -> validate -> ui -> edges -> draw -> matrix -> list -> euler -> postman -> info -> storage
+  Thứ tự nạp script mới: config -> state -> validate -> ui -> edges -> draw -> matrix -> list -> euler -> postman -> giai -> info -> storage

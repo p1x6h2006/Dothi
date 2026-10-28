@@ -42,6 +42,16 @@ function htmlBac() {
 //   1) Đỉnh/cạnh  2) Bậc  3) DANH SÁCH KỀ (list.js)  4) Ma trận kề  5) Ma trận trọng số  6) CHU TRÌNH EULER (euler.js)  7) NGƯỜI PHÁT THƯ (postman.js)
 function hienThiThongTin() {
     if (eulerHL) { resetEuler(); veDoThi(); }   // dựng lại thông tin thì bỏ tô màu Euler cũ
-    $("thongTin").innerHTML = htmlDinhCanh() + htmlBac() + htmlDanhSachKe() + htmlMaTranKe() + htmlMaTranTrongSo() + htmlEuler() + htmlNguoiPhatThu();
+    // Nhớ các khung "Cách giải chi tiết" đang mở (giai.js) để mở lại sau khi dựng lại
+    const dangMo = new Set([...document.querySelectorAll("#thongTin details.giai[open]")].map(d => d.dataset.key));
+    $("thongTin").innerHTML =
+        htmlDinhCanh() + giaiDinhCanh() +
+        htmlBac() + giaiBac() +
+        htmlDanhSachKe() + giaiDanhSachKe() +
+        htmlMaTranKe() + giaiMaTranKe() +
+        htmlMaTranTrongSo() + giaiMaTranTrongSo() +
+        htmlEuler() + giaiEuler() +
+        htmlNguoiPhatThu() + giaiChiTietNPT();
+    document.querySelectorAll("#thongTin details.giai").forEach(d => { if (dangMo.has(d.dataset.key)) d.open = true; });
     if (typeof luuTuDong === "function") luuTuDong();   // tự động lưu (storage.js)
 }

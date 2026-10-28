@@ -186,6 +186,8 @@ loai 1-3 là vô hướng, loai 4-5 là có hướng (hàm coHuong() trong state
                         và báo thêm nếu có ĐƯỜNG ĐI Euler (2 đỉnh bậc lẻ / lệch bậc ra-vào).
     - htmlEuler()     : vẽ phần kết quả (nằm cuối khung thông tin, sau ma trận trọng số).
     - chayEuler()     : mô phỏng từng bước (0,8 giây/cạnh): cạnh đã đi tô cam, ghi số thứ tự.
+                        Bấm là TỰ CUỘN lên chỗ đồ thị (cuonDenDoThi); lời giải thích từng bước
+                        hiện ngay trên hình (góc trên trái) và ở khung thông tin.
     - hienEuler()     : tô cả chu trình một lần. boEuler(): bỏ tô màu.
     - doiDinhEuler()  : chọn đỉnh bắt đầu (mặc định: đỉnh nhỏ nhất có cạnh).
     - resetEuler()    : dừng mô phỏng, bỏ tô màu (tự gọi khi thêm/xóa/sửa cạnh, tạo đồ thị mới).

@@ -38,6 +38,13 @@ function veDoThi() {
 
     // Thông báo bước Euler đang chạy (euler.js), đặt góc trên bên trái hình
     if (eulerHL && eulerHL.msg) el("text", { x: 16, y: 26, class: "edge-label", style: "text-anchor:start;font-size:15px" }).textContent = eulerHL.msg;
+
+    // Dòng thông báo của bài toán người phát thư (postman.js), góc dưới trái; bấm vào để xuống bảng kết quả
+    if (nptThongBao) {
+        const t = el("text", { x: 16, y: svg.clientHeight - 14, class: "edge-label", style: "text-anchor:start;font-size:14px;cursor:pointer;pointer-events:all" });
+        t.textContent = nptThongBao;
+        t.addEventListener("click", cuonDenKetQuaNPT);
+    }
 }
 
 // [Mục] Nhãn của cạnh: "(x,y)" hoặc "(x,y) · w"
@@ -58,7 +65,8 @@ function taoNhan(x, y, text, hl) {
 function veCanh(x, y, index) {
     const p1 = nodes[x], p2 = nodes[y], P = graphPalette;
     const buoc = eulerHL ? eulerHL.order[index] : undefined;      // thứ tự đi của cạnh trong chu trình Euler (nếu đang tô)
-    const mauCanh = buoc ? MAU_EULER : P.edge, mauGlow = buoc ? MAU_EULER : P.glow, dayNet = buoc ? 6 : 4;
+    const them = canhThemNPT.has(index);                           // cạnh do bài toán người phát thư thêm vào (xanh lá)
+    const mauCanh = buoc ? MAU_EULER : them ? MAU_THEM : P.edge, mauGlow = buoc ? MAU_EULER : them ? MAU_THEM : P.glow, dayNet = buoc ? 6 : them ? 5 : 4;
     const nhan = (buoc ? `#${buoc} ` : "") + nhanCanh(index);
     const mui = buoc ? "url(#arrowHL)" : "url(#arrow)";
 

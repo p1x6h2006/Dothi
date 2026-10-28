@@ -16,6 +16,7 @@ mo-phong-do-thi/
   js/matrix.js      Ma trận kề, ma trận trọng số
   js/list.js        Danh sách kề
   js/euler.js       Chu trình Euler (kiểm tra, tìm, mô phỏng)
+  js/postman.js     Bài toán người phát thư
   js/info.js        Danh sách đỉnh/cạnh, bậc của đỉnh
   chu-thich.txt     File này
 
@@ -194,3 +195,27 @@ loai 1-3 là vô hướng, loai 4-5 là có hướng (hàm coHuong() trong state
   Tô màu trên hình: biến eulerHL (state.js), được draw.js đọc trong veCanh() và veDinh().
   Thứ tự nạp script mới: config -> state -> validate -> ui -> edges -> draw -> matrix -> list -> euler -> info
   CSS: cuối style.css, nhóm .euler-wrap / .euler-yes / .euler-no / .euler-seq / .euler-v / .euler-e / .euler-btns.
+
+
+8. MỚI: BÀI TOÁN NGƯỜI PHÁT THƯ (js/postman.js)
+----------------------------------------------------------
+  Tìm hành trình NGẮN NHẤT đi qua mọi cạnh ít nhất 1 lần rồi quay về đỉnh đầu (đồ thị vô hướng, loai 1-3).
+  Các bước hiển thị đúng như bài mẫu trên lớp:
+    1. Σw(e)            : tổng trọng số (cạnh không có w tính w = 1).
+    2. V_o(G)           : các đỉnh bậc lẻ. Rỗng -> đã có chu trình Euler, m(G) = 0.
+    3. P = {P1, P2...}  : các phân hoạch cặp của V_o(G); d(Pi) = tổng khoảng cách ngắn nhất của các cặp
+                          (Floyd–Warshall, có dựng lại đường đi: "Nối qua: [a→b→c]").
+    4. m(G) = min d(Pi) ; Tổng chiều dài = Σw(e) + m(G).
+  [js/postman.js]
+    - giaiNguoiPhatThu()  : nút "Phân tích & giải bài toán" (khung Điều khiển), tự nhảy xuống bảng kết quả.
+    - tinhNguoiPhatThu()  : tính và lưu vào npt (state.js). cacPhanHoachCap(): ghép cặp.
+    - apDungPhanHoach(i)  : nút "Xem Pi" / "Tự động thêm cạnh & vẽ lại đồ thị": đồ thị = gốc + các cạnh
+                            sao chép dọc đường đi ngắn nhất của từng cặp (vẽ màu XANH LÁ), rồi nhảy lên đồ thị.
+                            Cạnh thêm là cạnh song song nên loai 1 tự đổi sang loai 2.
+                            Sau đó mọi đỉnh bậc chẵn -> mục Chu trình Euler báo "Có" và mô phỏng được.
+    - traLaiDoThiGoc()    : khôi phục cạnh và loại đồ thị ban đầu.
+    - resetNguoiPhatThu() : xóa kết quả (tự gọi khi thêm/xóa/sửa cạnh hoặc tạo đồ thị mới).
+  Giới hạn: không trọng số âm, đồ thị phải liên thông, tối đa 12 đỉnh bậc lẻ.
+    Quá 6 đỉnh lẻ (hơn 15 phân hoạch) chỉ hiện phân hoạch nhỏ nhất.
+  Thứ tự nạp script mới: config -> state -> validate -> ui -> edges -> draw -> matrix -> list -> euler -> postman -> info
+  CSS: cuối style.css, nhóm .npt-wrap / .npt-card / .npt-best / .npt-m / .npt-total / .npt-btns.

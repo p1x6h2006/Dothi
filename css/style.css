@@ -350,3 +350,23 @@ svg { background:
 .euler-btns button { margin-top: 0; padding: 9px 6px; font-size: 13px; }
 .euler-status { min-height: 1.3em; font-weight: 700; color: #f59e0b; }
 .edge-label.euler-label { fill: #f59e0b; }
+
+/* =====================================================
+   BÀI TOÁN NGƯỜI PHÁT THƯ (js/postman.js)
+   .npt-wrap : khung | .npt-step : dòng bước 1-4 | .npt-card : 1 phân hoạch Pi (.npt-best nhỏ nhất, .npt-on đang xem)
+   .npt-m / .npt-total : kết luận | .npt-btns : 2 nút cuối
+===================================================== */
+.npt-wrap { padding: 12px; background: var(--field); border: 1px solid var(--line); border-radius: 14px; }
+.npt-step { margin: 8px 0; }
+.npt-card { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 8px 0; padding: 10px 12px; background: var(--chip); border: 1px solid var(--line); border-radius: 12px; }
+.npt-card.npt-best { border-color: #16a34a; }
+.npt-card.npt-on { background: color-mix(in srgb, #16a34a 22%, transparent); }
+.npt-card-main { min-width: 0; word-break: break-word; }
+.npt-card button { width: auto; flex: none; margin-top: 0; padding: 8px 14px; font-size: 13px; }
+.npt-path { margin-top: 4px; font-size: 13px; color: var(--muted); }
+.npt-badge { display: inline-block; margin-left: 6px; padding: 1px 8px; border-radius: 999px; font-size: 11px; font-weight: 800; color: #fff; background: #16a34a; }
+.npt-m { margin: 12px 0 6px; padding: 8px 12px; border-radius: 10px; font-weight: 800; color: #fff; background: linear-gradient(120deg, #ef4444, #f97316); }
+.npt-total { margin: 8px 0; font-size: 16px; font-weight: 800; color: #16a34a; }
+.npt-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+.npt-btns button { margin-top: 0; padding: 9px 6px; font-size: 13px; }
+button:disabled { opacity: .45; pointer-events: none; }

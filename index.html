@@ -85,6 +85,12 @@
                 <button onclick="suaCanh()">Sửa cạnh</button>
 
                 <button class="info" onclick="sapXep()">🔄 Sắp xếp lại</button>
+                <hr>
+
+                <!-- [Mục] Bài toán người phát thư (giaiNguoiPhatThu trong postman.js) -->
+                <h3>📮 Bài toán người phát thư</h3>
+                <div class="note hint">Tìm hành trình ngắn nhất đi qua mọi cạnh rồi quay về (đồ thị vô hướng). Cạnh không có trọng số tính w = 1.</div>
+                <button class="success" onclick="giaiNguoiPhatThu()">📮 Phân tích &amp; giải bài toán</button>
             </div>
 
             <!-- ---- CỘT PHẢI: VÙNG ĐỒ THỊ ----
@@ -97,7 +103,7 @@
         </div>
     </div>
 
-    <!-- ===== NẠP SCRIPT (KHÔNG ĐỔI THỨ TỰ): config -> state -> validate -> ui -> edges -> draw -> matrix -> list -> euler -> info ===== -->
+    <!-- ===== NẠP SCRIPT (KHÔNG ĐỔI THỨ TỰ): config -> state -> validate -> ui -> edges -> draw -> matrix -> list -> euler -> postman -> info ===== -->
     <script src="js/config.js"></script>
     <script src="js/state.js"></script>
     <script src="js/validate.js"></script>
@@ -107,6 +113,7 @@
     <script src="js/matrix.js"></script>
     <script src="js/list.js"></script>   <!-- MỚI: danh sách kề -->
     <script src="js/euler.js"></script>  <!-- MỚI: chu trình Euler -->
+    <script src="js/postman.js"></script>  <!-- MỚI: bài toán người phát thư -->
     <script src="js/info.js"></script>
 
     <!-- ===== HIỆU ỨNG NỀN: phi kiếm bay (chỉ trang trí, không liên quan đồ thị) ===== -->

@@ -14,6 +14,8 @@ mo-phong-do-thi/
   js/edges.js       Tạo đồ thị, thêm / xóa / sửa cạnh
   js/draw.js        Vẽ đồ thị bằng SVG, kéo đỉnh
   js/matrix.js      Ma trận kề, ma trận trọng số
+  js/list.js        Danh sách kề
+  js/euler.js       Chu trình Euler (kiểm tra, tìm, mô phỏng)
   js/info.js        Danh sách đỉnh/cạnh, bậc của đỉnh
   chu-thich.txt     File này
 
@@ -169,3 +171,24 @@ loai 1-3 là vô hướng, loai 4-5 là có hướng (hàm coHuong() trong state
   Có trọng số: ô kề hiện thêm w=... ; di chuột vào ô để xem đó là cạnh e mấy.
   Thứ tự nạp script mới: config -> state -> validate -> ui -> edges -> draw -> matrix -> list -> info
   CSS: cuối style.css, nhóm .adj-list-wrap / .adj-row / .adj-head / .adj-node / .adj-arrow / .adj-null.
+
+
+7. MỚI: CHU TRÌNH EULER (js/euler.js)
+----------------------------------------------------------
+  Chu trình Euler: đi qua MỖI CẠNH đúng 1 lần rồi quay về đỉnh xuất phát.
+  Điều kiện (xét trên các đỉnh có cạnh, đỉnh cô lập bị bỏ qua):
+    loai 1-3 (vô hướng) : liên thông + mọi đỉnh có bậc chẵn (vòng khuyên tính bậc 2).
+    loai 4-5 (có hướng) : liên thông yếu + mọi đỉnh có deg⁺ = deg⁻.
+  [js/euler.js]
+    - phanTichEuler() : kiểm tra điều kiện; nếu thỏa thì tìm chu trình bằng thuật toán
+                        Hierholzer (đánh dấu cạnh đã dùng theo số thứ tự cạnh nên đúng với
+                        cạnh song song và vòng khuyên). Nếu không thỏa: trả về lý do,
+                        và báo thêm nếu có ĐƯỜNG ĐI Euler (2 đỉnh bậc lẻ / lệch bậc ra-vào).
+    - htmlEuler()     : vẽ phần kết quả (nằm cuối khung thông tin, sau ma trận trọng số).
+    - chayEuler()     : mô phỏng từng bước (0,8 giây/cạnh): cạnh đã đi tô cam, ghi số thứ tự.
+    - hienEuler()     : tô cả chu trình một lần. boEuler(): bỏ tô màu.
+    - doiDinhEuler()  : chọn đỉnh bắt đầu (mặc định: đỉnh nhỏ nhất có cạnh).
+    - resetEuler()    : dừng mô phỏng, bỏ tô màu (tự gọi khi thêm/xóa/sửa cạnh, tạo đồ thị mới).
+  Tô màu trên hình: biến eulerHL (state.js), được draw.js đọc trong veCanh() và veDinh().
+  Thứ tự nạp script mới: config -> state -> validate -> ui -> edges -> draw -> matrix -> list -> euler -> info
+  CSS: cuối style.css, nhóm .euler-wrap / .euler-yes / .euler-no / .euler-seq / .euler-v / .euler-e / .euler-btns.

@@ -33,6 +33,7 @@ function taoDoThi() {
         }
     }
 
+    resetEuler();
     n = soDinh;
     edges = list;
     nodes = {};
@@ -43,6 +44,7 @@ function taoDoThi() {
 
 // [Mục] Vẽ lại hình + cập nhật phần thông tin (dùng sau mỗi lần thêm/xóa/sửa)
 function capNhat() {
+    resetEuler();   // sửa đồ thị thì bỏ tô màu Euler cũ
     veDoThi();
     hienThiThongTin();
 }

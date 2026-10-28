@@ -26,8 +26,12 @@ function el(tag, attrs = {}, parent = svg) {
 // [Mục] VẼ TOÀN BỘ: xóa svg -> tạo mũi tên -> vẽ cạnh (trước) -> vẽ đỉnh (sau, nằm đè lên)
 function veDoThi() {
     svg.innerHTML = "";
-    const marker = el("marker", { id: "arrow", markerWidth: 10, markerHeight: 10, refX: 9, refY: 3, orient: "auto", fill: graphPalette.edge }, el("defs"));
+    const defs = el("defs");
+    const marker = el("marker", { id: "arrow", markerWidth: 10, markerHeight: 10, refX: 9, refY: 3, orient: "auto", fill: graphPalette.edge }, defs);
     el("path", { d: "M0,0 L0,6 L9,3 z", fill: graphPalette.edge }, marker);
+    // Mũi tên màu cam cho cạnh thuộc chu trình Euler đang tô (euler.js)
+    const markerHL = el("marker", { id: "arrowHL", markerWidth: 10, markerHeight: 10, refX: 9, refY: 3, orient: "auto", fill: MAU_EULER }, defs);
+    el("path", { d: "M0,0 L0,6 L9,3 z", fill: MAU_EULER }, markerHL);
 
     edges.forEach((e, index) => veCanh(e.x, e.y, index));
     for (const i in nodes) veDinh(Number(i));
@@ -39,8 +43,8 @@ function nhanCanh(index) {
     return w !== undefined ? `(${x},${y}) · ${w}` : `(${x},${y})`;
 }
 
-function taoNhan(x, y, text) {
-    el("text", { x, y, class: "edge-label" }).textContent = text;
+function taoNhan(x, y, text, hl) {
+    el("text", { x, y, class: hl ? "edge-label euler-label" : "edge-label" }).textContent = text;
 }
 
 // Vẽ một cạnh. Cách vẽ theo loại đồ thị:
@@ -50,16 +54,20 @@ function taoNhan(x, y, text) {
 //   - Có hướng (coHuong())     : thêm mũi tên ở đầu y               (loai 4, 5)
 function veCanh(x, y, index) {
     const p1 = nodes[x], p2 = nodes[y], P = graphPalette;
+    const buoc = eulerHL ? eulerHL.order[index] : undefined;      // thứ tự đi của cạnh trong chu trình Euler (nếu đang tô)
+    const mauCanh = buoc ? MAU_EULER : P.edge, mauGlow = buoc ? MAU_EULER : P.glow, dayNet = buoc ? 6 : 4;
+    const nhan = (buoc ? `#${buoc} ` : "") + nhanCanh(index);
+    const mui = buoc ? "url(#arrowHL)" : "url(#arrow)";
 
     // --- Vòng khuyên (chỉ loai 3 mới có) ---
     if (x === y) {
         // Nhiều vòng khuyên trên cùng một đỉnh: vòng thứ k vẽ to dần lên phía trên để không chồng nhau
         const k = edges.slice(0, index).filter(e => e.x === x && e.y === y).length;
         const cy = p1.y - 35 - k * 25, ex = k * 15, ey = k * 25;
-        el("ellipse", { cx: p1.x, cy, rx: 39 + ex, ry: 54 + ey, fill: "none", stroke: P.glow, "stroke-width": 15, opacity: 0.25 });   // quầng sáng: nét to mờ, không dùng filter
-        const loop = el("ellipse", { cx: p1.x, cy, rx: 35 + ex, ry: 50 + ey, class: "edge", stroke: P.edge, "stroke-width": 4, fill: "none" });
-        if (coHuong()) loop.setAttribute("marker-end", "url(#arrow)");
-        taoNhan(p1.x, p1.y - 90 - k * 50, nhanCanh(index));
+        el("ellipse", { cx: p1.x, cy, rx: 39 + ex, ry: 54 + ey, fill: "none", stroke: mauGlow, "stroke-width": 15, opacity: 0.25 });   // quầng sáng: nét to mờ, không dùng filter
+        const loop = el("ellipse", { cx: p1.x, cy, rx: 35 + ex, ry: 50 + ey, class: "edge", stroke: mauCanh, "stroke-width": dayNet, fill: "none" });
+        if (coHuong()) loop.setAttribute("marker-end", mui);
+        taoNhan(p1.x, p1.y - 90 - k * 50, nhan, buoc);
         return;
     }
 
@@ -78,8 +86,8 @@ function veCanh(x, y, index) {
     const bez = (t, a, b, c) => diem(a, b, t) + t * t * c;                       // điểm trên đường cong bậc hai
     const d = `M ${p1.x} ${p1.y} Q ${cx} ${cy} ${p2.x} ${p2.y}`;
 
-    el("path", { d, fill: "none", stroke: P.glow, "stroke-width": 14, opacity: 0.25, "stroke-linecap": "round" });   // quầng sáng: nét to mờ, không dùng filter
-    const path = el("path", { d, class: "edge", stroke: P.edge, "stroke-width": 4, fill: "none" });
+    el("path", { d, fill: "none", stroke: mauGlow, "stroke-width": 14, opacity: 0.25, "stroke-linecap": "round" });   // quầng sáng: nét to mờ, không dùng filter
+    const path = el("path", { d, class: "edge", stroke: mauCanh, "stroke-width": dayNet, fill: "none" });
 
     // --- Mũi tên cho đồ thị có hướng (loai 4, 5) ---
     if (coHuong()) {
@@ -94,18 +102,18 @@ function veCanh(x, y, index) {
             const t = (lo + hi) / 2;
             path.setAttribute("d", `M ${p1.x} ${p1.y} Q ${p1.x + t * (cx - p1.x)} ${p1.y + t * (cy - p1.y)} ${bez(t, p1.x, cx, p2.x)} ${bez(t, p1.y, cy, p2.y)}`);
         }
-        path.setAttribute("marker-end", "url(#arrow)");
+        path.setAttribute("marker-end", mui);
     }
 
     // Nhãn cạnh (x,y) · w đặt ở giữa đường cong
-    taoNhan((p1.x + 2 * cx + p2.x) / 4, (p1.y + 2 * cy + p2.y) / 4, nhanCanh(index));
+    taoNhan((p1.x + 2 * cx + p2.x) / 4, (p1.y + 2 * cy + p2.y) / 4, nhan, buoc);
 }
 
 // Vẽ một đỉnh (hình tròn + số hiệu), có thể kéo bằng chuột
 function veDinh(i) {
     const p = nodes[i], g = el("g");
     el("circle", { cx: p.x, cy: p.y + 7, r: 32, fill: "rgba(59, 130, 246, 0.22)", "pointer-events": "none" }, g);   // bóng đổ nhẹ, thay cho drop-shadow
-    const c = el("circle", { cx: p.x, cy: p.y, r: 30, class: "node", fill: graphPalette.node, stroke: graphPalette.border, "stroke-width": 3 }, g);
+    const c = el("circle", { cx: p.x, cy: p.y, r: 30, class: "node", fill: graphPalette.node, stroke: eulerHL && eulerHL.cur === i ? MAU_EULER : graphPalette.border, "stroke-width": eulerHL && eulerHL.cur === i ? 7 : 3 }, g);
     c.addEventListener("mousedown", e => { draggingNode = i; e.preventDefault(); });
     el("text", { x: p.x, y: p.y, class: "node-text" }, g).textContent = i;
 }

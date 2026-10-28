@@ -328,3 +328,25 @@ svg { background:
 .adj-node small { font-size: 10px; font-weight: 700; color: var(--muted); }
 .adj-arrow { color: var(--a2); font-weight: 800; }
 .adj-null { color: #ef4444; font-weight: 800; font-size: 12px; }
+
+/* =====================================================
+   CHU TRÌNH EULER (js/euler.js)
+   .euler-wrap : khung | .euler-yes / .euler-no : kết luận | .euler-reason : lý do không có
+   .euler-seq  : dãy đỉnh - cạnh | .euler-v : ô đỉnh | .euler-e : ô cạnh | .euler-btns : 3 nút
+   .euler-label: nhãn cạnh đang được tô trên hình (màu cam)
+===================================================== */
+.euler-wrap { padding: 12px; background: var(--field); border: 1px solid var(--line); border-radius: 14px; }
+.euler-yes { color: #10b981; font-weight: 800; }
+.euler-no { color: #ef4444; font-weight: 800; }
+.euler-reason, .euler-path, .euler-line, .euler-start, .euler-status { margin-top: 8px; }
+.euler-reason { color: var(--muted); }
+.euler-path { color: #f59e0b; font-weight: 700; }
+.euler-line { font-weight: 800; letter-spacing: .02em; word-break: break-word; }
+.euler-start select { width: auto; min-width: 70px; margin: 0 0 0 6px; padding: 4px 8px; }
+.euler-seq { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 10px; }
+.euler-v { display: inline-flex; align-items: center; justify-content: center; min-width: 34px; padding: 4px 10px; border-radius: 8px; font-weight: 800; color: #fff; background: linear-gradient(135deg, var(--a1), var(--a2)); }
+.euler-e { padding: 2px 8px; border-radius: 8px; font-size: 12px; font-weight: 800; color: var(--text); background: var(--chip); border: 1px solid #f59e0b; }
+.euler-btns { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 10px; }
+.euler-btns button { margin-top: 0; padding: 9px 6px; font-size: 13px; }
+.euler-status { min-height: 1.3em; font-weight: 700; color: #f59e0b; }
+.edge-label.euler-label { fill: #f59e0b; }

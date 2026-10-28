@@ -39,7 +39,8 @@ function htmlBac() {
 }
 
 // Ghép tất cả vào khung thông tin bên dưới đồ thị. Thứ tự hiển thị:
-//   1) Đỉnh/cạnh  2) Bậc  3) DANH SÁCH KỀ (list.js)  4) Ma trận kề  5) Ma trận trọng số
+//   1) Đỉnh/cạnh  2) Bậc  3) DANH SÁCH KỀ (list.js)  4) Ma trận kề  5) Ma trận trọng số  6) CHU TRÌNH EULER (euler.js)
 function hienThiThongTin() {
-    $("thongTin").innerHTML = htmlDinhCanh() + htmlBac() + htmlDanhSachKe() + htmlMaTranKe() + htmlMaTranTrongSo();
+    if (eulerHL) { resetEuler(); veDoThi(); }   // dựng lại thông tin thì bỏ tô màu Euler cũ
+    $("thongTin").innerHTML = htmlDinhCanh() + htmlBac() + htmlDanhSachKe() + htmlMaTranKe() + htmlMaTranTrongSo() + htmlEuler();
 }

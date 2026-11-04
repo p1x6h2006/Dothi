@@ -39,6 +39,7 @@
 | 📋 **Danh sách kề** | Hiển thị dạng `[đỉnh] → [kề] → [kề] → NULL` |
 | 🔄 **Chu trình Euler** | Kiểm tra, tìm và mô phỏng từng bước |
 | 📮 **Người phát thư** | Tìm hành trình ngắn nhất qua mọi cạnh |
+| 🌲 **Kruskal** | Cây khung nhỏ nhất: bảng cạnh đã sắp xếp, cạnh chọn/loại, xem từng bước, tô cây khung, nạp ví dụ 33 và bài tập 37 |
 | 🎨 **3 giao diện** | Light, Premium, Neon |
 | 💾 **Tự động lưu** | Lưu vào `localStorage`, mở lại là có ngay |
 
@@ -48,30 +49,38 @@
 
 ```text
 Dothi/
-├── index.html          # Giao diện: màn hình chọn loại + màn hình chính
-├── chu-thich.txt       # Bản chú thích gốc
+├── index.html              # Giao diện: màn hình chọn loại + màn hình chính
+├── chu-thich.txt           # Bản chú thích gốc
 ├── css/
-│   └── style.css       # Toàn bộ giao diện (3 theme: Light, Premium, Neon)
+│   └── style.css           # Toàn bộ giao diện (3 theme: Light, Premium, Neon)
 └── js/
-    ├── config.js       # Hằng số, tên 5 loại đồ thị, bảng màu
-    ├── state.js        # Biến trạng thái dùng chung
-    ├── validate.js     # Kiểm tra dữ liệu nhập
-    ├── ui.js           # Chọn loại, đổi theme, áp dụng màu
-    ├── edges.js        # Tạo đồ thị, thêm / xóa / sửa cạnh
-    ├── draw.js         # Vẽ đồ thị bằng SVG, kéo đỉnh
-    ├── matrix.js       # Ma trận kề, ma trận trọng số
-    ├── list.js         # Danh sách kề
-    ├── euler.js        # Chu trình Euler (kiểm tra, tìm, mô phỏng)
-    ├── postman.js      # Bài toán người phát thư
-    ├── giai.js         # Cách giải chi tiết (khung bấm mới xổ ra) cho từng mục
-    ├── info.js         # Danh sách đỉnh/cạnh, bậc của đỉnh
-    └── storage.js      # Tự động lưu / khôi phục / reset (localStorage)
+    ├── chinh.js            # Khởi động (nạp sau cùng): khôi phục dữ liệu đã lưu
+    ├── dung_chung/         # DÙNG CHUNG: mọi file khác đều dùng tới
+    │   ├── cau_hinh.js     # Hằng số, tên 5 loại đồ thị, bảng màu
+    │   ├── trang_thai.js   # Biến trạng thái dùng chung
+    │   └── kiem_tra.js     # Kiểm tra dữ liệu nhập
+    ├── giao_dien/          # GIAO DIỆN: theme, màu, hiệu ứng
+    │   ├── doi_giao_dien.js      # Chọn loại, đổi theme, áp dụng màu
+    │   └── hieu_ung_phi_kiem.js  # Hiệu ứng nền phi kiếm bay (canvas)
+    ├── loi/                # LÕI: dựng đồ thị, vẽ, lưu
+    │   ├── chinh_sua_canh.js     # Tạo đồ thị, thêm / xóa / sửa cạnh
+    │   ├── ve_do_thi.js          # Vẽ đồ thị bằng SVG, kéo đỉnh
+    │   └── luu_tru.js            # Tự động lưu / khôi phục / reset (localStorage)
+    └── chuc_nang/          # CHỨC NĂNG: các bài toán và cách hiển thị
+        ├── bieu_dien/
+        │   ├── ma_tran.js        # Ma trận kề, ma trận trọng số
+        │   ├── danh_sach_ke.js   # Danh sách kề
+        │   └── thong_tin.js      # Danh sách đỉnh/cạnh, bậc của đỉnh
+        ├── chu_trinh_euler.js    # Chu trình Euler (kiểm tra, tìm, mô phỏng)
+        ├── nguoi_phat_thu.js     # Bài toán người phát thư
+        ├── kruskal.js            # Thuật toán Kruskal (cây khung nhỏ nhất, vô hướng)
+        └── cach_giai.js          # Cách giải chi tiết (khung bấm mới xổ ra) cho từng mục
 ```
 
 > ⚠️ **Thứ tự nạp script trong `index.html` (không được đổi):**
 >
 > ```text
-> config → state → validate → ui → edges → draw → matrix → list → euler → postman → giai → info → storage
+> cau_hinh → trang_thai → kiem_tra → doi_giao_dien → chinh_sua_canh → ve_do_thi → ma_tran → danh_sach_ke → chu_trinh_euler → nguoi_phat_thu → kruskal → cach_giai → thong_tin → luu_tru → chinh
 > ```
 
 ---
@@ -88,7 +97,7 @@ Biến `loai` nhận giá trị từ `1` đến `5`.
 | **4** | Đơn đồ thị có hướng | Có hướng | ❌ | ❌ | `x→y` và `y→x` là 2 cạnh khác nhau, nhập được cả hai |
 | **5** | Đa đồ thị có hướng | Có hướng | ❌ | ✅ (cùng chiều) | Có mũi tên |
 
-> `loai` 1–3 là **vô hướng**, `loai` 4–5 là **có hướng** (hàm `coHuong()` trong `state.js`).
+> `loai` 1–3 là **vô hướng**, `loai` 4–5 là **có hướng** (hàm `coHuong()` trong `js/dung_chung/trang_thai.js`).
 
 ---
 
@@ -105,7 +114,7 @@ Biến `loai` nhận giá trị từ `1` đến `5`.
 </details>
 
 <details>
-<summary><b>⚙️ js/config.js</b></summary>
+<summary><b>⚙️ js/dung_chung/cau_hinh.js</b></summary>
 
 | Tên | Công dụng |
 |-----|-----------|
@@ -118,7 +127,7 @@ Biến `loai` nhận giá trị từ `1` đến `5`.
 </details>
 
 <details>
-<summary><b>🧠 js/state.js</b></summary>
+<summary><b>🧠 js/dung_chung/trang_thai.js</b></summary>
 
 | Biến / hàm | Công dụng |
 |------------|-----------|
@@ -132,7 +141,7 @@ Biến `loai` nhận giá trị từ `1` đến `5`.
 </details>
 
 <details>
-<summary><b>✅ js/validate.js</b></summary>
+<summary><b>✅ js/dung_chung/kiem_tra.js</b></summary>
 
 - `kiemTraDinh`: đỉnh phải là số nguyên từ `0` đến `n-1`.
 - `kiemTraCanh`: trả về chuỗi lỗi hoặc `null` nếu hợp lệ.
@@ -144,7 +153,7 @@ Biến `loai` nhận giá trị từ `1` đến `5`.
 </details>
 
 <details>
-<summary><b>🎛️ js/ui.js</b></summary>
+<summary><b>🎛️ js/giao_dien/doi_giao_dien.js</b></summary>
 
 - Tạo các nút chọn loại và danh sách chọn loại.
 - `chonGiaoDien(mode)`: đổi theme `light` / `premium` / `dark`.
@@ -155,7 +164,7 @@ Biến `loai` nhận giá trị từ `1` đến `5`.
 </details>
 
 <details>
-<summary><b>🔗 js/edges.js</b></summary>
+<summary><b>🔗 js/loi/chinh_sua_canh.js</b></summary>
 
 - `taoDoThi()`: hỏi từng cạnh bằng hộp thoại (dạng `x y` hoặc `x y w`), kiểm tra, rồi dựng đồ thị mới.
 - `capNhat()`: vẽ lại và cập nhật thông tin.
@@ -167,7 +176,7 @@ Biến `loai` nhận giá trị từ `1` đến `5`.
 </details>
 
 <details>
-<summary><b>🖌️ js/draw.js</b></summary>
+<summary><b>🖌️ js/loi/ve_do_thi.js</b></summary>
 
 - `sapXep()`: xếp các đỉnh đều trên một vòng tròn.
 - `el()`: hàm tạo phần tử SVG.
@@ -183,7 +192,7 @@ Biến `loai` nhận giá trị từ `1` đến `5`.
 </details>
 
 <details>
-<summary><b>🔢 js/matrix.js</b></summary>
+<summary><b>🔢 js/chuc_nang/bieu_dien/ma_tran.js</b></summary>
 
 - `bangMa()`: vẽ ma trận `n × n` thành bảng HTML.
 - `htmlMaTranKe()`: ma trận kề, ô `[i][j]` = số cạnh nối `i` với `j`.
@@ -197,7 +206,7 @@ Biến `loai` nhận giá trị từ `1` đến `5`.
 </details>
 
 <details>
-<summary><b>ℹ️ js/info.js</b></summary>
+<summary><b>ℹ️ js/chuc_nang/bieu_dien/thong_tin.js</b></summary>
 
 - `htmlDinhCanh()`: liệt kê đỉnh và cạnh (`e1`, `e2`, ...).
 - `htmlBac()`: bậc của đỉnh.
@@ -229,7 +238,7 @@ Với **mỗi đỉnh**, lưu danh sách các đỉnh kề với nó.
 
 Hiển thị nằm giữa phần **Bậc** và **Ma trận kề**.
 
-**File `js/list.js`**
+**File `js/chuc_nang/bieu_dien/danh_sach_ke.js`**
 
 - `xayDanhSachKe()`: dựng dữ liệu từ mảng `edges` (xếp tăng dần).
 - `htmlDanhSachKe()`: vẽ HTML + ghi chú giải thích theo loại đồ thị.
@@ -263,7 +272,7 @@ Hiển thị nằm giữa phần **Bậc** và **Ma trận kề**.
 | `loai 1–3` (vô hướng) | Liên thông **và** mọi đỉnh có bậc chẵn (vòng khuyên tính bậc 2) |
 | `loai 4–5` (có hướng) | Liên thông yếu **và** mọi đỉnh có `deg⁺ = deg⁻` |
 
-**File `js/euler.js`**
+**File `js/chuc_nang/chu_trinh_euler.js`**
 
 | Hàm | Công dụng |
 |-----|-----------|
@@ -275,13 +284,13 @@ Hiển thị nằm giữa phần **Bậc** và **Ma trận kề**.
 | `doiDinhEuler()` | Chọn đỉnh bắt đầu (mặc định: đỉnh nhỏ nhất có cạnh) |
 | `resetEuler()` | Dừng mô phỏng, bỏ tô màu (tự gọi khi thêm/xóa/sửa cạnh, tạo đồ thị mới) |
 
-**Tô màu trên hình:** biến `eulerHL` (`state.js`), được `draw.js` đọc trong `veCanh()` và `veDinh()`.
+**Tô màu trên hình:** biến `eulerHL` (`trang_thai.js`), được `ve_do_thi.js` đọc trong `veCanh()` và `veDinh()`.
 
 **CSS:** nhóm `.euler-wrap` / `.euler-yes` / `.euler-no` / `.euler-seq` / `.euler-v` / `.euler-e` / `.euler-btns`.
 
 ### 🚀 Euler = hành trình ngắn nhất
 
-- **Đồ thị vô hướng** liên thông nhưng có đỉnh bậc lẻ: không chỉ báo "Không có chu trình Euler" nữa. Vẫn nêu lý do, rồi **tự tính hành trình ngắn nhất** đi qua mọi cạnh rồi quay về (dùng lại `tinhNguoiPhatThu()` của `postman.js`): hiện dãy đỉnh - cạnh (cạnh phải đi lặp có dấu `*`), độ dài = `Σw(e) + m(G)`.
+- **Đồ thị vô hướng** liên thông nhưng có đỉnh bậc lẻ: không chỉ báo "Không có chu trình Euler" nữa. Vẫn nêu lý do, rồi **tự tính hành trình ngắn nhất** đi qua mọi cạnh rồi quay về (dùng lại `tinhNguoiPhatThu()` của `nguoi_phat_thu.js`): hiện dãy đỉnh - cạnh (cạnh phải đi lặp có dấu `*`), độ dài = `Σw(e) + m(G)`.
 - Bấm **Mô phỏng** / **Tô cả chu trình**: tự thêm các cạnh lặp (xanh lá) vào đồ thị (`apDungPhanHoach` của phân hoạch nhỏ nhất) rồi đi theo hành trình (`chuanBiEuler`). Bấm **Trả lại đồ thị gốc** ở mục Người phát thư để về đồ thị ban đầu.
 - Đồ thị đã có chu trình Euler: hiện thêm độ dài hành trình = `Σw(e)` (cạnh không có `w` tính 1).
 - **Đồ thị có hướng** không có chu trình Euler: vẫn chỉ báo lý do (chưa hỗ trợ hành trình ngắn nhất cho đồ thị có hướng).
@@ -302,12 +311,12 @@ Tìm hành trình **ngắn nhất** đi qua mọi cạnh ít nhất 1 lần rồ
 | 3 | `P = {P1, P2, ...}`: các phân hoạch cặp của `V_o(G)`; `d(Pi)` = tổng khoảng cách ngắn nhất của các cặp (**Floyd–Warshall**, có dựng lại đường đi: *"Nối qua: [a→b→c]"*) |
 | 4 | `m(G) = min d(Pi)`; **Tổng chiều dài = Σw(e) + m(G)** |
 
-**File `js/postman.js`**
+**File `js/chuc_nang/nguoi_phat_thu.js`**
 
 | Hàm | Công dụng |
 |-----|-----------|
 | `giaiNguoiPhatThu()` | Nút *"Phân tích & giải bài toán"* (khung Điều khiển), tự nhảy xuống bảng kết quả |
-| `tinhNguoiPhatThu()` | Tính và lưu vào `npt` (`state.js`) |
+| `tinhNguoiPhatThu()` | Tính và lưu vào `npt` (`trang_thai.js`) |
 | `cacPhanHoachCap()` | Ghép cặp |
 | `apDungPhanHoach(i)` | Nút *"Xem Pi"* / *"Tự động thêm cạnh & vẽ lại đồ thị"*: đồ thị = gốc + các cạnh sao chép dọc đường đi ngắn nhất của từng cặp (vẽ màu **xanh lá**), rồi nhảy lên đồ thị. Cạnh thêm là cạnh song song nên `loai 1` tự đổi sang `loai 2`. Sau đó mọi đỉnh bậc chẵn → mục Chu trình Euler báo "Có" và mô phỏng được |
 | `traLaiDoThiGoc()` | Khôi phục cạnh và loại đồ thị ban đầu |
@@ -325,7 +334,7 @@ Tìm hành trình **ngắn nhất** đi qua mọi cạnh ít nhất 1 lần rồ
 
 ## 💾 Lưu và Reset
 
-**File `js/storage.js`** (khung Điều khiển, trên cùng: nút **💾 Lưu** và **↺ Reset**)
+**File `js/loi/luu_tru.js`** (khung Điều khiển, trên cùng: nút **💾 Lưu** và **↺ Reset**)
 
 - **Tự động lưu** vào `localStorage` sau mỗi lần vẽ lại (`veDoThi`) / dựng lại thông tin (`hienThiThongTin`) và khi thoát trang.
 - Dữ liệu được lưu: loại đồ thị, theme, 4 màu, số đỉnh/cạnh, vị trí đỉnh, phần tô màu Euler, cạnh thêm xanh lá, kết quả người phát thư.
@@ -340,7 +349,7 @@ Tìm hành trình **ngắn nhất** đi qua mọi cạnh ít nhất 1 lần rồ
 
 Giữ nguyên hiệu ứng **kiếm bay**.
 
-**Kiếm** (`index.html`, cuối file)
+**Kiếm** (`js/giao_dien/hieu_ung_phi_kiem.js`, canvas `#swordBg` trong `index.html`)
 
 - Quầng sáng của kiếm vẽ sẵn 1 lần vào canvas phụ (hết `shadowBlur` mỗi khung hình).
 - `COUNT = 8` kiếm ở màn hình chọn loại, `HCOUNT = 4` kiếm ở màn hình chính (muốn dày hơn thì tăng 2 hằng số này, bản gốc là 12 và 6).
@@ -353,7 +362,7 @@ Giữ nguyên hiệu ứng **kiếm bay**.
 - Giảm `backdrop-filter` (22px → 10px, 20px → 8px), khung đồ thị vốn đã nền đặc.
 - Bỏ các hiệu ứng lặp vô hạn trên khung chọn loại và tiêu đề (floaty, spin, shine).
 
-**SVG đồ thị** (`js/draw.js`)
+**SVG đồ thị** (`js/loi/ve_do_thi.js`)
 
 - Bỏ `drop-shadow` trên từng cạnh/đỉnh, thay bằng nét to mờ và vòng bóng nhẹ.
 - Kéo đỉnh: gom các lần di chuột, mỗi khung hình chỉ vẽ lại 1 lần.
@@ -378,3 +387,25 @@ Giữ nguyên hiệu ứng **kiếm bay**.
 ⭐ Nếu thấy dự án hữu ích, hãy để lại một **Star** nhé! ⭐
 
 </div>
+
+
+---
+
+## 🌲 Thuật toán Kruskal
+
+File: `js/chuc_nang/kruskal.js` (lời giải chi tiết: `giaiChiTietKruskal()` trong `cach_giai.js`). Chỉ dùng cho đồ thị **vô hướng** (`loai` 1–3).
+
+1. Bắt đầu từ đồ thị rỗng `T` có `n` đỉnh, `F = Ø`.
+2. Sắp xếp cạnh theo trọng lượng tăng dần (bằng nhau thì giữ thứ tự nhập; cạnh không có `w` tính `w = 1`).
+3. Xét từng cạnh: hai đầu ở hai cây khác nhau (kiểm tra bằng Union–Find) thì **chọn**, ngược lại **loại** (tạo chu trình).
+4. Dừng khi đủ `n − 1` cạnh; trọng lượng nhỏ nhất = tổng các cạnh đã chọn.
+   Đồ thị không liên thông thì cho rừng khung nhỏ nhất (`n − k` cạnh).
+
+| Nút | Tác dụng |
+|-----|----------|
+| 🌲 Phân tích & giải Kruskal | Hiện bảng cạnh đã sắp xếp, cạnh chọn/loại, tổng trọng lượng |
+| Nạp ví dụ (6 đỉnh) / Nạp bài tập (9 đỉnh) | Nạp đồ thị trong file Word (kết quả 33 và 37) |
+| ▶ Xem từng bước | Mỗi giây xét một cạnh: chọn = xanh ngọc, loại = đỏ nét đứt |
+| Tô cây khung / Bỏ tô màu | Chỉ tô các cạnh của cây khung / xóa màu |
+
+Trạng thái tô màu: biến `krHL` (`trang_thai.js`), được lưu cùng đồ thị; `ve_do_thi.js` đọc `krHL` khi vẽ cạnh.

@@ -50,7 +50,6 @@
 ```text
 Dothi/
 ├── index.html              # Giao diện: màn hình chọn loại + màn hình chính
-├── chu-thich.txt           # Bản chú thích gốc
 ├── css/
 │   └── style.css           # Toàn bộ giao diện (3 theme: Light, Premium, Neon)
 └── js/

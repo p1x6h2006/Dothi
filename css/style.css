@@ -225,6 +225,7 @@ button:active { transform: translateY(0) scale(.97); }
 .info:hover { box-shadow: 0 14px 30px rgba(139,92,246,.5); }
 /* ----- Chọn theme ----- */
 .theme-switch { display: grid; grid-template-columns: 1fr 1.3fr 1fr; gap: 8px; margin: 14px 0 8px; }
+.label-switch { grid-template-columns: 1fr 1fr; margin-top: 6px; }
 .theme-btn {
     margin-top: 0; padding: 10px 2px; font-size: 12px; white-space: nowrap; color: var(--text); background: var(--chip);
     border: 1px solid var(--line); box-shadow: none;
@@ -234,6 +235,7 @@ button:active { transform: translateY(0) scale(.97); }
 #lightThemeBtn.active { background: linear-gradient(135deg, #6366f1, #06b6d4); }
 #premiumThemeBtn.active { background: linear-gradient(135deg, #f59e0b, #f97316); }
 #darkThemeBtn.active { background: linear-gradient(135deg, #a855f7, #22d3ee); }
+#soNhanBtn.active, #chuNhanBtn.active { background: linear-gradient(135deg, #10b981, #06b6d4); }
 /* =====================================================
    KHU VỰC ĐỒ THỊ
 ===================================================== */

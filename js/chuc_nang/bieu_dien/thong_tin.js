@@ -4,8 +4,8 @@
 
 // Danh sách đỉnh và cạnh
 function htmlDinhCanh() {
-    const text = `<b>Đỉnh:</b> ${dsDinh().join(", ")}<br><b>Cạnh:</b><br>`;
-    return text + (edges.length ? edges.map((e, i) => `e${i + 1}: (${e.x},${e.y})<br>`).join("") : "<i>(Không có cạnh)</i><br>");
+    const text = `<b>Đỉnh:</b> ${dsDinh().map(nhanDinh).join(", ")}<br><b>Cạnh:</b><br>`;
+    return text + (edges.length ? edges.map((e, i) => `e${i + 1}: (${nhanDinh(e.x)},${nhanDinh(e.y)})<br>`).join("") : "<i>(Không có cạnh)</i><br>");
 }
 
 // Bậc của đỉnh
@@ -20,8 +20,8 @@ function htmlBac() {
         else { deg[e.x]++; deg[e.y]++; }
     });
     const bac = range.map(i => huong ? degIn[i] + degOut[i] : deg[i]);
-    const dsBac = range.map(i => huong ? `deg(${i}) = ${bac[i]} (deg⁻=${degIn[i]}, deg⁺=${degOut[i]})` : `deg(${i}) = ${bac[i]}`);
-    const loc = k => range.filter(i => bac[i] === k).join(", ") || "Không có";
+    const dsBac = range.map(i => huong ? `deg(${nhanDinh(i)}) = ${bac[i]} (deg⁻=${degIn[i]}, deg⁺=${degOut[i]})` : `deg(${nhanDinh(i)}) = ${bac[i]}`);
+    const loc = k => range.filter(i => bac[i] === k).map(nhanDinh).join(", ") || "Không có";
 
     let text = `<br><b>Bậc của đỉnh</b><br><div class="degree-values">${dsBac.join(", ")}</div>`;
     text += `<div class="degree-category">Đỉnh treo: ${loc(1)}</div>`;
@@ -32,7 +32,7 @@ function htmlBac() {
     if (huong) {
         text += '<h3 class="directed-degree-heading">Bán bậc ra và bán bậc vào của đồ thị</h3>';
         text += '<div class="directed-degree-table-wrap"><table class="directed-degree-table"><thead><tr><th>Đỉnh</th><th>deg⁺(v)<br><small>Bán bậc ra</small></th><th>deg⁻(v)<br><small>Bán bậc vào</small></th></tr></thead><tbody>';
-        text += range.map(i => `<tr><td>${i}</td><td>${degOut[i]}</td><td>${degIn[i]}</td></tr>`).join("");
+        text += range.map(i => `<tr><td>${nhanDinh(i)}</td><td>${degOut[i]}</td><td>${degIn[i]}</td></tr>`).join("");
         text += `</tbody></table><div class="directed-degree-sums">Σ deg⁺(v) = ${m} = ${m} cạnh<br>Σ deg⁻(v) = ${m}</div></div>`;
     }
     return text;

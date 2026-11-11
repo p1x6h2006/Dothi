@@ -5,7 +5,7 @@ const kiemTraDinh = (x, N = n) => Number.isInteger(x) && x >= 0 && x < N;
 
 // Trả về chuỗi lỗi (nếu có) hoặc null nếu cạnh hợp lệ
 function kiemTraCanh(x, y, loai, list = edges, N = n) {
-    if (!kiemTraDinh(x, N) || !kiemTraDinh(y, N)) return `Đỉnh phải nằm từ 0 đến ${N - 1}!`;
+    if (!kiemTraDinh(x, N) || !kiemTraDinh(y, N)) return `Đỉnh phải nằm từ ${nhanDinh(0)} đến ${nhanDinh(N - 1)}!`;
     const huong = loai >= 4; // loai 4, 5 là đồ thị có hướng
     // Vòng khuyên (x = y): chỉ loai 3 (giả đồ thị vô hướng) được phép
     if (x === y && loai !== 3) {
@@ -18,7 +18,7 @@ function kiemTraCanh(x, y, loai, list = edges, N = n) {
     // Vô hướng: (x,y) và (y,x) là một; có hướng: chỉ trùng khi cùng chiều (x→y và y→x là hai cạnh khác nhau).
     const choPhepSongSong = loai === 2 || loai === 3 || loai === 5;
     if (!choPhepSongSong && list.some(e => (e.x === x && e.y === y) || (!huong && e.x === y && e.y === x))) {
-        return `Cạnh (${x},${y}) đã tồn tại! (đơn đồ thị không cho phép cạnh song song)`;
+        return `Cạnh (${nhanDinh(x)},${nhanDinh(y)}) đã tồn tại! (đơn đồ thị không cho phép cạnh song song)`;
     }
     return null;
 }

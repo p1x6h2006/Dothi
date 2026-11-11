@@ -22,7 +22,7 @@ function ghiTrangThaiLuu(msg) {
 // Chụp trạng thái hiện tại thành 1 đối tượng JSON
 function chupTrangThai() {
     return {
-        v: 1, loai: $("loai").value, theme: themeHienTai(), palette: graphPalette,
+        v: 1, loai: $("loai").value, theme: themeHienTai(), palette: graphPalette, kieuNhan,
         soDinh: $("soDinh").value, soCanh: $("soCanh").value,
         n, edges, nodes, eulerHL, eulerStart, krHL,
         npt, canhThemNPT: [...canhThemNPT], nptThongBao
@@ -59,6 +59,7 @@ function khoiPhuc() {
         $("loai").value = d.loai; capNhatTenLoai();
         $("soDinh").value = d.soDinh; $("soCanh").value = d.soCanh;
 
+        chonKieuNhan(d.kieuNhan || "so");            // nhãn số / chữ (nodes còn rỗng nên chỉ đặt chế độ, chưa vẽ)
         chonGiaoDien(d.theme);                       // đổi theme trước, rồi mới ghi đè bằng màu người dùng đã chọn
         graphPalette = { ...graphPalette, ...d.palette };
         for (const k in COLOR_INPUTS) $(COLOR_INPUTS[k]).value = graphPalette[k];
@@ -95,6 +96,7 @@ function resetDoThi() {
     $("soDinh").value = 5; $("soCanh").value = 5;
     ["themX", "themY", "themW", "xoaX", "xoaY", "cuX", "cuY", "moiX", "moiY", "moiW"].forEach(id => { $(id).value = ""; });
     chonGiaoDien("light");                           // về theme và 4 màu mặc định
+    chonKieuNhan("so");                              // và về nhãn số
     document.documentElement.style.removeProperty("--primary");
     document.documentElement.style.removeProperty("--primary-dark");
     svg.innerHTML = "";

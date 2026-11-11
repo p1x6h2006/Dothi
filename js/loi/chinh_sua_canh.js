@@ -13,14 +13,14 @@ function taoDoThi() {
     const list = [];
     for (let i = 0; i < m; i++) {
         while (true) {
-            const input = prompt(`Nhập cạnh ${i + 1} theo dạng x y hoặc x y w (w = trọng số, có thể bỏ trống; đỉnh từ 0 đến ${soDinh - 1}):`);
+            const input = prompt(`Nhập cạnh ${i + 1} theo dạng x y hoặc x y w (w = trọng số, có thể bỏ trống; đỉnh từ ${nhanDinh(0)} đến ${nhanDinh(soDinh - 1)}, nhập số hoặc chữ đều được):`);
             if (input === null) return;
 
             const a = input.trim().split(/\s+/);
             if (a.length !== 2 && a.length !== 3) { alert("Vui lòng nhập đúng dạng: x y hoặc x y w"); continue; }
 
-            const x = parseInt(a[0]), y = parseInt(a[1]);
-            if (!Number.isInteger(x) || !Number.isInteger(y)) { alert("x và y phải là số nguyên!"); continue; }
+            const x = docDinh(a[0]), y = docDinh(a[1]);
+            if (!Number.isInteger(x) || !Number.isInteger(y)) { alert("x và y phải là số thứ tự đỉnh (0, 1, 2…) hoặc chữ cái (a, b, c…)!"); continue; }
 
             const w = docTrongSo(a[2]);
             if (Number.isNaN(w)) { alert("Trọng số w phải là một số!"); continue; }
@@ -53,7 +53,7 @@ function capNhat() {
 
 // ---- Thêm cạnh: áp dụng luật của loại đồ thị đang chọn ----
 function themCanh() {
-    const x = parseInt($("themX").value), y = parseInt($("themY").value);
+    const x = docDinh($("themX").value), y = docDinh($("themY").value);
     const loi = kiemTraCanh(x, y, loaiHienTai());
     if (loi) return alert(loi);
 
@@ -68,7 +68,7 @@ const timCanh = (x, y) => edges.findIndex(e => e.x === x && e.y === y);
 
 // ---- Xóa cạnh: chỉ xóa 1 cạnh khớp đúng thứ tự (x,y) (tìm bằng timCanh) ----
 function xoaCanh() {
-    const index = timCanh(parseInt($("xoaX").value), parseInt($("xoaY").value));
+    const index = timCanh(docDinh($("xoaX").value), docDinh($("xoaY").value));
     if (index === -1) return alert("Không tìm thấy cạnh!");
     edges.splice(index, 1); // chỉ xóa một cạnh
     capNhat();
@@ -76,8 +76,8 @@ function xoaCanh() {
 
 // ---- Sửa cạnh: kiểm tra lại luật của loại đồ thị trên danh sách đã bỏ cạnh cũ ----
 function suaCanh() {
-    const [cuX, cuY, moiX, moiY] = ["cuX", "cuY", "moiX", "moiY"].map(id => parseInt($(id).value));
-    if (![cuX, cuY, moiX, moiY].every(v => kiemTraDinh(v))) return alert(`Các đỉnh phải nằm từ 0 đến ${n - 1}!`);
+    const [cuX, cuY, moiX, moiY] = ["cuX", "cuY", "moiX", "moiY"].map(id => docDinh($(id).value));
+    if (![cuX, cuY, moiX, moiY].every(v => kiemTraDinh(v))) return alert(`Các đỉnh phải nằm từ ${nhanDinh(0)} đến ${nhanDinh(n - 1)}!`);
 
     const index = timCanh(cuX, cuY);
     if (index === -1) return alert("Không tìm thấy cạnh!");

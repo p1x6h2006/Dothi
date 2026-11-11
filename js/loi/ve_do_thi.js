@@ -54,7 +54,7 @@ function veDoThi() {
 // [Mục] Nhãn của cạnh: "(x,y)" hoặc "(x,y) · w"
 function nhanCanh(index) {
     const { x, y, w } = edges[index];
-    return w !== undefined ? `(${x},${y}) · ${w}` : `(${x},${y})`;
+    return w !== undefined ? `(${nhanDinh(x)},${nhanDinh(y)}) · ${w}` : `(${nhanDinh(x)},${nhanDinh(y)})`;
 }
 
 function taoNhan(x, y, text, hl) {
@@ -136,7 +136,7 @@ function veDinh(i) {
     el("circle", { cx: p.x, cy: p.y + 7, r: 32, fill: "rgba(59, 130, 246, 0.22)", "pointer-events": "none" }, g);   // bóng đổ nhẹ, thay cho drop-shadow
     const c = el("circle", { cx: p.x, cy: p.y, r: 30, class: "node", fill: graphPalette.node, stroke: eulerHL && eulerHL.cur === i ? MAU_EULER : graphPalette.border, "stroke-width": eulerHL && eulerHL.cur === i ? 7 : 3 }, g);
     c.addEventListener("mousedown", e => { draggingNode = i; e.preventDefault(); });
-    el("text", { x: p.x, y: p.y, class: "node-text" }, g).textContent = i;
+    el("text", { x: p.x, y: p.y, class: "node-text" }, g).textContent = nhanDinh(i);
 }
 
 // Kéo bằng chuột: kéo 1 đỉnh (bấm trúng đỉnh) hoặc kéo CẢ ĐỒ THỊ (bấm vào chỗ trống / cạnh trong khung đồ thị)

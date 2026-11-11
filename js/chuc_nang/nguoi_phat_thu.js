@@ -160,7 +160,7 @@ function htmlNguoiPhatThu() {
     const sub = i => `P<sub>${i + 1}</sub>`;
     text += '<div class="npt-wrap" id="nptKetQua">';
     text += `<div class="npt-step"><b>1. Tổng các cạnh ban đầu:</b> Σw(e) = ${fmt(npt.tong)}</div>`;
-    text += `<div class="npt-step"><b>2. Tập hợp các đỉnh bậc lẻ:</b> V<sub>o</sub>(G) = { ${le.join(", ") || "∅"} }</div>`;
+    text += `<div class="npt-step"><b>2. Tập hợp các đỉnh bậc lẻ:</b> V<sub>o</sub>(G) = { ${le.map(nhanDinh).join(", ") || "∅"} }</div>`;
 
     if (!le.length) {
         text += '<div class="euler-yes">✔ Mọi đỉnh đều bậc chẵn nên đồ thị đã có chu trình Euler: m(G) = 0, không cần thêm cạnh.</div>';
@@ -171,9 +171,9 @@ function htmlNguoiPhatThu() {
             : `Có ${ds.length} phân hoạch cặp (quá nhiều để liệt kê).</b> Chỉ hiện phân hoạch nhỏ nhất:`}</div>`;
         text += hien.map(i => {
             const p = ds[i], tot = Math.abs(p.d - m) < 1e-9, dang = npt.daApDung === i;
-            const cap = p.pairs.map(q => `(${q.a},${q.b})`).join(", ");
+            const cap = p.pairs.map(q => `(${nhanDinh(q.a)},${nhanDinh(q.b)})`).join(", ");
             const tinh = p.pairs.map(q => fmt(q.d)).join(" + ");
-            const qua = p.pairs.map(q => `[${q.path.join("→")}]`).join(" và ");
+            const qua = p.pairs.map(q => `[${q.path.map(nhanDinh).join("→")}]`).join(" và ");
             return `<div class="npt-card${tot ? " npt-best" : ""}${dang ? " npt-on" : ""}"><div class="npt-card-main">` +
                 `<b>${sub(i)} = { ${cap} }</b> → d(${sub(i)}) = ${tinh}${p.pairs.length > 1 ? " = " + fmt(p.d) : ""}` +
                 `${tot ? ' <span class="npt-badge">nhỏ nhất</span>' : ""}<div class="npt-path">Nối qua: ${qua}</div></div>` +

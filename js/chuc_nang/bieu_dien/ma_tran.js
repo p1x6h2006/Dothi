@@ -9,8 +9,8 @@ const loaiDoThi = () => (coHuong() ? "có hướng" : "vô hướng");
 
 // Vẽ một ma trận n x n thành bảng HTML; hienThiO quyết định cách hiện từng ô
 function bangMa(M, hienThiO) {
-    const head = Array.from({ length: n }, (_, c) => `<th>${c}</th>`).join("");
-    const rows = M.map((row, r) => `<tr><th>${r}</th>${row.map((v, c) => hienThiO(v, r, c)).join("")}</tr>`).join("");
+    const head = Array.from({ length: n }, (_, c) => `<th>${nhanDinh(c)}</th>`).join("");
+    const rows = M.map((row, r) => `<tr><th>${nhanDinh(r)}</th>${row.map((v, c) => hienThiO(v, r, c)).join("")}</tr>`).join("");
     return `<table class="adjacency-matrix"><thead><tr><th>Đỉnh</th>${head}</tr></thead><tbody>${rows}</tbody></table>`;
 }
 
@@ -29,7 +29,7 @@ function htmlMaTranKe() {
 
     let text = `<h3 class="adjacency-matrix-heading">Ma trận kề (đồ thị ${loaiDoThi()})</h3><div class="adjacency-matrix-wrap">`;
     text += bangMa(adj, v => `<td>${v}</td>`);
-    text += ghiChu(`Hàng và cột sử dụng cùng số hiệu đỉnh trên đồ thị (0–${n - 1}).`);
+    text += ghiChu(`Hàng và cột sử dụng cùng số hiệu đỉnh trên đồ thị (${nhanDinh(0)}–${nhanDinh(n - 1)}).`);
     if (huong) text += ghiChu("Hàng là đỉnh xuất phát, cột là đỉnh đích.");
     else if (edges.some(e => e.x === e.y)) text += ghiChu("Mỗi vòng khuyên ghi 1 trên đường chéo chính và đóng góp 2 vào bậc đỉnh.");
     if (loai === 2 || loai === 5) text += ghiChu("Mỗi ô ghi số cạnh song song giữa hai đỉnh.");

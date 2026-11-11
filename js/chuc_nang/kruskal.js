@@ -85,8 +85,8 @@ function datThongBaoKruskal(msg) {
 }
 
 const moTaBuocKruskal = (b, soCan) => b.chon
-    ? `Xét (${b.x},${b.y}) w = ${fmt(b.w)}: hai đầu ở hai cây khác nhau ⇒ CHỌN (${b.thu}/${soCan}).`
-    : `Xét (${b.x},${b.y}) w = ${fmt(b.w)}: ${b.x === b.y ? "là vòng khuyên" : "hai đầu đã cùng một cây"} ⇒ tạo chu trình, LOẠI.`;
+    ? `Xét (${nhanDinh(b.x)},${nhanDinh(b.y)}) w = ${fmt(b.w)}: hai đầu ở hai cây khác nhau ⇒ CHỌN (${b.thu}/${soCan}).`
+    : `Xét (${nhanDinh(b.x)},${nhanDinh(b.y)}) w = ${fmt(b.w)}: ${b.x === b.y ? "là vòng khuyên" : "hai đầu đã cùng một cây"} ⇒ tạo chu trình, LOẠI.`;
 
 // Xem từng bước: mỗi 1 giây xét thêm một cạnh theo thứ tự đã sắp xếp
 function chayKruskal() {
@@ -181,7 +181,7 @@ function htmlKruskal() {
     text += '<div class="npt-step"><b>2. Sắp xếp các cạnh theo thứ tự tăng dần:</b></div>';
     const o = (cls, nd) => `<td class="${cls}">${nd}</td>`;
     text += '<div class="kr-scroll"><table class="kr-table"><tbody>' +
-        "<tr><th>Cạnh</th>" + kq.sorted.map((c, k) => o("kr-" + kq.tt[k], `(${c.x},${c.y})`)).join("") + "</tr>" +
+        "<tr><th>Cạnh</th>" + kq.sorted.map((c, k) => o("kr-" + kq.tt[k], `(${nhanDinh(c.x)},${nhanDinh(c.y)})`)).join("") + "</tr>" +
         "<tr><th>Trọng lượng</th>" + kq.sorted.map((c, k) => o("kr-" + kq.tt[k], fmt(c.w))).join("") + "</tr>" +
         "<tr><th>Kết quả</th>" + kq.sorted.map((c, k) => o("kr-" + kq.tt[k], { chon: "✔ chọn", loai: "✖ loại", chua: "—" }[kq.tt[k]])).join("") + "</tr>" +
         "</tbody></table></div>";
@@ -189,7 +189,7 @@ function htmlKruskal() {
 
     text += `<div class="npt-step"><b>3. Bổ sung dần các cạnh vào F</b> với điều kiện không tạo nên chu trình trong T:</div>`;
     text += '<div class="kr-scroll"><table class="kr-table"><tbody>' +
-        "<tr><th>Cạnh</th>" + kq.chon.map(i => `<td class="kr-chon">(${edges[i].x},${edges[i].y})</td>`).join("") + "</tr>" +
+        "<tr><th>Cạnh</th>" + kq.chon.map(i => `<td class="kr-chon">(${nhanDinh(edges[i].x)},${nhanDinh(edges[i].y)})</td>`).join("") + "</tr>" +
         "<tr><th>Trọng lượng</th>" + kq.chon.map(i => `<td class="kr-chon">${fmt(trongSoCanh(edges[i]))}</td>`).join("") + "</tr>" +
         "</tbody></table></div>";
     text += `<div class="npt-step"><b>4.</b> Thuật toán dừng lại khi có n − 1 = ${n - 1} cạnh được chọn${kq.lienThong ? "." : " (không đạt được vì đồ thị không liên thông)."}</div>`;

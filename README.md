@@ -37,6 +37,7 @@
 | 🖱️ **Kéo thả đỉnh** | Vẽ bằng SVG, kéo đỉnh bằng chuột |
 | 🔢 **Ma trận** | Ma trận kề và ma trận trọng số |
 | 📋 **Danh sách kề** | Hiển thị dạng `[đỉnh] → [kề] → [kề] → NULL` |
+| 🔤 **Nhãn số / chữ** | Nút “Nhãn số / Nhãn chữ” đổi cách hiện đỉnh và cạnh: `(0,1)` ⇄ `(a,b)` ở hình vẽ, bảng, lời giải |
 | 🔄 **Chu trình Euler** | Kiểm tra, tìm và mô phỏng từng bước |
 | 📮 **Người phát thư** | Tìm hành trình ngắn nhất qua mọi cạnh |
 | 🌲 **Kruskal** | Cây khung nhỏ nhất: bảng cạnh đã sắp xếp, cạnh chọn/loại, xem từng bước, tô cây khung, nạp ví dụ 33 và bài tập 37 |
@@ -50,6 +51,7 @@
 ```text
 Dothi/
 ├── index.html              # Giao diện: màn hình chọn loại + màn hình chính
+├── chu-thich.txt           # Bản chú thích gốc
 ├── css/
 │   └── style.css           # Toàn bộ giao diện (3 theme: Light, Premium, Neon)
 └── js/
@@ -408,3 +410,19 @@ File: `js/chuc_nang/kruskal.js` (lời giải chi tiết: `giaiChiTietKruskal()`
 | Tô cây khung / Bỏ tô màu | Chỉ tô các cạnh của cây khung / xóa màu |
 
 Trạng thái tô màu: biến `krHL` (`trang_thai.js`), được lưu cùng đồ thị; `ve_do_thi.js` đọc `krHL` khi vẽ cạnh.
+
+---
+
+## 🔤 Nhãn số / chữ
+
+Nút **🔢 Nhãn số / 🔤 Nhãn chữ** (khung Điều khiển, dưới nút đổi giao diện) chỉ đổi cách **hiển thị** nhãn đỉnh và cạnh; dữ liệu đồ thị bên trong vẫn là số 0…n−1.
+
+| | Nhãn số | Nhãn chữ |
+|---|---|---|
+| Đỉnh | `0, 1, 2, …` | `a, b, c, …, z, aa, ab, …` |
+| Nhãn cạnh | `(0,1) · 5` | `(a,b) · 5` |
+
+- Áp dụng cho: hình vẽ, danh sách đỉnh/cạnh, bậc, danh sách kề, ma trận, Euler, người phát thư, Kruskal và các khung “Cách giải chi tiết”.
+- Khi nhập đỉnh (Thêm / Xóa / Sửa cạnh, hộp thoại Tạo đồ thị) có thể gõ **số hoặc chữ** (`0 1` hay `a b`, không phân biệt hoa thường) ở cả hai chế độ.
+- Chế độ đang chọn được lưu cùng đồ thị; **Reset** đưa về Nhãn số. Đổi chế độ sẽ bỏ phần tô màu Euler/Kruskal đang chạy dở.
+- Mã nguồn: `kieuNhan`, `nhanDinh()`, `docDinh()` trong `js/dung_chung/cau_hinh.js`; `chonKieuNhan()` trong `js/giao_dien/doi_giao_dien.js`.

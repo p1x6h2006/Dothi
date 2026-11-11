@@ -47,6 +47,13 @@
                     <button class="theme-btn" id="darkThemeBtn" onclick="chonGiaoDien('dark')">🌙 Neon</button>
                 </div>
 
+                <!-- [Mục] Kiểu nhãn đỉnh/cạnh: Số (0,1,2…) hoặc Chữ (a,b,c…) (chonKieuNhan trong doi_giao_dien.js) -->
+                <div class="theme-switch label-switch">
+                    <button class="theme-btn active" id="soNhanBtn" onclick="chonKieuNhan('so')">🔢 Nhãn số</button>
+                    <button class="theme-btn" id="chuNhanBtn" onclick="chonKieuNhan('chu')">🔤 Nhãn chữ</button>
+                </div>
+                <div class="note hint" id="goiYNhan">Cạnh hiện dạng (0,1) · (2,3)…</div>
+
                 <!-- [Mục] Chọn màu đỉnh, cạnh, viền, glow (apDungMauDoThi trong doi_giao_dien.js) -->
                 <div class="color-row">
                     <div class="color-box"><label for="nodeColor">Màu đỉnh</label><input type="color" id="nodeColor" value="#60a5fa"></div>
@@ -65,30 +72,30 @@
                 <input type="number" id="soCanh" min="0" value="5">
                 <button onclick="taoDoThi()">Tạo đồ thị</button>
                 <div class="note tip">
-                    Hướng dẫn: nhập cạnh dạng x y hoặc x y w (w là trọng số), số hiệu đỉnh từ 0 đến n−1.
+                    Hướng dẫn: nhập cạnh dạng x y hoặc x y w (w là trọng số), đỉnh từ 0 đến n−1 (hoặc a, b, c… tương ứng). Nhập số hay chữ đều được.
                 </div>
                 <hr>
 
                 <!-- [Mục] Thêm cạnh (themCanh) -->
                 <h3>➕ Thêm cạnh</h3>
-                <input type="number" id="themX" placeholder="Đỉnh x">
-                <input type="number" id="themY" placeholder="Đỉnh y">
+                <input type="text" autocomplete="off" id="themX" placeholder="Đỉnh x">
+                <input type="text" autocomplete="off" id="themY" placeholder="Đỉnh y">
                 <input type="number" id="themW" step="any" placeholder="Trọng số w (có thể bỏ trống)">
                 <button class="success" onclick="themCanh()">Thêm cạnh</button>
-                <div class="note hint">Ví dụ: 0 1 để nối đỉnh 0 với đỉnh 1.</div>
+                <div class="note hint">Ví dụ: 0 1 (hoặc a b) để nối đỉnh 0 (a) với đỉnh 1 (b).</div>
 
                 <!-- [Mục] Xóa cạnh (xoaCanh) -->
                 <h3>🗑️ Xóa cạnh</h3>
-                <input type="number" id="xoaX" placeholder="Đỉnh x">
-                <input type="number" id="xoaY" placeholder="Đỉnh y">
+                <input type="text" autocomplete="off" id="xoaX" placeholder="Đỉnh x">
+                <input type="text" autocomplete="off" id="xoaY" placeholder="Đỉnh y">
                 <button class="danger" onclick="xoaCanh()">Xóa cạnh</button>
 
                 <!-- [Mục] Sửa cạnh (suaCanh) -->
                 <h3>✏️ Sửa cạnh</h3>
-                <input type="number" id="cuX" placeholder="Đỉnh x cũ">
-                <input type="number" id="cuY" placeholder="Đỉnh y cũ">
-                <input type="number" id="moiX" placeholder="Đỉnh x mới">
-                <input type="number" id="moiY" placeholder="Đỉnh y mới">
+                <input type="text" autocomplete="off" id="cuX" placeholder="Đỉnh x cũ">
+                <input type="text" autocomplete="off" id="cuY" placeholder="Đỉnh y cũ">
+                <input type="text" autocomplete="off" id="moiX" placeholder="Đỉnh x mới">
+                <input type="text" autocomplete="off" id="moiY" placeholder="Đỉnh y mới">
                 <input type="number" id="moiW" step="any" placeholder="Trọng số mới (bỏ trống = giữ cũ)">
                 <button onclick="suaCanh()">Sửa cạnh</button>
 

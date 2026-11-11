@@ -23,6 +23,18 @@ function apDungMauDoThi() {
     veDoThi();
 }
 
+// [Mục] Đổi kiểu nhãn đỉnh/cạnh: "so" (0,1,2…) hoặc "chu" (a,b,c…). Chỉ đổi cách hiển thị, dữ liệu đồ thị giữ nguyên.
+function chonKieuNhan(k) {
+    kieuNhan = k === "chu" ? "chu" : "so";
+    $("soNhanBtn").classList.toggle("active", kieuNhan === "so");
+    $("chuNhanBtn").classList.toggle("active", kieuNhan === "chu");
+    $("goiYNhan").textContent = kieuNhan === "chu" ? "Cạnh hiện dạng (a,b) · (c,d)… (nhập số hoặc chữ đều được)" : "Cạnh hiện dạng (0,1) · (2,3)… (nhập số hoặc chữ đều được)";
+    if (!Object.keys(nodes).length) return;   // chưa có đồ thị: chỉ nhớ chế độ
+    resetEuler();                              // bỏ tô Euler/Kruskal cũ (thông báo bước còn ghi nhãn kiểu cũ)
+    veDoThi();
+    hienThiThongTin();
+}
+
 // =========================================
 // CHỌN LOẠI ĐỒ THỊ
 // =========================================

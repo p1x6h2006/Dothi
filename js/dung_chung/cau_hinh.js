@@ -22,3 +22,30 @@ const PALETTES = {
     premium: { node: "#fbbf24", border: "#f8fafc", edge: "#38bdf8", glow: "#facc15" }
 };
 const COLOR_INPUTS = { node: "nodeColor", border: "nodeBorderColor", edge: "edgeColor", glow: "edgeGlowColor" };
+
+// -----------------------------------------------------
+// KIỂU NHÃN ĐỈNH / CẠNH: "so" (0, 1, 2, …) hoặc "chu" (a, b, c, …, z, aa, ab, …)
+//   Chỉ đổi cách HIỂN THỊ; bên trong đồ thị luôn lưu số 0..n-1.
+//   Nhãn cạnh (x,y) hiện theo nhãn của hai đỉnh nên đổi theo: (0,1) <-> (a,b).
+//   Đổi bằng nút "Nhãn số / Nhãn chữ" (chonKieuNhan trong doi_giao_dien.js).
+// -----------------------------------------------------
+let kieuNhan = "so";
+const chuCai = i => {                       // 0->a, 25->z, 26->aa, 27->ab, …
+    let s = "";
+    i = Number(i);
+    do { s = String.fromCharCode(97 + i % 26) + s; i = Math.floor(i / 26) - 1; } while (i >= 0);
+    return s;
+};
+const nhanDinh = i => kieuNhan === "chu" ? chuCai(i) : String(i);
+
+// Đọc đỉnh người dùng nhập: nhận cả số ("3") lẫn chữ ("d"/"D") ở mọi chế độ; sai -> NaN
+function docDinh(v) {
+    const t = String(v === undefined || v === null ? "" : v).trim();
+    if (/^\d+$/.test(t)) return parseInt(t, 10);
+    if (/^[a-zA-Z]+$/.test(t)) {
+        let x = 0;
+        for (const ch of t.toLowerCase()) x = x * 26 + (ch.charCodeAt(0) - 96);
+        return x - 1;
+    }
+    return NaN;
+}

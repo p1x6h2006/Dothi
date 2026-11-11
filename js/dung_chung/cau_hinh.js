@@ -24,16 +24,16 @@ const PALETTES = {
 const COLOR_INPUTS = { node: "nodeColor", border: "nodeBorderColor", edge: "edgeColor", glow: "edgeGlowColor" };
 
 // -----------------------------------------------------
-// KIỂU NHÃN ĐỈNH / CẠNH: "so" (0, 1, 2, …) hoặc "chu" (a, b, c, …, z, aa, ab, …)
+// KIỂU NHÃN ĐỈNH / CẠNH: "so" (0, 1, 2, …) hoặc "chu" (A, B, C, …, Z, AA, AB, …)
 //   Chỉ đổi cách HIỂN THỊ; bên trong đồ thị luôn lưu số 0..n-1.
-//   Nhãn cạnh (x,y) hiện theo nhãn của hai đỉnh nên đổi theo: (0,1) <-> (a,b).
+//   Nhãn cạnh (x,y) hiện theo nhãn của hai đỉnh nên đổi theo: (0,1) <-> (A,B).
 //   Đổi bằng nút "Nhãn số / Nhãn chữ" (chonKieuNhan trong doi_giao_dien.js).
 // -----------------------------------------------------
 let kieuNhan = "so";
-const chuCai = i => {                       // 0->a, 25->z, 26->aa, 27->ab, …
+const chuCai = i => {                       // 0->A, 25->Z, 26->AA, 27->AB, …
     let s = "";
     i = Number(i);
-    do { s = String.fromCharCode(97 + i % 26) + s; i = Math.floor(i / 26) - 1; } while (i >= 0);
+    do { s = String.fromCharCode(65 + i % 26) + s; i = Math.floor(i / 26) - 1; } while (i >= 0);
     return s;
 };
 const nhanDinh = i => kieuNhan === "chu" ? chuCai(i) : String(i);

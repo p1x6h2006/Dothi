@@ -20,7 +20,7 @@ function taoDoThi() {
             if (a.length !== 2 && a.length !== 3) { alert("Vui lòng nhập đúng dạng: x y hoặc x y w"); continue; }
 
             const x = docDinh(a[0]), y = docDinh(a[1]);
-            if (!Number.isInteger(x) || !Number.isInteger(y)) { alert("x và y phải là số thứ tự đỉnh (0, 1, 2…) hoặc chữ cái (a, b, c…)!"); continue; }
+            if (!Number.isInteger(x) || !Number.isInteger(y)) { alert("x và y phải là số thứ tự đỉnh (0, 1, 2…) hoặc chữ cái (A, B, C…)!"); continue; }
 
             const w = docTrongSo(a[2]);
             if (Number.isNaN(w)) { alert("Trọng số w phải là một số!"); continue; }

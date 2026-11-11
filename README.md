@@ -37,7 +37,7 @@
 | 🖱️ **Kéo thả đỉnh** | Vẽ bằng SVG, kéo đỉnh bằng chuột |
 | 🔢 **Ma trận** | Ma trận kề và ma trận trọng số |
 | 📋 **Danh sách kề** | Hiển thị dạng `[đỉnh] → [kề] → [kề] → NULL` |
-| 🔤 **Nhãn số / chữ** | Nút “Nhãn số / Nhãn chữ” đổi cách hiện đỉnh và cạnh: `(0,1)` ⇄ `(a,b)` ở hình vẽ, bảng, lời giải |
+| 🔤 **Nhãn số / chữ** | Nút “Nhãn số / Nhãn chữ” đổi cách hiện đỉnh và cạnh: `(0,1)` ⇄ `(A,B)` ở hình vẽ, bảng, lời giải |
 | 🔄 **Chu trình Euler** | Kiểm tra, tìm và mô phỏng từng bước |
 | 📮 **Người phát thư** | Tìm hành trình ngắn nhất qua mọi cạnh |
 | 🌲 **Kruskal** | Cây khung nhỏ nhất: bảng cạnh đã sắp xếp, cạnh chọn/loại, xem từng bước, tô cây khung, nạp ví dụ 33 và bài tập 37 |
@@ -419,10 +419,10 @@ Nút **🔢 Nhãn số / 🔤 Nhãn chữ** (khung Điều khiển, dưới nút
 
 | | Nhãn số | Nhãn chữ |
 |---|---|---|
-| Đỉnh | `0, 1, 2, …` | `a, b, c, …, z, aa, ab, …` |
-| Nhãn cạnh | `(0,1) · 5` | `(a,b) · 5` |
+| Đỉnh | `0, 1, 2, …` | `A, B, C, …, Z, AA, AB, …` |
+| Nhãn cạnh | `(0,1) · 5` | `(A,B) · 5` |
 
 - Áp dụng cho: hình vẽ, danh sách đỉnh/cạnh, bậc, danh sách kề, ma trận, Euler, người phát thư, Kruskal và các khung “Cách giải chi tiết”.
-- Khi nhập đỉnh (Thêm / Xóa / Sửa cạnh, hộp thoại Tạo đồ thị) có thể gõ **số hoặc chữ** (`0 1` hay `a b`, không phân biệt hoa thường) ở cả hai chế độ.
+- Khi nhập đỉnh (Thêm / Xóa / Sửa cạnh, hộp thoại Tạo đồ thị) có thể gõ **số hoặc chữ** (`0 1` hay `A B`, gõ chữ hoa hay thường đều nhận) ở cả hai chế độ.
 - Chế độ đang chọn được lưu cùng đồ thị; **Reset** đưa về Nhãn số. Đổi chế độ sẽ bỏ phần tô màu Euler/Kruskal đang chạy dở.
 - Mã nguồn: `kieuNhan`, `nhanDinh()`, `docDinh()` trong `js/dung_chung/cau_hinh.js`; `chonKieuNhan()` trong `js/giao_dien/doi_giao_dien.js`.

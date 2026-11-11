@@ -138,7 +138,7 @@ function boKruskal() {
 // ---- Nạp đồ thị mẫu lấy từ file Word (đỉnh a,b,c,… được đánh số 0,1,2,…) ----
 const VI_DU_KRUSKAL = {
     1: {   // Ví dụ: 6 đỉnh a..f -> 0..5, cây khung nặng 33
-        n: 6, tenDinh: "a=0, b=1, c=2, d=3, e=4, f=5",
+        n: 6, tenDinh: "A=0, B=1, C=2, D=3, E=4, F=5",
         e: [[3, 4, 1], [0, 5, 3], [1, 5, 4], [2, 3, 5], [2, 4, 7], [0, 1, 12], [5, 4, 20], [1, 2, 24]],
         pos: null   // bố trí đều trên vòng tròn
     },

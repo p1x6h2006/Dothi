@@ -28,7 +28,7 @@ function chonKieuNhan(k) {
     kieuNhan = k === "chu" ? "chu" : "so";
     $("soNhanBtn").classList.toggle("active", kieuNhan === "so");
     $("chuNhanBtn").classList.toggle("active", kieuNhan === "chu");
-    $("goiYNhan").textContent = kieuNhan === "chu" ? "Cạnh hiện dạng (a,b) · (c,d)… (nhập số hoặc chữ đều được)" : "Cạnh hiện dạng (0,1) · (2,3)… (nhập số hoặc chữ đều được)";
+    $("goiYNhan").textContent = kieuNhan === "chu" ? "Cạnh hiện dạng (A,B) · (C,D)… (nhập số hoặc chữ đều được)" : "Cạnh hiện dạng (0,1) · (2,3)… (nhập số hoặc chữ đều được)";
     if (!Object.keys(nodes).length) return;   // chưa có đồ thị: chỉ nhớ chế độ
     resetEuler();                              // bỏ tô Euler/Kruskal cũ (thông báo bước còn ghi nhãn kiểu cũ)
     veDoThi();

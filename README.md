@@ -41,8 +41,10 @@
 | 🔄 **Chu trình Euler** | Kiểm tra, tìm và mô phỏng từng bước |
 | 📮 **Người phát thư** | Tìm hành trình ngắn nhất qua mọi cạnh |
 | 🌲 **Kruskal** | Cây khung nhỏ nhất: bảng cạnh đã sắp xếp, cạnh chọn/loại, xem từng bước, tô cây khung, nạp ví dụ 33 và bài tập 37 |
+| 🌳 **Prim** | Cây khung nhỏ nhất: chọn đỉnh xuất phát, bảng cạnh ứng viên từng bước, xem từng bước, tô cây khung (xóa cạnh thừa), hủy mô phỏng |
 | 🎨 **3 giao diện** | Light, Premium, Neon |
 | 💾 **Tự động lưu** | Lưu vào `localStorage`, mở lại là có ngay |
+| 🗂️ **Phiên đồ thị** | Mỗi phiên là 1 đồ thị riêng (➕ Phiên mới, ✏️ Đổi tên, 🗑️ Xóa); bấm vào phiên nào thì đồ thị đó hiện ra |
 
 ---
 
@@ -66,7 +68,7 @@ Dothi/
     ├── loi/                # LÕI: dựng đồ thị, vẽ, lưu
     │   ├── chinh_sua_canh.js     # Tạo đồ thị, thêm / xóa / sửa cạnh
     │   ├── ve_do_thi.js          # Vẽ đồ thị bằng SVG, kéo đỉnh
-    │   └── luu_tru.js            # Tự động lưu / khôi phục / reset (localStorage)
+    │   └── luu_tru.js            # Phiên đồ thị + tự động lưu / khôi phục / reset (localStorage)
     └── chuc_nang/          # CHỨC NĂNG: các bài toán và cách hiển thị
         ├── bieu_dien/
         │   ├── ma_tran.js        # Ma trận kề, ma trận trọng số
@@ -75,6 +77,7 @@ Dothi/
         ├── chu_trinh_euler.js    # Chu trình Euler (kiểm tra, tìm, mô phỏng)
         ├── nguoi_phat_thu.js     # Bài toán người phát thư
         ├── kruskal.js            # Thuật toán Kruskal (cây khung nhỏ nhất, vô hướng)
+        ├── prim.js               # Thuật toán Prim (cây khung nhỏ nhất, vô hướng)
         └── cach_giai.js          # Cách giải chi tiết (khung bấm mới xổ ra) cho từng mục
 ```
 
@@ -279,7 +282,7 @@ Hiển thị nằm giữa phần **Bậc** và **Ma trận kề**.
 |-----|-----------|
 | `phanTichEuler()` | Kiểm tra điều kiện; nếu thỏa thì tìm chu trình bằng thuật toán **Hierholzer** (đánh dấu cạnh đã dùng theo số thứ tự cạnh nên đúng với cạnh song song và vòng khuyên). Nếu không thỏa: trả về lý do, và báo thêm nếu có **đường đi Euler** (2 đỉnh bậc lẻ / lệch bậc ra-vào) |
 | `htmlEuler()` | Vẽ phần kết quả (nằm cuối khung thông tin, sau ma trận trọng số) |
-| `chayEuler()` | Mô phỏng từng bước (0,8 giây/cạnh): cạnh đã đi tô cam, ghi số thứ tự. Bấm là **tự cuộn** lên chỗ đồ thị (`cuonDenDoThi`); lời giải thích từng bước hiện ngay trên hình (góc trên trái) và ở khung thông tin |
+| `taoDKEuler()` | Đưa cho bộ điều khiển từng bước (`dieu_khien_buoc.js`) số bước và hàm dựng lại phần tô màu ở bước j. Điều khiển bằng 5 nút ⏮ Về đầu · ◀ Bước trước · Bước tiếp ▶ · ⏩ Tự chạy (0,8 giây/cạnh) · ⏸ Dừng. Lần đầu bấm sẽ **tự cuộn** lên chỗ đồ thị (`cuonDenDoThi`); lời giải thích từng bước hiện trên hình (góc trên trái) và ở khung thông tin |
 | `hienEuler()` | Tô cả chu trình một lần |
 | `boEuler()` | Bỏ tô màu, tự cuộn lên chỗ đồ thị |
 | `doiDinhEuler()` | Chọn đỉnh bắt đầu (mặc định: đỉnh nhỏ nhất có cạnh) |
@@ -407,9 +410,27 @@ File: `js/chuc_nang/kruskal.js` (lời giải chi tiết: `giaiChiTietKruskal()`
 | 🌲 Phân tích & giải Kruskal | Hiện bảng cạnh đã sắp xếp, cạnh chọn/loại, tổng trọng lượng |
 | Nạp ví dụ (6 đỉnh) / Nạp bài tập (9 đỉnh) | Nạp đồ thị trong file Word (kết quả 33 và 37) |
 | ▶ Xem từng bước | Mỗi giây xét một cạnh: chọn = xanh ngọc, loại = đỏ nét đứt |
-| Tô cây khung / Bỏ tô màu | Chỉ tô các cạnh của cây khung / xóa màu |
+| Tô cây khung | Tô các cạnh của cây khung và **xóa các cạnh thừa** khỏi hình |
+| ✖ Hủy mô phỏng | Dừng chạy, hiện lại mọi cạnh, đồ thị trở về bình thường |
 
-Trạng thái tô màu: biến `krHL` (`trang_thai.js`), được lưu cùng đồ thị; `ve_do_thi.js` đọc `krHL` khi vẽ cạnh.
+Trạng thái tô màu: biến `krHL` (`trang_thai.js`), được lưu cùng đồ thị; `ve_do_thi.js` đọc `krHL` khi vẽ cạnh. Khi `krHL.an = true` (đã ra kết quả cây khung) các cạnh không thuộc cây khung không được vẽ; dữ liệu đồ thị không bị sửa nên Hủy mô phỏng khôi phục lại ngay.
+
+---
+
+## 🌳 Thuật toán Prim
+
+File: `js/chuc_nang/prim.js` (lời giải chi tiết: `giaiChiTietPrim()` trong `cach_giai.js`). Chỉ dùng cho đồ thị **vô hướng** (`loai` 1–3), dùng chung `krHL` và hai ví dụ của Kruskal.
+
+1. Chọn đỉnh xuất phát `s` (ô “Đỉnh bắt đầu”), `V_T = {s}`, `F = Ø`.
+2. Trong các cạnh có một đầu trong `V_T`, một đầu ngoài `V_T`, chọn cạnh có trọng lượng nhỏ nhất (bằng nhau thì lấy cạnh nhập trước), thêm đỉnh mới vào `V_T`.
+3. Lặp đến khi đủ `n − 1` cạnh. Đồ thị không liên thông thì chỉ phủ được thành phần chứa `s`.
+
+| Nút | Tác dụng |
+|-----|----------|
+| 🌳 Phân tích & giải Prim | Hiện bảng từng bước: `V_T`, cạnh ứng viên, cạnh chọn, tổng trọng lượng |
+| ▶ Xem từng bước | Mỗi giây thêm một cạnh (xanh ngọc, đỉnh trong cây có viền xanh ngọc); xong thì xóa cạnh thừa |
+| Tô cây khung | Tô ngay cây khung và xóa cạnh thừa |
+| ✖ Hủy mô phỏng | Dừng chạy, hiện lại mọi cạnh, đồ thị trở về bình thường |
 
 ---
 
@@ -426,3 +447,17 @@ Nút **🔢 Nhãn số / 🔤 Nhãn chữ** (khung Điều khiển, dưới nút
 - Khi nhập đỉnh (Thêm / Xóa / Sửa cạnh, hộp thoại Tạo đồ thị) có thể gõ **số hoặc chữ** (`0 1` hay `A B`, gõ chữ hoa hay thường đều nhận) ở cả hai chế độ.
 - Chế độ đang chọn được lưu cùng đồ thị; **Reset** đưa về Nhãn số. Đổi chế độ sẽ bỏ phần tô màu Euler/Kruskal đang chạy dở.
 - Mã nguồn: `kieuNhan`, `nhanDinh()`, `docDinh()` trong `js/dung_chung/cau_hinh.js`; `chonKieuNhan()` trong `js/giao_dien/doi_giao_dien.js`.
+
+
+## Bộ điều khiển từng bước (Euler · Kruskal · Prim)
+
+**File `js/loi/dieu_khien_buoc.js`** — 5 nút dùng chung: ⏮ Về đầu · ◀ Bước trước · Bước tiếp ▶ · ⏩ Tự chạy · ⏸ Dừng. Có dòng "Bước k/max" phía trên.
+
+| Hàm | Công dụng |
+|---|---|
+| `htmlDieuKhienBuoc(kieu)` | Sinh khung 5 nút (`kieu` = `euler` / `kruskal` / `prim`) |
+| `dkLenh(kieu, act)` | Điểm vào của mọi nút (`dau` / `truoc` / `tiep` / `chay` / `dung`) |
+| `dkDen(j)` | Đi tới bước j: gọi `ap(j)` dựng lại toàn bộ phần tô màu rồi vẽ lại |
+| `dkHuy()` | Hủy mô phỏng (tự gọi từ `resetEuler()` / `resetKruskalHL()`, nên sửa đồ thị là tự dừng) |
+
+Mỗi thuật toán chỉ cần cung cấp `taoDKEuler()` / `taoDKKruskal()` / `taoDKPrim()` trả về `{ max, delay, k0(), ap(j) }`. Vì `ap(j)` dựng lại từ đầu nên đi lùi hay nhảy về đầu đều dùng chung một hàm. Tự chạy khi đã xong sẽ chạy lại từ đầu; "Tô cả chu trình / Tô cây khung" đưa bộ đếm tới bước cuối. Nút cũ "Xem từng bước" / "Mô phỏng" đã được thay bằng bộ nút này.

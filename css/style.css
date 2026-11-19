@@ -419,4 +419,32 @@ button:disabled { opacity: .45; pointer-events: none; }
 .kr-table td.kr-chon { background: color-mix(in srgb, #059669 24%, transparent); font-weight: 800; }
 .kr-table td.kr-loai { background: color-mix(in srgb, #ef4444 20%, transparent); text-decoration: line-through; text-decoration-color: rgba(239, 68, 68, .55); }
 .kr-table td.kr-chua { color: var(--muted); opacity: .75; }
-.npt-btns.kr-btns { grid-template-columns: 1fr 1fr 1fr; }
+.npt-btns.kr-btns { grid-template-columns: 1fr 1fr; }
+
+/* =====================================================
+   ĐIỀU KHIỂN TỪNG BƯỚC (js/loi/dieu_khien_buoc.js): 5 nút xếp dọc dùng chung cho Euler / Kruskal / Prim
+   .dk-count : "Bước k/max" | .dk-btns : cột nút | .dk-dau : nút "Về đầu" (hồng tím)
+===================================================== */
+.dk-wrap { margin-top: 12px; }
+.dk-count { margin-bottom: 4px; font-size: 13px; font-weight: 700; color: var(--muted); }
+.dk-btns { display: flex; flex-direction: column; gap: 10px; }
+.dk-btns button { margin-top: 0; padding: 12px 14px; font-size: 15px; border-radius: 14px; }
+.dk-dau { background: linear-gradient(120deg, #d946ef, #ec4899, #d946ef); background-size: 200% auto; box-shadow: 0 8px 20px rgba(217,70,239,.35); }
+.dk-dau:hover { box-shadow: 0 14px 30px rgba(217,70,239,.5); }
+
+
+/* =========================================================
+   PHIÊN ĐỒ THỊ (js/loi/luu_tru.js)
+   .phien-list : danh sách phiên (cuộn) | .phien-item : 1 phiên (.active = đang xem) | .phien-btns : 3 nút
+   ========================================================= */
+.phien-list { display: flex; flex-direction: column; gap: 6px; max-height: 190px; overflow-y: auto; padding: 2px; }
+.phien-item {
+    display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin-top: 0; padding: 9px 12px; text-align: left;
+    font-size: 14px; color: var(--text); background: var(--chip); border: 1px solid var(--line); box-shadow: none;
+}
+.phien-item:hover { background: var(--chip-hover); box-shadow: none; filter: none; }
+.phien-item.active { color: #fff; border-color: transparent; background: linear-gradient(135deg, var(--a1), var(--a2)); }
+.phien-ten { font-weight: 800; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.phien-item small { flex: none; font-size: 11px; opacity: .85; }
+.phien-btns { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 8px; }
+.phien-btns button { margin-top: 0; padding: 9px 4px; font-size: 13px; }

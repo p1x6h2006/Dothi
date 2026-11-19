@@ -37,6 +37,16 @@
                     <button class="danger" onclick="resetDoThi()">↺ Reset</button>
                 </div>
                 <div class="save-status" id="luuTrangThai">Đồ thị được tự động lưu</div>
+
+                <!-- [Mục] Phiên đồ thị (luu_tru.js): mỗi phiên là 1 đồ thị riêng, bấm vào phiên nào thì đồ thị đó hiện ra -->
+                <h3>🗂️ Phiên đồ thị</h3>
+                <div class="phien-list" id="danhSachPhien"></div>
+                <div class="phien-btns">
+                    <button class="success" onclick="phienMoi()">➕ Phiên mới</button>
+                    <button class="info" onclick="doiTenPhien()">✏️ Đổi tên</button>
+                    <button class="danger" onclick="xoaPhien()">🗑️ Xóa</button>
+                </div>
+                <hr>
                 <label>Loại đồ thị:</label>
                 <select id="loai" onchange="hienThiThongTin()"></select>
 
@@ -117,6 +127,12 @@
                     <button class="info" onclick="napViDuKruskal(2)">Nạp bài tập (9 đỉnh)</button>
                 </div>
                 <div class="note hint">Ví dụ 6 đỉnh: A, B, C, D, E, F được đánh số 0, 1, 2, 3, 4, 5.</div>
+                <hr>
+
+                <!-- [Mục] Thuật toán Prim: cây khung nhỏ nhất (giaiPrim trong prim.js) -->
+                <h3>🌳 Thuật toán Prim</h3>
+                <div class="note hint">Tìm cây khung nhỏ nhất của đồ thị vô hướng có trọng số: xuất phát từ một đỉnh, mỗi bước thêm cạnh nhỏ nhất nối cây với một đỉnh chưa có trong cây. Ra kết quả sẽ xóa các cạnh thừa; bấm “Hủy mô phỏng” để trả đồ thị về bình thường. Có thể dùng hai ví dụ Kruskal ở trên.</div>
+                <button class="success" onclick="giaiPrim()">🌳 Phân tích &amp; giải Prim</button>
             </div>
 
             <!-- ---- CỘT GIỮA: VÙNG ĐỒ THỊ ----
@@ -134,18 +150,20 @@
         </div>
     </div>
 
-    <!-- ===== NẠP SCRIPT (KHÔNG ĐỔI THỨ TỰ): cau_hinh -> trang_thai -> kiem_tra -> doi_giao_dien -> chinh_sua_canh -> ve_do_thi -> ma_tran -> danh_sach_ke -> chu_trinh_euler -> nguoi_phat_thu -> kruskal -> cach_giai -> thong_tin -> luu_tru -> chinh ===== -->
+    <!-- ===== NẠP SCRIPT (KHÔNG ĐỔI THỨ TỰ): cau_hinh -> trang_thai -> kiem_tra -> doi_giao_dien -> chinh_sua_canh -> ve_do_thi -> dieu_khien_buoc -> ma_tran -> danh_sach_ke -> chu_trinh_euler -> nguoi_phat_thu -> kruskal -> prim -> cach_giai -> thong_tin -> luu_tru -> chinh ===== -->
     <script src="js/dung_chung/cau_hinh.js"></script>
     <script src="js/dung_chung/trang_thai.js"></script>
     <script src="js/dung_chung/kiem_tra.js"></script>
     <script src="js/giao_dien/doi_giao_dien.js"></script>
     <script src="js/loi/chinh_sua_canh.js"></script>
     <script src="js/loi/ve_do_thi.js"></script>
+    <script src="js/loi/dieu_khien_buoc.js"></script>
     <script src="js/chuc_nang/bieu_dien/ma_tran.js"></script>
     <script src="js/chuc_nang/bieu_dien/danh_sach_ke.js"></script>
     <script src="js/chuc_nang/chu_trinh_euler.js"></script>
     <script src="js/chuc_nang/nguoi_phat_thu.js"></script>
     <script src="js/chuc_nang/kruskal.js"></script>
+    <script src="js/chuc_nang/prim.js"></script>
     <script src="js/chuc_nang/cach_giai.js"></script>
     <script src="js/chuc_nang/bieu_dien/thong_tin.js"></script>
     <script src="js/loi/luu_tru.js"></script>

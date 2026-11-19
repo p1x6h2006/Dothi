@@ -121,6 +121,7 @@ function canhThemTheoPhanHoach(goc, p) {
 // ---- Xem / áp dụng phân hoạch Pi: dựng lại đồ thị = gốc + các cạnh dọc đường đi ngắn nhất ----
 function apDungPhanHoach(i) {
     if (!npt || npt.loi || !npt.ds[i]) return;
+    const dangEuler = !!dk && dk.kieu === "euler";   // đang mô phỏng Euler thì nhớ lại để chạy tiếp trên đồ thị mới
     edges = npt.goc.map(e => ({ ...e }));
     canhThemNPT = new Set();
     canhThemTheoPhanHoach(npt.goc, npt.ds[i]).forEach(e => {
@@ -134,6 +135,8 @@ function apDungPhanHoach(i) {
     veDoThi();
     hienThiThongTin();
     cuonDenDoThi();       // nhảy lên chỗ đồ thị để xem luôn
+    // Đổi sang phân hoạch khác thì hành trình đổi theo: mô phỏng Euler bắt đầu lại từ bước 0 trên đồ thị mới (không để mất)
+    if (dangEuler) dkLenh("euler", "dau");
 }
 
 function traLaiDoThiGoc(khongCuon) {

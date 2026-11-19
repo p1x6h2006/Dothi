@@ -284,7 +284,7 @@ Hiển thị nằm giữa phần **Bậc** và **Ma trận kề**.
 | `htmlEuler()` | Vẽ phần kết quả (nằm cuối khung thông tin, sau ma trận trọng số) |
 | `taoDKEuler()` | Đưa cho bộ điều khiển từng bước (`dieu_khien_buoc.js`) số bước và hàm dựng lại phần tô màu ở bước j. Điều khiển bằng 5 nút ⏮ Về đầu · ◀ Bước trước · Bước tiếp ▶ · ⏩ Tự chạy (0,8 giây/cạnh) · ⏸ Dừng. Lần đầu bấm sẽ **tự cuộn** lên chỗ đồ thị (`cuonDenDoThi`); lời giải thích từng bước hiện trên hình (góc trên trái) và ở khung thông tin |
 | `hienEuler()` | Tô cả chu trình một lần |
-| `boEuler()` | Bỏ tô màu, tự cuộn lên chỗ đồ thị |
+| `huyEuler()` | Nút **✖ Hủy mô phỏng**: dừng chạy, bỏ tô màu, tự cuộn lên chỗ đồ thị |
 | `doiDinhEuler()` | Chọn đỉnh bắt đầu (mặc định: đỉnh nhỏ nhất có cạnh) |
 | `resetEuler()` | Dừng mô phỏng, bỏ tô màu (tự gọi khi thêm/xóa/sửa cạnh, tạo đồ thị mới) |
 

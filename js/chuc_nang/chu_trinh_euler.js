@@ -159,7 +159,8 @@ function hienEuler() {
     cuonDenDoThi();
 }
 
-function boEuler() {
+// HỦY MÔ PHỎNG: dừng chạy, bỏ tô màu, đồ thị trở về bình thường
+function huyEuler() {
     resetEuler();
     veDoThi();
     const t = $("eulerStatus");
@@ -185,7 +186,7 @@ function htmlDayEuler(r, soCanhGoc) {
 }
 
 function htmlNutEuler() {
-    return '<div class="euler-btns"><button class="success" onclick="hienEuler()">Tô cả chu trình</button><button class="danger" onclick="boEuler()">Bỏ tô màu</button></div>' +
+    return '<div class="euler-btns"><button class="success" onclick="hienEuler()">Tô cả chu trình</button><button class="danger" onclick="huyEuler()">✖ Hủy mô phỏng</button></div>' +
         htmlDieuKhienBuoc("euler") +
         '<div class="euler-status" id="eulerStatus"></div>';
 }

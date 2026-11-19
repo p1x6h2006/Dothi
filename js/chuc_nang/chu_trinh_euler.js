@@ -11,13 +11,10 @@
 //   ve_do_thi.js đọc eulerHL khi vẽ cạnh / đỉnh.
 
 const MAU_EULER = "#f59e0b";
-let eulerTimer = null;   // bộ đếm giờ của phần mô phỏng từng bước
 let eulerStart = null;   // đỉnh bắt đầu do người dùng chọn (null = đỉnh nhỏ nhất có cạnh)
 
 // Dừng mô phỏng và bỏ tô màu (KHÔNG vẽ lại; nơi gọi tự vẽ lại nếu cần)
 function resetEuler() {
-    clearInterval(eulerTimer);
-    eulerTimer = null;
     eulerHL = null;
     if (typeof resetKruskalHL === "function") resetKruskalHL();   // hai kiểu tô màu không hiện cùng lúc (kruskal.js)
 }
@@ -135,23 +132,20 @@ function chuanBiEuler() {
     return r;
 }
 
-function chayEuler() {
+// Mô phỏng từng bước (nút ⏮ ◀ ▶ ⏩ ⏸ trong js/loi/dieu_khien_buoc.js): bước j = đã đi j cạnh đầu của hành trình.
+function taoDKEuler() {
     const r = chuanBiEuler();
-    if (!r.ok) return;
-    resetEuler();
-    eulerHL = { order: {}, cur: r.vs[0] };
-    trangThaiEuler(r, 0);
-    veDoThi();
-    cuonDenDoThi();
-    let k = 0;
-    eulerTimer = setInterval(() => {
-        if (k >= r.es.length) { clearInterval(eulerTimer); eulerTimer = null; return; }
-        eulerHL.order[r.es[k]] = k + 1;
-        k++;
-        eulerHL.cur = r.vs[k];
-        trangThaiEuler(r, k);
-        veDoThi();
-    }, 800);
+    if (!r.ok) return null;
+    return {
+        max: r.es.length, delay: 800,
+        k0: () => eulerHL ? (eulerHL.cur === null ? r.es.length : Object.keys(eulerHL.order).length) : 0,
+        ap: j => {
+            krHL = null;
+            eulerHL = { order: {}, cur: r.vs[j] };
+            for (let t = 0; t < j; t++) eulerHL.order[r.es[t]] = t + 1;
+            trangThaiEuler(r, j);
+        }
+    };
 }
 
 function hienEuler() {
@@ -175,6 +169,7 @@ function boEuler() {
 
 function doiDinhEuler(v) {
     eulerStart = parseInt(v);
+    resetEuler();
     hienThiThongTin();   // dựng lại bảng và tự bỏ tô màu cũ
 }
 
@@ -190,7 +185,8 @@ function htmlDayEuler(r, soCanhGoc) {
 }
 
 function htmlNutEuler() {
-    return '<div class="euler-btns"><button onclick="chayEuler()">▶ Mô phỏng</button><button class="success" onclick="hienEuler()">Tô cả chu trình</button><button class="danger" onclick="boEuler()">Bỏ tô màu</button></div>' +
+    return '<div class="euler-btns"><button class="success" onclick="hienEuler()">Tô cả chu trình</button><button class="danger" onclick="boEuler()">Bỏ tô màu</button></div>' +
+        htmlDieuKhienBuoc("euler") +
         '<div class="euler-status" id="eulerStatus"></div>';
 }
 

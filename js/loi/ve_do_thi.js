@@ -33,13 +33,14 @@ function veDoThi() {
     const markerHL = el("marker", { id: "arrowHL", markerWidth: 10, markerHeight: 10, refX: 9, refY: 3, orient: "auto", fill: MAU_EULER }, defs);
     el("path", { d: "M0,0 L0,6 L9,3 z", fill: MAU_EULER }, markerHL);
 
-    edges.forEach((e, index) => veCanh(e.x, e.y, index));
+    // Khi ra kết quả cây khung (krHL.an): chỉ vẽ các cạnh thuộc cây khung, các cạnh thừa không vẽ (dữ liệu vẫn còn; "Hủy mô phỏng" sẽ hiện lại)
+    edges.forEach((e, index) => { if (krHL && krHL.an && !krHL.chon[index]) return; veCanh(e.x, e.y, index); });
     for (const i in nodes) veDinh(Number(i));
 
     // Thông báo bước Euler đang chạy (chu_trinh_euler.js), đặt góc trên bên trái hình
     if (eulerHL && eulerHL.msg) el("text", { x: 16, y: 26, class: "edge-label", style: "text-anchor:start;font-size:15px" }).textContent = eulerHL.msg;
 
-    // Thông báo bước Kruskal đang chạy (kruskal.js), cùng chỗ với thông báo Euler
+    // Thông báo bước Kruskal / Prim đang chạy (kruskal.js, prim.js), cùng chỗ với thông báo Euler
     if (krHL && krHL.msg) el("text", { x: 16, y: 26, class: "edge-label", style: "text-anchor:start;font-size:15px" }).textContent = krHL.msg;
 
     // Dòng thông báo của bài toán người phát thư (nguoi_phat_thu.js), góc dưới trái; bấm vào để xuống bảng kết quả
@@ -93,7 +94,8 @@ function veCanh(x, y, index) {
 
     // --- Cạnh thường: tính độ cong ---
     // Độ cong: các cạnh song song được tách ra hai bên
-    const same = edges.filter(e => (e.x === x && e.y === y) || (e.x === y && e.y === x));
+    // (đang hiện riêng cây khung thì không có cạnh song song nào được vẽ cùng, nên vẽ thẳng)
+    const same = krHL && krHL.an ? [edges[index]] : edges.filter(e => (e.x === x && e.y === y) || (e.x === y && e.y === x));
     const offset = (same.indexOf(edges[index]) - (same.length - 1) / 2) * 50;
     // Pháp tuyến luôn tính theo chiều CỐ ĐỊNH (đỉnh nhỏ -> đỉnh lớn), không phụ thuộc chiều cạnh.
     // Nhờ vậy (1,4) và (4,1) cong về HAI PHÍA KHÁC NHAU thành 2 đường riêng, thay vì chồng lên nhau.
@@ -134,7 +136,7 @@ function veCanh(x, y, index) {
 function veDinh(i) {
     const p = nodes[i], g = el("g");
     el("circle", { cx: p.x, cy: p.y + 7, r: 32, fill: "rgba(59, 130, 246, 0.22)", "pointer-events": "none" }, g);   // bóng đổ nhẹ, thay cho drop-shadow
-    const c = el("circle", { cx: p.x, cy: p.y, r: 30, class: "node", fill: graphPalette.node, stroke: eulerHL && eulerHL.cur === i ? MAU_EULER : graphPalette.border, "stroke-width": eulerHL && eulerHL.cur === i ? 7 : 3 }, g);
+    const c = el("circle", { cx: p.x, cy: p.y, r: 30, class: "node", fill: graphPalette.node, stroke: eulerHL && eulerHL.cur === i ? MAU_EULER : krHL && krHL.tham && krHL.tham.includes(i) ? MAU_KRUSKAL : graphPalette.border, "stroke-width": eulerHL && eulerHL.cur === i ? 7 : krHL && krHL.tham && krHL.tham.includes(i) ? 6 : 3 }, g);   // đỉnh đã vào cây Prim: viền xanh ngọc
     c.addEventListener("mousedown", e => { draggingNode = i; e.preventDefault(); });
     el("text", { x: p.x, y: p.y, class: "node-text" }, g).textContent = nhanDinh(i);
 }

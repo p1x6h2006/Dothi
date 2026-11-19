@@ -11,16 +11,16 @@
 // Nếu đồ thị không liên thông: không có cây khung, thuật toán cho RỪNG KHUNG NHỎ NHẤT (n − k cạnh, k = số thành phần liên thông).
 // Trạng thái tô màu: krHL (trang_thai.js) = { chon: {chỉ số cạnh: thứ tự chọn}, loai: [chỉ số cạnh bị loại], msg }
 //   ve_do_thi.js đọc krHL khi vẽ cạnh: cạnh chọn màu xanh ngọc, cạnh bị loại màu đỏ nét đứt.
+//   Ngoài ra krHL.an = true (đặt khi ra kết quả cây khung) -> ve_do_thi.js KHÔNG vẽ các cạnh thừa (không thuộc cây khung).
+//   Nút "Hủy mô phỏng" đặt krHL = null -> mọi cạnh hiện lại, đồ thị trở về bình thường. Prim (prim.js) dùng chung krHL.
 
 const MAU_KRUSKAL = "#059669";    // cạnh được chọn vào cây khung
 const MAU_KRUSKAL_LOAI = "#ef4444";   // cạnh bị loại (tạo chu trình)
 const NHAN_LOAI_KRUSKAL = "Thuật toán Kruskal chỉ hỗ trợ đồ thị vô hướng (loại 1–3).";
-let krTimer = null;   // bộ đếm giờ của phần xem từng bước
 
 // Dừng xem từng bước và bỏ tô màu (KHÔNG vẽ lại; nơi gọi tự vẽ lại nếu cần). resetEuler() cũng gọi hàm này.
 function resetKruskalHL() {
-    clearInterval(krTimer);
-    krTimer = null;
+    dkHuy();   // dừng tự chạy (dieu_khien_buoc.js)
     krHL = null;
 }
 
@@ -88,45 +88,42 @@ const moTaBuocKruskal = (b, soCan) => b.chon
     ? `Xét (${nhanDinh(b.x)},${nhanDinh(b.y)}) w = ${fmt(b.w)}: hai đầu ở hai cây khác nhau ⇒ CHỌN (${b.thu}/${soCan}).`
     : `Xét (${nhanDinh(b.x)},${nhanDinh(b.y)}) w = ${fmt(b.w)}: ${b.x === b.y ? "là vòng khuyên" : "hai đầu đã cùng một cây"} ⇒ tạo chu trình, LOẠI.`;
 
-// Xem từng bước: mỗi 1 giây xét thêm một cạnh theo thứ tự đã sắp xếp
-function chayKruskal() {
-    if (coHuong()) return alert(NHAN_LOAI_KRUSKAL);
+// Mô phỏng từng bước (nút ⏮ ◀ ▶ ⏩ ⏸ trong js/loi/dieu_khien_buoc.js): bước j = đã xét j cạnh đầu theo thứ tự sắp xếp;
+// bước cuối (max) = xong, ẩn các cạnh thừa.
+function taoDKKruskal() {
+    if (coHuong()) { alert(NHAN_LOAI_KRUSKAL); return null; }
     const kq = tinhKruskal();
-    if (kq.loi) return alert(kq.loi);
-    resetEuler();
-    krHL = { chon: {}, loai: [], msg: "" };
-    datThongBaoKruskal(`Bắt đầu với F = Ø: đồ thị rỗng T có ${n} đỉnh, ${kq.sorted.length} cạnh đã xếp tăng dần.`);
-    veDoThi();
-    cuonDenDoThi();
-    let k = 0;
-    krTimer = setInterval(() => {
-        if (!krHL) { clearInterval(krTimer); krTimer = null; return; }
-        if (k >= kq.buoc.length) {
-            clearInterval(krTimer); krTimer = null;
-            datThongBaoKruskal(`Xong: đã chọn ${kq.chon.length} cạnh, trọng lượng nhỏ nhất = ${fmt(kq.tong)}.`);
-            veDoThi();
-            return;
+    if (kq.loi) { alert(kq.loi); return null; }
+    const L = kq.buoc.length;
+    return {
+        max: L + 1, delay: 1000,
+        k0: () => krHL && krHL.kieu === "kruskal" ? (krHL.an ? L + 1 : Object.keys(krHL.chon).length + krHL.loai.length) : 0,
+        ap: j => {
+            eulerHL = null;
+            krHL = { kieu: "kruskal", chon: {}, loai: [], an: j > L, msg: "" };
+            kq.buoc.slice(0, Math.min(j, L)).forEach(b => { if (b.chon) krHL.chon[b.i] = b.thu; else krHL.loai.push(b.i); });
+            datThongBaoKruskal(j === 0
+                ? `Bắt đầu với F = Ø: đồ thị rỗng T có ${n} đỉnh, ${kq.sorted.length} cạnh đã xếp tăng dần.`
+                : j <= L ? moTaBuocKruskal(kq.buoc[j - 1], kq.canChon)
+                : `Xong: đã chọn ${kq.chon.length} cạnh, trọng lượng nhỏ nhất = ${fmt(kq.tong)}. Đã xóa các cạnh thừa (bấm “Hủy mô phỏng” để trả lại).`);
         }
-        const b = kq.buoc[k++];
-        if (b.chon) krHL.chon[b.i] = b.thu; else krHL.loai.push(b.i);
-        datThongBaoKruskal(moTaBuocKruskal(b, kq.canChon));
-        veDoThi();
-    }, 1000);
+    };
 }
 
-// Tô ngay cây khung (chỉ các cạnh được chọn)
+// Tô ngay cây khung và xóa luôn các cạnh thừa (chỉ còn các cạnh được chọn)
 function hienKruskal() {
     if (coHuong()) return alert(NHAN_LOAI_KRUSKAL);
     const kq = tinhKruskal();
     if (kq.loi) return alert(kq.loi);
     resetEuler();
-    krHL = { chon: {}, loai: [], msg: "" };
+    krHL = { kieu: "kruskal", chon: {}, loai: [], an: true, msg: "" };   // an = true: xóa các cạnh thừa khỏi hình
     kq.buoc.forEach(b => { if (b.chon) krHL.chon[b.i] = b.thu; });
-    datThongBaoKruskal(`${kq.lienThong ? "Cây khung nhỏ nhất" : "Rừng khung nhỏ nhất"}: ${kq.chon.length} cạnh, trọng lượng = ${fmt(kq.tong)}.`);
+    datThongBaoKruskal(`${kq.lienThong ? "Cây khung nhỏ nhất" : "Rừng khung nhỏ nhất"}: ${kq.chon.length} cạnh, trọng lượng = ${fmt(kq.tong)}. Đã xóa các cạnh thừa.`);
     veDoThi();
     cuonDenDoThi();
 }
 
+// HỦY MÔ PHỎNG: dừng chạy, bỏ tô màu, hiện lại mọi cạnh -> đồ thị như ban đầu
 function boKruskal() {
     resetKruskalHL();
     veDoThi();
@@ -201,10 +198,10 @@ function htmlKruskal() {
         text += `<div class="npt-total">Rừng khung nhỏ nhất (${kq.chon.length} cạnh): ${kq.chon.map(i => fmt(trongSoCanh(edges[i]))).join(" + ") || "0"} = ${fmt(kq.tong)}</div>`;
     }
     text += '<div class="npt-btns kr-btns">' +
-        '<button onclick="chayKruskal()">▶ Xem từng bước</button>' +
         '<button class="success" onclick="hienKruskal()">Tô cây khung</button>' +
-        '<button class="danger" onclick="boKruskal()">Bỏ tô màu</button></div>';
-    text += '<div class="euler-status" id="krStatus">' + (krHL && krHL.msg ? krHL.msg : "") + "</div>";
+        '<button class="danger" onclick="boKruskal()">✖ Hủy mô phỏng</button></div>';
+    text += htmlDieuKhienBuoc("kruskal");
+    text += '<div class="euler-status" id="krStatus">' + (krHL && krHL.kieu !== "prim" && krHL.msg ? krHL.msg : "") + "</div>";
     if (edges.some(e => e.w === undefined)) text += ghiChu("Cạnh nhập không có trọng số được tính w = 1.");
     return text + "</div>";
 }

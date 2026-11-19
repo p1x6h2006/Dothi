@@ -421,3 +421,37 @@ function giaiChiTietKruskal() {
         gDong("Bấm “Xem từng bước” hoặc “Tô cây khung” để xem trực tiếp trên đồ thị."));
     return gKhung("kruskal", s);
 }
+
+// =====================================================
+// 9) THUẬT TOÁN PRIM (cây khung nhỏ nhất)
+// =====================================================
+function giaiChiTietPrim() {
+    if (coHuong()) return gKhung("prim", gBuoc(1, "Phạm vi", gDong(NHAN_LOAI_PRIM)));
+    const k = tinhPrim();
+    if (k.loi) return gKhung("prim", gBuoc(1, "Không giải được", gDong(gXau(k.loi))));
+
+    const tp = ds => `{${ds.map(nhanDinh).join(", ")}}`;
+    let s = gBuoc(1, "Hiểu đề",
+        gDong("<b>Cây khung</b> là đồ thị con liên thông, không có chu trình, chứa mọi đỉnh (n đỉnh thì có đúng n − 1 cạnh). Cây khung nhỏ nhất là cây khung có tổng trọng lượng bé nhất.") +
+        gDong("Prim: lớn dần <b>một cây duy nhất</b> từ một đỉnh xuất phát; mỗi bước thêm cạnh nhỏ nhất nối cây với một đỉnh nằm ngoài cây."));
+
+    s += gBuoc(2, "Chọn đỉnh xuất phát",
+        gDong(`Chọn s = ${gv(k.start)} (có thể đổi ở ô “Đỉnh bắt đầu”). Cây ban đầu chỉ có đỉnh s, chưa có cạnh.`) +
+        gCT(`V_T = ${tp([k.start])}, F = Ø`));
+
+    s += gBuoc(3, "Lặp: chọn cạnh ứng viên nhỏ nhất",
+        gDong("Cạnh ứng viên là cạnh có <b>một đầu trong V_T, một đầu ngoài V_T</b>, nên thêm vào không bao giờ tạo chu trình. Cạnh không có w tính w = 1; bằng trọng lượng thì lấy cạnh nhập trước.") +
+        k.buoc.map(b => gDong(
+            `Bước ${b.thu}: V_T = ${tp(b.daTham)}. Ứng viên: ${b.ungVien.map(c => `${tenCanhPrim(c)}:${fmt(c.w)}`).join(", ")} ⇒ ` +
+            gOk(`chọn ${tenCanhPrim(b)} (w = ${fmt(b.w)}), thêm đỉnh ${nhanDinh(b.moi)}. V_T = ${tp(b.sauTham)}`)
+        )).join(""));
+
+    s += gBuoc(4, "Kết luận",
+        (k.lienThong
+            ? gDong(gOk(`Chọn được n − 1 = ${n - 1} cạnh: ${k.chon.map(i => `(${nhanDinh(edges[i].x)},${nhanDinh(edges[i].y)})`).join(", ")}.`)) +
+              gCT(`Trọng lượng nhỏ nhất cây khung = ${k.chon.map(i => fmt(trongSoCanh(edges[i]))).join(" + ")} = ${fmt(k.tong)}`)
+            : gDong(gXau(`Đồ thị có ${k.soThanhPhan} thành phần liên thông nên không có cây khung; Prim chỉ phủ được thành phần chứa đỉnh ${nhanDinh(k.start)} (${k.chon.length} cạnh).`)) +
+              gCT(`Tổng trọng lượng = ${fmt(k.tong)}`)) +
+        gDong("Bấm “Xem từng bước” hoặc “Tô cây khung”: khi ra kết quả, các cạnh thừa sẽ bị xóa khỏi hình. Bấm “Hủy mô phỏng” để trả đồ thị về bình thường."));
+    return gKhung("prim", s);
+}

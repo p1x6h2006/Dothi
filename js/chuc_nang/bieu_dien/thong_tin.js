@@ -39,7 +39,7 @@ function htmlBac() {
 }
 
 // Ghép tất cả vào khung thông tin bên dưới đồ thị. Thứ tự hiển thị:
-//   1) Đỉnh/cạnh  2) Bậc  3) DANH SÁCH KỀ (danh_sach_ke.js)  4) Ma trận kề  5) Ma trận trọng số  6) CHU TRÌNH EULER (chu_trinh_euler.js)  7) NGƯỜI PHÁT THƯ (nguoi_phat_thu.js)  8) KRUSKAL (kruskal.js)
+//   1) Đỉnh/cạnh  2) Bậc  3) DANH SÁCH KỀ (danh_sach_ke.js)  4) Ma trận kề  5) Ma trận trọng số  6) CHU TRÌNH EULER (chu_trinh_euler.js)  7) NGƯỜI PHÁT THƯ (nguoi_phat_thu.js)  8) KRUSKAL (kruskal.js)  9) PRIM (prim.js)
 function hienThiThongTin() {
     if (eulerHL) { resetEuler(); veDoThi(); }   // dựng lại thông tin thì bỏ tô màu Euler cũ
     // Nhớ các khung "Cách giải chi tiết" đang mở (cach_giai.js) để mở lại sau khi dựng lại
@@ -52,7 +52,9 @@ function hienThiThongTin() {
         htmlMaTranTrongSo() + giaiMaTranTrongSo() +
         htmlEuler() + giaiEuler() +
         htmlNguoiPhatThu() + giaiChiTietNPT() +
-        htmlKruskal() + giaiChiTietKruskal();
+        htmlKruskal() + giaiChiTietKruskal() +
+        htmlPrim() + giaiChiTietPrim();
     document.querySelectorAll("#thongTin details.giai").forEach(d => { if (dangMo.has(d.dataset.key)) d.open = true; });
+    capNhatNutDK();   // số bước + bật/tắt 5 nút điều khiển (dieu_khien_buoc.js)
     if (typeof luuTuDong === "function") luuTuDong();   // tự động lưu (luu_tru.js)
 }

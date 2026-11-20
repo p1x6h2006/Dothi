@@ -41,25 +41,6 @@
                 <div class="save-status" id="luuTrangThai">Đồ thị được tự động lưu</div>
                 <div class="note ap-dung" data-loai="1,2,3,4,5">📌 <b>Lưu ý:</b> dùng được cho <b>cả 5 loại</b> đồ thị (vô hướng và có hướng).<span class="ap-dung-tt"></span></div>
 
-                <!-- [Mục] Loại đồ thị: một ô, bấm tiêu đề mới xổ ra (cùng kiểu Phiên đồ thị) -->
-                <details class="giai mst-menu">
-                    <summary>🧩 Loại đồ thị</summary>
-                    <div class="giai-body mst-body">
-                        <select id="loai" onchange="hienThiThongTin()"></select>
-                    </div>
-                </details>
-
-                <!-- [Mục] Tạo đồ thị mới: nhập số đỉnh, số cạnh (taoDoThi trong chinh_sua_canh.js) -->
-                <label>Số đỉnh:</label>
-                <input type="number" id="soDinh" min="1" value="5">
-                <label>Số cạnh:</label>
-                <input type="number" id="soCanh" min="0" value="5">
-                <button onclick="taoDoThi()">Tạo đồ thị</button>
-                <div class="note ap-dung" data-loai="1,2,3,4,5">📌 <b>Lưu ý:</b> dùng được cho <b>cả 5 loại</b> đồ thị (vô hướng và có hướng).<span class="ap-dung-tt"></span></div>
-                <div class="note tip">
-                    Hướng dẫn: nhập cạnh dạng x y hoặc x y w (w là trọng số), đỉnh từ 0 đến n−1 (hoặc A, B, C… tương ứng). Nhập số hay chữ đều được.
-                </div>
-
                 <!-- [Mục] Phiên đồ thị: một ô, bấm tiêu đề mới xổ ra -->
                 <details class="giai mst-menu">
                     <summary>🗂️ Phiên đồ thị</summary>
@@ -72,6 +53,14 @@
                     <button class="info" onclick="doiTenPhien()">✏️ Đổi tên</button>
                     <button class="danger" onclick="xoaPhien()">🗑️ Xóa</button>
                 </div>
+                    </div>
+                </details>
+
+                <!-- [Mục] Loại đồ thị: một ô, bấm tiêu đề mới xổ ra (cùng kiểu Phiên đồ thị) -->
+                <details class="giai mst-menu">
+                    <summary>🧩 Loại đồ thị</summary>
+                    <div class="giai-body mst-body">
+                        <select id="loai" onchange="hienThiThongTin()"></select>
                     </div>
                 </details>
 
@@ -107,6 +96,18 @@
 
                     </div>
                 </details>
+
+                <!-- [Mục] Tạo đồ thị mới: nhập số đỉnh, số cạnh (taoDoThi trong chinh_sua_canh.js) -->
+                <label>Số đỉnh:</label>
+                <input type="number" id="soDinh" min="1" value="5">
+                <label>Số cạnh:</label>
+                <input type="number" id="soCanh" min="0" value="5">
+                <button onclick="taoDoThi()">Tạo đồ thị</button>
+                <div class="note ap-dung" data-loai="1,2,3,4,5">📌 <b>Lưu ý:</b> dùng được cho <b>cả 5 loại</b> đồ thị (vô hướng và có hướng).<span class="ap-dung-tt"></span></div>
+                <div class="note tip">
+                    Hướng dẫn: nhập cạnh dạng x y hoặc x y w (w là trọng số), đỉnh từ 0 đến n−1 (hoặc A, B, C… tương ứng). Nhập số hay chữ đều được.
+                </div>
+
                 <hr>
 
                 <!-- Mỗi chức năng là một ô <details>: bấm tiêu đề mới xổ ra -->

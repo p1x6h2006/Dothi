@@ -40,8 +40,15 @@ function veDoThi() {
     // Thông báo bước Euler đang chạy (chu_trinh_euler.js), đặt góc trên bên trái hình
     if (eulerHL && eulerHL.msg) el("text", { x: 16, y: 26, class: "edge-label", style: "text-anchor:start;font-size:15px" }).textContent = eulerHL.msg;
 
+    // Thông báo đường đi / chu trình đang tô (duong_di.js)
+    const dd = pathDangHien();
+    if (dd && dd.msg) el("text", { x: 16, y: 26, class: "edge-label", style: "text-anchor:start;font-size:15px" }).textContent = dd.msg;
+
     // Thông báo bước Kruskal / Prim đang chạy (kruskal.js, prim.js), cùng chỗ với thông báo Euler
     if (krHL && krHL.msg) el("text", { x: 16, y: 26, class: "edge-label", style: "text-anchor:start;font-size:15px" }).textContent = krHL.msg;
+
+    // Thông báo bước mô phỏng người phát thư đang chạy (nguoi_phat_thu.js), cùng chỗ với thông báo Euler / Kruskal
+    if (nptHL && nptHL.msg) el("text", { x: 16, y: 26, class: "edge-label", style: "text-anchor:start;font-size:15px" }).textContent = nptHL.msg;
 
     // Dòng thông báo của bài toán người phát thư (nguoi_phat_thu.js), góc dưới trái; bấm vào để xuống bảng kết quả
     if (nptThongBao) {
@@ -69,14 +76,16 @@ function taoNhan(x, y, text, hl) {
 //   - Có hướng (coHuong())     : thêm mũi tên ở đầu y               (loai 4, 5)
 function veCanh(x, y, index) {
     const p1 = nodes[x], p2 = nodes[y], P = graphPalette;
-    const buoc = eulerHL ? eulerHL.order[index] : undefined;      // thứ tự đi của cạnh trong chu trình Euler (nếu đang tô)
+    const pHL = pathDangHien();                                    // đường đi / chu trình người dùng chọn ở mục "Đường đi & chu trình" (duong_di.js)
+    const buoc = eulerHL ? eulerHL.order[index] : pHL ? pHL.canh[index] : undefined;   // thứ tự đi của cạnh trong chu trình Euler hoặc đường đi đang tô (cùng màu cam)
     const them = canhThemNPT.has(index);                           // cạnh do bài toán người phát thư thêm vào (xanh lá)
     const kBuoc = krHL ? krHL.chon[index] : undefined;              // thứ tự chọn của cạnh trong cây khung Kruskal (nếu đang tô)
     const kLoai = krHL ? krHL.loai.includes(index) : false;         // cạnh bị Kruskal loại (tạo chu trình): đỏ, nét đứt
-    const mauCanh = buoc ? MAU_EULER : kBuoc ? MAU_KRUSKAL : kLoai ? MAU_KRUSKAL_LOAI : them ? MAU_THEM : P.edge;
-    const mauGlow = buoc ? MAU_EULER : kBuoc ? MAU_KRUSKAL : kLoai ? MAU_KRUSKAL_LOAI : them ? MAU_THEM : P.glow;
-    const dayNet = buoc ? 6 : kBuoc ? 7 : kLoai ? 4 : them ? 5 : 4;
-    const nhan = (buoc ? `#${buoc} ` : kBuoc ? `✔${kBuoc} ` : kLoai ? "✖ " : "") + nhanCanh(index);
+    const vuaThem = !!(nptHL && nptHL.canhCur && nptHL.canhCur.includes(index));   // cạnh sao chép vừa thêm ở bước mô phỏng người phát thư hiện tại (hồng)
+    const mauCanh = buoc ? MAU_EULER : kBuoc ? MAU_KRUSKAL : kLoai ? MAU_KRUSKAL_LOAI : vuaThem ? MAU_NPT_HIENTAI : them ? MAU_THEM : P.edge;
+    const mauGlow = buoc ? MAU_EULER : kBuoc ? MAU_KRUSKAL : kLoai ? MAU_KRUSKAL_LOAI : vuaThem ? MAU_NPT_HIENTAI : them ? MAU_THEM : P.glow;
+    const dayNet = buoc ? 6 : kBuoc ? 7 : kLoai ? 4 : vuaThem ? 7 : them ? 5 : 4;
+    const nhan = (buoc ? `#${buoc} ` : kBuoc ? `✔${kBuoc} ` : kLoai ? "✖ " : vuaThem ? "＋ " : "") + nhanCanh(index);
     const mui = buoc ? "url(#arrowHL)" : "url(#arrow)";
 
     // --- Vòng khuyên (chỉ loai 3 mới có) ---
@@ -132,11 +141,21 @@ function veCanh(x, y, index) {
     taoNhan((p1.x + 2 * cx + p2.x) / 4, (p1.y + 2 * cy + p2.y) / 4, nhan, buoc);
 }
 
+// Màu viền đỉnh khi đang mô phỏng người phát thư: cặp đang ghép (hồng) > đã ghép xong (xanh lá) > đỉnh bậc lẻ chưa ghép (cam); không thuộc loại nào -> ""
+function mauVienNPT(i) {
+    if (!nptHL) return "";
+    if (nptHL.cur.includes(i)) return MAU_NPT_HIENTAI;
+    if (nptHL.xong.includes(i)) return MAU_THEM;
+    if (nptHL.le.includes(i)) return MAU_NPT_LE;
+    return "";
+}
+
 // Vẽ một đỉnh (hình tròn + số hiệu), có thể kéo bằng chuột
 function veDinh(i) {
     const p = nodes[i], g = el("g");
     el("circle", { cx: p.x, cy: p.y + 7, r: 32, fill: "rgba(59, 130, 246, 0.22)", "pointer-events": "none" }, g);   // bóng đổ nhẹ, thay cho drop-shadow
-    const c = el("circle", { cx: p.x, cy: p.y, r: 30, class: "node", fill: graphPalette.node, stroke: eulerHL && eulerHL.cur === i ? MAU_EULER : krHL && krHL.tham && krHL.tham.includes(i) ? MAU_KRUSKAL : graphPalette.border, "stroke-width": eulerHL && eulerHL.cur === i ? 7 : krHL && krHL.tham && krHL.tham.includes(i) ? 6 : 3 }, g);   // đỉnh đã vào cây Prim: viền xanh ngọc
+    const dd = pathDangHien(), vienCam = (eulerHL && eulerHL.cur === i) || (dd && dd.dinh.includes(i));   // đỉnh hiện tại của Euler / đỉnh nằm trên đường đi đang tô: viền cam
+    const c = el("circle", { cx: p.x, cy: p.y, r: 30, class: "node", fill: graphPalette.node, stroke: vienCam ? MAU_EULER : krHL && krHL.tham && krHL.tham.includes(i) ? MAU_KRUSKAL : mauVienNPT(i) || graphPalette.border, "stroke-width": vienCam ? 7 : krHL && krHL.tham && krHL.tham.includes(i) ? 6 : mauVienNPT(i) ? 7 : 3 }, g);   // đỉnh đã vào cây Prim: viền xanh ngọc
     c.addEventListener("mousedown", e => { draggingNode = i; e.preventDefault(); });
     el("text", { x: p.x, y: p.y, class: "node-text" }, g).textContent = nhanDinh(i);
 }

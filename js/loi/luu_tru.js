@@ -68,6 +68,7 @@ function luuTuDong() {
 // ---- Áp dụng 1 phiên lên màn hình (d = null: phiên trống) ----
 function apDungPhien(d) {
     resetEuler(); resetNguoiPhatThu(); resetKruskalHL(); eulerStart = null;   // bỏ mọi kết quả của phiên trước
+    if (typeof ddXoaKetQua === "function") ddXoaKetQua(false);                // và danh sách "Đường đi & chu trình"
     ["themX", "themY", "themW", "xoaX", "xoaY", "cuX", "cuY", "moiX", "moiY", "moiW"].forEach(id => { $(id).value = ""; });
     if (d && d.nodes && Object.keys(d.nodes).length) {
         $("loai").value = d.loai; capNhatTenLoai();

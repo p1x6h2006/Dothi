@@ -1,5 +1,5 @@
 // =====================================================
-// BỘ ĐIỀU KHIỂN TỪNG BƯỚC (dùng chung cho Euler, Kruskal, Prim)
+// BỘ ĐIỀU KHIỂN TỪNG BƯỚC (dùng chung cho Euler, Kruskal, Prim, Người phát thư)
 // =====================================================
 // 5 nút: ⏮ Về đầu · ◀ Bước trước · Bước tiếp ▶ · ⏩ Tự chạy · ⏸ Dừng
 // Mỗi thuật toán chỉ cần đưa ra:  { max, delay, k0(), ap(j) }
@@ -15,7 +15,8 @@ let dk = null;   // { kieu, max, delay, ap, k, timer, daVe }
 const DK_CAU_HINH = {
     euler:   () => taoDKEuler(),
     kruskal: () => taoDKKruskal(),
-    prim:    () => taoDKPrim()
+    prim:    () => taoDKPrim(),
+    npt:     () => taoDKNPT()
 };
 
 // Khung 5 nút để chèn vào bảng thông tin của từng thuật toán
@@ -57,11 +58,14 @@ function dkDung() {
 function dkHuy() {
     if (dk) clearInterval(dk.timer);
     dk = null;
+    nptHL = null;   // bỏ tô màu mô phỏng người phát thư (đồ thị giữ nguyên; muốn về đồ thị gốc dùng huyMoPhongNPT / traLaiDoThiGoc)
     capNhatNutDK();
 }
 
 // Tạo mô phỏng cho thuật toán `kieu`; trả về false nếu không chạy được (đã báo lỗi)
 function dkKhoiTao(kieu) {
+    // Đang mô phỏng người phát thư dở dang (đã thêm một phần cạnh lặp) mà chuyển sang thuật toán khác -> trả đồ thị về gốc trước
+    if (dk && dk.kieu === "npt" && kieu !== "npt" && dk.k < dk.max) traLaiDoThiGoc(true);
     const d = DK_CAU_HINH[kieu]();
     if (!d) return false;
     const k0 = Math.max(0, Math.min(d.max, d.k0()));   // đọc trước khi resetEuler() xóa phần tô màu

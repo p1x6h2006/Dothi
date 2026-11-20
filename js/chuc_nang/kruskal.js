@@ -22,6 +22,8 @@ const NHAN_LOAI_KRUSKAL = "Thuật toán Kruskal chỉ hỗ trợ đồ thị v�
 function resetKruskalHL() {
     dkHuy();   // dừng tự chạy (dieu_khien_buoc.js)
     krHL = null;
+    pathHL = null;   // bỏ luôn phần tô đường đi / chu trình (duong_di.js): các kiểu tô không hiện cùng lúc
+    if (typeof ddCapNhatChon === "function") ddCapNhatChon();
 }
 
 function cuonDenKetQuaKruskal() {

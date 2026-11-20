@@ -13,8 +13,12 @@
 // Giới hạn: không có trọng số âm; tối đa 12 đỉnh bậc lẻ (10395 phân hoạch).
 // Trạng thái dùng chung (trang_thai.js): npt (kết quả), canhThemNPT (chỉ số các cạnh đã thêm), nptThongBao.
 // Cạnh thêm vào là cạnh SONG SONG nên đơn đồ thị (loai 1) tự chuyển sang đa đồ thị (loai 2).
+// MÔ PHỎNG TỪNG BƯỚC (5 nút trong dieu_khien_buoc.js, kiểu "npt"): taoDKNPT() — gốc → đỉnh bậc lẻ → chọn phân hoạch → ghép từng cặp
+//   (thêm cạnh sao chép dọc đường đi ngắn nhất) → kết quả. Tô màu bằng nptHL (trang_thai.js), mỗi bước dựng lại đồ thị = gốc + cạnh đã thêm.
 
 const MAU_THEM = "#16a34a";
+const MAU_NPT_LE = "#f59e0b";        // đỉnh bậc lẻ chưa được ghép (mô phỏng)
+const MAU_NPT_HIENTAI = "#db2777";   // cặp đỉnh đang ghép và cạnh sao chép vừa thêm (mô phỏng)
 const fmt = v => String(Math.round(v * 1e6) / 1e6);
 const trongSoCanh = e => e.w === undefined ? 1 : e.w;
 const NHAN_LOAI_NPT = "Bài toán người phát thư chỉ hỗ trợ đồ thị vô hướng (loại 1–3).";
@@ -152,11 +156,108 @@ function traLaiDoThiGoc(khongCuon) {
     if (!khongCuon) cuonDenDoThi();
 }
 
+// ---- MÔ PHỎNG TỪNG BƯỚC ----
+// Bước j (0 → max):
+//   0 : đồ thị gốc, Σw(e)
+//   1 : tô các đỉnh bậc lẻ V_o(G)   (không có đỉnh lẻ -> max = 1, kết luận đã có chu trình Euler)
+//   2 : chọn phân hoạch P_i (nhỏ nhất, hoặc phân hoạch đang xem) và công thức d(P_i)
+//   3 … K+2 : ghép cặp thứ j−2: thêm các cạnh sao chép (hồng khi vừa thêm, sau đó xanh lá) dọc đường đi ngắn nhất của cặp
+//   K+3 : xong, mọi đỉnh bậc chẵn, tổng chiều dài = Σw(e) + m(G)
+// ap(j) luôn dựng lại từ đồ thị gốc npt.goc nên đi lùi / về đầu đều đúng.
+function datThongBaoNPT(msg) {
+    if (nptHL) nptHL.msg = msg;
+    const t = $("nptStatus");
+    if (t) t.textContent = msg;
+}
+
+function taoDKNPT() {
+    if (coHuong()) { alert(NHAN_LOAI_NPT); return null; }
+    if (!npt) { npt = tinhNguoiPhatThu(); canhThemNPT = new Set(); nptThongBao = ""; hienThiThongTin(); }
+    if (npt.loi) { alert(npt.loi); return null; }
+
+    const kq = npt, K = kq.le.length ? kq.ds[kq.daApDung !== null ? kq.daApDung : kq.best].pairs.length : 0;
+    const pi = kq.daApDung !== null ? kq.daApDung : kq.best;     // phân hoạch dùng để mô phỏng (đang xem, nếu không thì nhỏ nhất)
+    const P = K ? kq.ds[pi] : null;
+    const max = K ? K + 3 : 1;
+    const sub = i => `P${i + 1}`;
+    const cap = q => `(${nhanDinh(q.a)},${nhanDinh(q.b)})`;
+
+    return {
+        max, delay: 1300,
+        k0: () => kq.daApDung !== null && canhThemNPT.size > 0 ? max : 0,
+        ap: j => {
+            eulerHL = null; krHL = null;
+            // Dựng lại đồ thị = gốc + cạnh sao chép của da cặp đầu
+            const da = Math.max(0, Math.min(K, j - 2));
+            edges = kq.goc.map(e => ({ ...e }));
+            canhThemNPT = new Set();
+            const canhCur = [];
+            for (let t = 0; t < da; t++) {
+                canhThemTheoPhanHoach(kq.goc, { pairs: [P.pairs[t]] }).forEach(e => {
+                    if (t === da - 1) canhCur.push(edges.length);
+                    canhThemNPT.add(edges.length);
+                    edges.push(e);
+                });
+            }
+            if (kq.loaiGoc === 1) $("loai").value = canhThemNPT.size ? 2 : 1;   // có cạnh song song -> đa đồ thị
+            capNhatTenLoai();
+            kq.daApDung = da > 0 ? pi : null;
+            nptThongBao = j === max && K ? `Đã thêm ${canhThemNPT.size} cạnh (xanh lá) theo ${sub(pi)}. Bấm vào đây để xuống bảng kết quả ↓` : "";
+
+            // Tô màu đỉnh
+            const dangGhep = j >= 3 && j <= K + 2;
+            const soXong = j >= K + 3 ? K : Math.max(0, da - 1);
+            const xong = [];
+            for (let t = 0; t < soXong; t++) xong.push(P.pairs[t].a, P.pairs[t].b);
+            nptHL = {
+                le: j >= 1 ? kq.le : [],
+                cur: dangGhep ? [P.pairs[da - 1].a, P.pairs[da - 1].b] : [],
+                xong, canhCur: dangGhep ? canhCur : [], msg: ""
+            };
+
+            // Lời giải thích của bước
+            let msg;
+            if (j === 0) msg = `Bắt đầu: đồ thị gốc có ${kq.goc.length} cạnh, Σw(e) = ${fmt(kq.tong)}.`;
+            else if (!K) msg = "Mọi đỉnh đều bậc chẵn ⇒ đã có chu trình Euler: m(G) = 0, không cần thêm cạnh.";
+            else if (j === 1) msg = `Tìm đỉnh bậc lẻ: Vo(G) = { ${kq.le.map(nhanDinh).join(", ")} } (${kq.le.length} đỉnh, tô cam).`;
+            else if (j === 2) msg = `Chọn ${sub(pi)} = { ${P.pairs.map(cap).join(", ")} }: d(${sub(pi)}) = ${P.pairs.map(q => fmt(q.d)).join(" + ")}${K > 1 ? " = " + fmt(P.d) : ""}` +
+                (pi === kq.best ? ` là nhỏ nhất${kq.ds.length > 1 ? ` trong ${kq.ds.length} phân hoạch` : ""}.` : " (phân hoạch đang xem).");
+            else if (j <= K + 2) {
+                const q = P.pairs[j - 3];
+                msg = `Ghép cặp ${j - 2}/${K}: ${cap(q)} đi qua [${q.path.map(nhanDinh).join("→")}], sao chép ${q.path.length - 1} cạnh (d = ${fmt(q.d)}).`;
+            } else msg = `Xong: mọi đỉnh bậc chẵn. m(G) = ${fmt(P.d)} ⇒ tổng = ${fmt(kq.tong)} + ${fmt(P.d)} = ${fmt(kq.tong + P.d)}. Xem mục Chu trình Euler để đi hành trình.`;
+            nptHL.msg = msg;
+            hienThiThongTin();   // bậc của đỉnh, ma trận, Euler... đổi theo đồ thị ở bước này
+        }
+    };
+}
+
+// Nút ở khung Điều khiển: mở mô phỏng ở bước 0 (đồ thị gốc), rồi dùng 5 nút ở bảng bên phải
+function moPhongNguoiPhatThu() {
+    if (coHuong()) return alert(NHAN_LOAI_NPT);
+    dkLenh("npt", "dau");
+}
+
+// HỦY MÔ PHỎNG: dừng chạy, bỏ tô màu, trả lại đồ thị gốc (bỏ các cạnh sao chép đã thêm)
+function huyMoPhongNPT() {
+    dkHuy();
+    if (npt && npt.daApDung !== null) traLaiDoThiGoc(true);
+    else { nptThongBao = ""; veDoThi(); hienThiThongTin(); }
+    cuonDenDoThi();
+}
+
+function htmlMoPhongNPT() {
+    return '<div class="npt-sim"><div class="npt-step"><b>🎬 Mô phỏng từng bước</b></div>' +
+        '<div class="npt-btns"><button class="danger" onclick="huyMoPhongNPT()">✖ Hủy mô phỏng</button></div>' +
+        htmlDieuKhienBuoc("npt") +
+        `<div class="euler-status" id="nptStatus">${nptHL && nptHL.msg ? nptHL.msg : ""}</div></div>`;
+}
+
 // ---- Vẽ phần kết quả vào khung thông tin ----
 function htmlNguoiPhatThu() {
     let text = '<h3 class="adjacency-matrix-heading">Bài toán người phát thư</h3>';
     if (coHuong()) return text + '<div class="npt-wrap" id="nptKetQua">' + NHAN_LOAI_NPT + "</div>";
-    if (!npt) return text + '<div class="npt-wrap" id="nptKetQua"><i>Bấm nút “Phân tích &amp; giải bài toán” ở khung Điều khiển để xem lời giải.</i></div>';
+    if (!npt) return text + '<div class="npt-wrap" id="nptKetQua"><i>Bấm nút “Phân tích &amp; giải bài toán” ở khung Điều khiển để xem lời giải, hoặc “Mô phỏng từng bước” để xem từng bước.</i>' + htmlMoPhongNPT() + "</div>";
     if (npt.loi) return text + `<div class="npt-wrap" id="nptKetQua"><div class="euler-no">✖ ${npt.loi}</div></div>`;
 
     const { ds, best, le, m } = npt, tatCa = ds.length <= 15;
@@ -196,6 +297,7 @@ function htmlNguoiPhatThu() {
             if (npt.loaiGoc === 1) text += ghiChu("Đồ thị đơn có thêm cạnh song song nên tự chuyển sang loại 2 (đa đồ thị); bấm “Trả lại đồ thị gốc” sẽ về loại 1.");
         }
     }
+    text += htmlMoPhongNPT();
     if (npt.goc.some(e => e.w === undefined)) text += ghiChu("Cạnh nhập không có trọng số được tính w = 1.");
     return text + "</div>";
 }

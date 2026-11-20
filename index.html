@@ -116,23 +116,74 @@
                 <h3>📮 Bài toán người phát thư</h3>
                 <div class="note hint">Tìm hành trình ngắn nhất đi qua mọi cạnh rồi quay về (đồ thị vô hướng). Cạnh không có trọng số tính w = 1.</div>
                 <button class="success" onclick="giaiNguoiPhatThu()">📮 Phân tích &amp; giải bài toán</button>
+                <button class="info" onclick="moPhongNguoiPhatThu()">🎬 Mô phỏng từng bước</button>
                 <hr>
 
-                <!-- [Mục] Thuật toán Kruskal: cây khung nhỏ nhất (giaiKruskal, napViDuKruskal trong kruskal.js) -->
-                <h3>🌲 Thuật toán Kruskal</h3>
-                <div class="note hint">Tìm cây khung nhỏ nhất của đồ thị vô hướng có trọng số: xếp cạnh tăng dần, thêm cạnh nào không tạo chu trình. Cạnh không có trọng số tính w = 1.</div>
-                <button class="success" onclick="giaiKruskal()">🌲 Phân tích &amp; giải Kruskal</button>
-                <div class="save-row">
-                    <button class="info" onclick="napViDuKruskal(1)">Nạp ví dụ (6 đỉnh)</button>
-                    <button class="info" onclick="napViDuKruskal(2)">Nạp bài tập (9 đỉnh)</button>
-                </div>
-                <div class="note hint">Ví dụ 6 đỉnh: A, B, C, D, E, F được đánh số 0, 1, 2, 3, 4, 5.</div>
-                <hr>
+                <!-- [Mục] Thuật toán tìm cây khung nhỏ nhất: bấm tiêu đề mới xổ ra, trong đó chọn Kruskal (kruskal.js) hoặc Prim (prim.js) -->
+                <details class="giai mst-menu">
+                    <summary>🌲 Thuật toán tìm cây khung nhỏ nhất</summary>
+                    <div class="giai-body mst-body">
+                        <div class="note hint">Tìm cây khung nhỏ nhất của đồ thị vô hướng có trọng số. Cạnh không có trọng số tính w = 1. Chọn một thuật toán bên dưới.</div>
 
-                <!-- [Mục] Thuật toán Prim: cây khung nhỏ nhất (giaiPrim trong prim.js) -->
-                <h3>🌳 Thuật toán Prim</h3>
-                <div class="note hint">Tìm cây khung nhỏ nhất của đồ thị vô hướng có trọng số: xuất phát từ một đỉnh, mỗi bước thêm cạnh nhỏ nhất nối cây với một đỉnh chưa có trong cây. Ra kết quả sẽ xóa các cạnh thừa; bấm “Hủy mô phỏng” để trả đồ thị về bình thường. Có thể dùng hai ví dụ Kruskal ở trên.</div>
-                <button class="success" onclick="giaiPrim()">🌳 Phân tích &amp; giải Prim</button>
+                        <!-- Kruskal (giaiKruskal trong kruskal.js) -->
+                        <div class="mst-algo">
+                            <b>🌲 Kruskal</b>
+                            <div class="note">Xếp cạnh tăng dần, thêm cạnh nào không tạo chu trình.</div>
+                            <button class="success" onclick="giaiKruskal()">🌲 Phân tích &amp; giải Kruskal</button>
+                        </div>
+
+                        <!-- Prim (giaiPrim trong prim.js) -->
+                        <div class="mst-algo">
+                            <b>🌳 Prim</b>
+                            <div class="note">Xuất phát từ một đỉnh, mỗi bước thêm cạnh nhỏ nhất nối cây với một đỉnh chưa có trong cây. Ra kết quả sẽ xóa các cạnh thừa; bấm “Hủy mô phỏng” để trả đồ thị về bình thường.</div>
+                            <button class="success" onclick="giaiPrim()">🌳 Phân tích &amp; giải Prim</button>
+                        </div>
+
+                        <!-- Ví dụ dùng chung cho cả hai thuật toán (napViDuKruskal trong kruskal.js) -->
+                        <div class="mst-algo">
+                            <b>📥 Nạp ví dụ (dùng cho cả hai)</b>
+                            <div class="save-row">
+                                <button class="info" onclick="napViDuKruskal(1)">Ví dụ (6 đỉnh)</button>
+                                <button class="info" onclick="napViDuKruskal(2)">Bài tập (9 đỉnh)</button>
+                            </div>
+                            <div class="note hint">Ví dụ 6 đỉnh: A, B, C, D, E, F được đánh số 0, 1, 2, 3, 4, 5.</div>
+                        </div>
+                    </div>
+                </details>
+
+                <!-- [Mục] Đường đi & chu trình (duong_di.js): chọn loại + đỉnh xuất phát / đích -> Tìm kiếm -> bấm một kết quả để tô lên đồ thị -->
+                <details class="giai mst-menu dd-menu" open>
+                    <summary>🛤️ Đường đi &amp; chu trình</summary>
+                    <div class="giai-body mst-body">
+                        <label for="ddLoai">Loại đường đi / chu trình:</label>
+                        <select id="ddLoai" onchange="ddDoiLoai()">
+                            <optgroup label="Đường đi (từ đỉnh xuất phát đến đỉnh đích)">
+                                <option value="duong:sc">Đường đi sơ cấp (không lặp đỉnh)</option>
+                                <option value="duong:don">Đường đi đơn (không lặp cạnh)</option>
+                                <option value="duong:chung">Đường đi chung (cho phép lặp)</option>
+                                <option value="duong:nncanh">Ngắn nhất theo số cạnh</option>
+                                <option value="duong:nnw">Ngắn nhất theo tổng trọng số</option>
+                            </optgroup>
+                            <optgroup label="Chu trình (xuất phát và quay về cùng một đỉnh)">
+                                <option value="ct:sc">Chu trình sơ cấp (không lặp đỉnh)</option>
+                                <option value="ct:don">Chu trình đơn (không lặp cạnh)</option>
+                                <option value="ct:chung">Chu trình chung (cho phép lặp)</option>
+                                <option value="ct:nncanh">Chu trình ngắn nhất theo số cạnh</option>
+                                <option value="ct:nnw">Chu trình ngắn nhất theo tổng trọng số</option>
+                            </optgroup>
+                        </select>
+                        <div class="dd-row">
+                            <div><label for="ddXuatPhat">Đỉnh xuất phát</label><input type="text" autocomplete="off" id="ddXuatPhat" placeholder="vd: 2" oninput="ddGoDinhDau()" onkeydown="if (event.key === 'Enter') ddTim()"></div>
+                            <div><label for="ddDich">Đỉnh đích</label><input type="text" autocomplete="off" id="ddDich" placeholder="vd: 7" onkeydown="if (event.key === 'Enter') ddTim()"></div>
+                        </div>
+                        <div class="save-row">
+                            <button class="success" onclick="ddTim()">🔍 Tìm kiếm</button>
+                            <button class="danger" onclick="ddXoaTo()">✖ Xóa tô màu</button>
+                        </div>
+                        <label>Kết quả (bấm để xem trên đồ thị):</label>
+                        <div class="dd-kq" id="ddKetQua"><div class="dd-rong">Chọn loại, nhập đỉnh rồi bấm “Tìm kiếm”. Với chu trình chỉ cần đỉnh xuất phát. Cạnh không có trọng số tính w = 1.</div></div>
+                    </div>
+                </details>
             </div>
 
             <!-- ---- CỘT GIỮA: VÙNG ĐỒ THỊ ----
@@ -150,7 +201,7 @@
         </div>
     </div>
 
-    <!-- ===== NẠP SCRIPT (KHÔNG ĐỔI THỨ TỰ): cau_hinh -> trang_thai -> kiem_tra -> doi_giao_dien -> chinh_sua_canh -> ve_do_thi -> dieu_khien_buoc -> ma_tran -> danh_sach_ke -> chu_trinh_euler -> nguoi_phat_thu -> kruskal -> prim -> cach_giai -> thong_tin -> luu_tru -> chinh ===== -->
+    <!-- ===== NẠP SCRIPT (KHÔNG ĐỔI THỨ TỰ): cau_hinh -> trang_thai -> kiem_tra -> doi_giao_dien -> chinh_sua_canh -> ve_do_thi -> dieu_khien_buoc -> ma_tran -> danh_sach_ke -> chu_trinh_euler -> nguoi_phat_thu -> kruskal -> prim -> duong_di -> cach_giai -> thong_tin -> luu_tru -> chinh ===== -->
     <script src="js/dung_chung/cau_hinh.js"></script>
     <script src="js/dung_chung/trang_thai.js"></script>
     <script src="js/dung_chung/kiem_tra.js"></script>
@@ -164,6 +215,7 @@
     <script src="js/chuc_nang/nguoi_phat_thu.js"></script>
     <script src="js/chuc_nang/kruskal.js"></script>
     <script src="js/chuc_nang/prim.js"></script>
+    <script src="js/chuc_nang/duong_di.js"></script>
     <script src="js/chuc_nang/cach_giai.js"></script>
     <script src="js/chuc_nang/bieu_dien/thong_tin.js"></script>
     <script src="js/loi/luu_tru.js"></script>

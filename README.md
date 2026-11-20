@@ -78,6 +78,7 @@ Dothi/
         ├── nguoi_phat_thu.js     # Bài toán người phát thư
         ├── kruskal.js            # Thuật toán Kruskal (cây khung nhỏ nhất, vô hướng)
         ├── prim.js               # Thuật toán Prim (cây khung nhỏ nhất, vô hướng)
+        ├── duong_di.js           # Đường đi & chu trình: tìm theo đỉnh xuất phát / đích, bấm kết quả để tô lên đồ thị
         └── cach_giai.js          # Cách giải chi tiết (khung bấm mới xổ ra) cho từng mục
 ```
 
@@ -332,7 +333,38 @@ Tìm hành trình **ngắn nhất** đi qua mọi cạnh ít nhất 1 lần rồ
 - Đồ thị phải liên thông.
 - Tối đa 12 đỉnh bậc lẻ. Quá 6 đỉnh lẻ (hơn 15 phân hoạch) chỉ hiện phân hoạch nhỏ nhất.
 
+**Mô phỏng từng bước** (nút **🎬 Mô phỏng từng bước** ở khung Điều khiển, hoặc 5 nút ⏮ ◀ ▶ ⏩ ⏸ trong bảng kết quả; `taoDKNPT()` kiểu `"npt"` trong `dieu_khien_buoc.js`):
+
+| Bước | Nội dung |
+|---|---|
+| 0 | Đồ thị gốc, Σw(e) |
+| 1 | Tô cam các đỉnh bậc lẻ V<sub>o</sub>(G) (không có đỉnh lẻ thì dừng ở đây: đã có chu trình Euler) |
+| 2 | Chọn phân hoạch P<sub>i</sub> nhỏ nhất (hoặc phân hoạch đang xem) và d(P<sub>i</sub>) |
+| 3 … K+2 | Ghép từng cặp: cặp đang ghép viền hồng, thêm các cạnh sao chép (hồng khi vừa thêm, sau đó xanh lá), đỉnh đã ghép xong viền xanh lá |
+| K+3 | Xong: mọi đỉnh bậc chẵn, tổng = Σw(e) + m(G); dùng mục Chu trình Euler để đi hành trình |
+
+- Mỗi bước dựng lại đồ thị = gốc (`npt.goc`) + cạnh sao chép của các cặp đã ghép, nên đi lùi / về đầu đều đúng; bảng bậc, ma trận, Euler... đổi theo từng bước.
+- Tô màu bằng biến `nptHL` (`trang_thai.js`), vẽ trong `ve_do_thi.js` (`mauVienNPT`, cạnh `vuaThem`). Lời giải thích hiện ở góc trên trái hình và dưới nút điều khiển.
+- **✖ Hủy mô phỏng** trả lại đồ thị gốc. Chuyển sang mô phỏng Euler / Kruskal / Prim khi đang dở dang cũng tự trả về đồ thị gốc.
+
 **CSS:** nhóm `.npt-wrap` / `.npt-card` / `.npt-best` / `.npt-m` / `.npt-total` / `.npt-btns`.
+
+---
+
+## 🛤️ Đường đi & chu trình
+
+File: `js/chuc_nang/duong_di.js` (giao diện: mục “Đường đi & chu trình” ở khung Điều khiển; tô màu dùng biến `pathHL` trong `trang_thai.js`, vẽ ở `ve_do_thi.js`).
+
+Chọn loại, nhập **đỉnh xuất phát** và **đỉnh đích** (số hoặc chữ), bấm **Tìm kiếm**. Danh sách kết quả hiện bên dưới (tối đa 100, sắp theo số cạnh tăng dần); **bấm vào một dòng** để tô đường đó lên đồ thị (màu cam, số `#k` trên cạnh là thứ tự đi), bấm **Xóa tô màu** để bỏ. Cạnh không có trọng số tính w = 1. Dùng được cho cả 5 loại đồ thị (đa đồ thị: các cạnh song song là các kết quả khác nhau, có ghi thêm `[e1,e4]`).
+
+| Loại | Ý nghĩa | Thuật toán |
+|------|---------|-----------|
+| Đường đi sơ cấp / Chu trình sơ cấp | không lặp đỉnh (chu trình chỉ lặp đỉnh đầu = cuối) | DFS quay lui |
+| Đường đi đơn / Chu trình đơn | không lặp cạnh (được lặp đỉnh) | DFS quay lui |
+| Đường đi chung / Chu trình chung | cho phép lặp đỉnh và cạnh (có thể vô hạn, lấy 100 kết quả ngắn nhất) | BFS theo độ dài |
+| Ngắn nhất theo số cạnh / theo tổng trọng số | mọi đường (chu trình) ngắn nhất; trọng số phải không âm | Dijkstra + liệt kê đường chặt |
+
+Chu trình: chỉ cần nhập đỉnh xuất phát (đỉnh đích tự bằng đỉnh xuất phát). Đồ thị vô hướng: mỗi chu trình chỉ liệt kê một chiều. Sửa đồ thị thì kết quả cũ tự bị xóa (so bằng `ddSig()`); kiểu tô này không hiện cùng lúc với Euler / Kruskal / Prim.
 
 ---
 
@@ -398,6 +430,8 @@ Giữ nguyên hiệu ứng **kiếm bay**.
 ## 🌲 Thuật toán Kruskal
 
 File: `js/chuc_nang/kruskal.js` (lời giải chi tiết: `giaiChiTietKruskal()` trong `cach_giai.js`). Chỉ dùng cho đồ thị **vô hướng** (`loai` 1–3).
+
+> Trên giao diện, Kruskal và Prim nằm chung trong mục **“Thuật toán tìm cây khung nhỏ nhất”** ở khung điều khiển (`<details class="giai mst-menu">` trong `index.html`): bấm tiêu đề mới xổ ra, rồi chọn Kruskal hoặc Prim; hai nút nạp ví dụ dùng chung cho cả hai.
 
 1. Bắt đầu từ đồ thị rỗng `T` có `n` đỉnh, `F = Ø`.
 2. Sắp xếp cạnh theo trọng lượng tăng dần (bằng nhau thì giữ thứ tự nhập; cạnh không có `w` tính `w = 1`).

@@ -116,6 +116,8 @@ function veDanhSachPhien() {
         b.addEventListener("click", () => chuyenPhien(p.id));
         kv.appendChild(b);
     });
+    const dang = kv.querySelector(".phien-item.active");
+    if (dang) dang.scrollIntoView({ block: "nearest" });   // phiên đang chọn luôn nằm trong vùng nhìn thấy (vd. vừa tạo phiên mới)
 }
 
 function chuyenPhien(id) {

@@ -450,9 +450,10 @@ button:disabled { opacity: .45; pointer-events: none; }
    PHIÊN ĐỒ THỊ (js/loi/luu_tru.js)
    .phien-list : danh sách phiên (cuộn) | .phien-item : 1 phiên (.active = đang xem) | .phien-btns : 3 nút
    ========================================================= */
-.phien-list { display: flex; flex-direction: column; gap: 6px; max-height: 190px; overflow-y: auto; padding: 2px; }
+.phien-list { display: flex; flex-direction: column; gap: 6px; max-height: 202px; overflow-y: auto; overscroll-behavior: contain; padding: 2px 4px 2px 2px; scrollbar-width: thin; }   /* vừa đúng 4 phiên, từ phiên thứ 5 thì cuộn */
 .phien-item {
-    display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin-top: 0; padding: 9px 12px; text-align: left;
+    flex: none; box-sizing: border-box; min-height: 44px;   /* flex: none = không bị ép nhỏ lại khi có nhiều phiên */
+    display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 0; padding: 9px 12px; text-align: left;
     font-size: 14px; color: var(--text); background: var(--chip); border: 1px solid var(--line); box-shadow: none;
 }
 .phien-item:hover { background: var(--chip-hover); box-shadow: none; filter: none; }

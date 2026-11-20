@@ -511,3 +511,7 @@ button:disabled { opacity: .45; pointer-events: none; }
 .tplt-ten { display: inline-grid; place-items: center; min-width: 22px; height: 22px; border-radius: 50%; background: var(--a1); color: #fff; font-size: 12px; font-weight: 800; }
 .tplt-dinh { font-weight: 800; }
 .tplt-item small { color: var(--muted); }
+
+/* Nháy sáng tiêu đề kết quả khi khung phải cuộn tới (js/giao_dien/cuon_ket_qua.js) */
+@keyframes kqNhay { 0%, 100% { background: transparent; } 25%, 60% { background: color-mix(in srgb, var(--a1) 28%, transparent); } }
+#thongTin h3.kq-nhay { animation: kqNhay 1.4s ease; border-radius: 8px; }

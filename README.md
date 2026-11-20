@@ -67,6 +67,7 @@ Dothi/
     │   ├── doi_giao_dien.js      # Chọn loại, đổi theme, áp dụng màu
     │   ├── thanh_nut.js          # Thanh nút góc phải trên theo chức năng đang chọn
     │   ├── luu_y_loai.js         # Dòng “📌 Lưu ý”: chức năng / bài tập nào dùng được cho loại đồ thị nào
+    │   ├── cuon_ket_qua.js       # Bấm chức năng ở khung trái -> khung phải tự cuộn tới kết quả (thuộc tính data-kq trong index.html)
     │   └── hieu_ung_phi_kiem.js  # Hiệu ứng nền phi kiếm bay (canvas)
     ├── loi/                # LÕI: dựng đồ thị, vẽ, lưu
     │   ├── chinh_sua_canh.js     # Tạo đồ thị, thêm / xóa / sửa cạnh

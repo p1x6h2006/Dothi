@@ -168,6 +168,14 @@ function napViDuKruskal(k) {
     hienThiThongTin();
 }
 
+// Nút điều khiển Kruskal: đặt ở khung Điều khiển bên trái (#ctlKruskal)
+function htmlDieuKhienKruskal() {
+    if (coHuong()) return "";
+    // Nút “Tô cây khung” / “Hủy mô phỏng” nằm ở thanh nút góc phải trên (thanh_nut.js)
+    return htmlDieuKhienBuoc("kruskal") +
+        '<div class="euler-status" id="krStatus">' + (krHL && krHL.kieu !== "prim" && krHL.msg ? krHL.msg : "") + "</div>";
+}
+
 // ---- Vẽ phần kết quả vào khung thông tin ----
 function htmlKruskal() {
     let text = '<h3 class="adjacency-matrix-heading">Thuật toán Kruskal (cây khung nhỏ nhất)</h3>';
@@ -199,11 +207,6 @@ function htmlKruskal() {
         text += `<div class="euler-no">✖ Đồ thị không liên thông (${kq.soThanhPhan} thành phần) nên không có cây khung.</div>`;
         text += `<div class="npt-total">Rừng khung nhỏ nhất (${kq.chon.length} cạnh): ${kq.chon.map(i => fmt(trongSoCanh(edges[i]))).join(" + ") || "0"} = ${fmt(kq.tong)}</div>`;
     }
-    text += '<div class="npt-btns kr-btns">' +
-        '<button class="success" onclick="hienKruskal()">Tô cây khung</button>' +
-        '<button class="danger" onclick="boKruskal()">✖ Hủy mô phỏng</button></div>';
-    text += htmlDieuKhienBuoc("kruskal");
-    text += '<div class="euler-status" id="krStatus">' + (krHL && krHL.kieu !== "prim" && krHL.msg ? krHL.msg : "") + "</div>";
     if (edges.some(e => e.w === undefined)) text += ghiChu("Cạnh nhập không có trọng số được tính w = 1.");
     return text + "</div>";
 }

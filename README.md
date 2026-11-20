@@ -39,7 +39,8 @@
 | 📋 **Danh sách kề** | Hiển thị dạng `[đỉnh] → [kề] → [kề] → NULL` |
 | 🔤 **Nhãn số / chữ** | Nút “Nhãn số / Nhãn chữ” đổi cách hiện đỉnh và cạnh: `(0,1)` ⇄ `(A,B)` ở hình vẽ, bảng, lời giải |
 | 🔄 **Chu trình Euler** | Kiểm tra, tìm và mô phỏng từng bước |
-| 📮 **Người phát thư** | Tìm hành trình ngắn nhất qua mọi cạnh |
+| 📮 **Người phát thư** | Tìm hành trình ngắn nhất qua mọi cạnh, mô phỏng từng bước và **🚶 đi hành trình ngay trong mục này** |
+| 📌 **Lưu ý loại đồ thị** | Mỗi chức năng và bài tập có một dòng “Lưu ý” cho biết loại đồ thị nào dùng được, kèm trạng thái ✔ / ✖ theo loại đang chọn |
 | 🌲 **Kruskal** | Cây khung nhỏ nhất: bảng cạnh đã sắp xếp, cạnh chọn/loại, xem từng bước, tô cây khung, nạp ví dụ 33 và bài tập 37 |
 | 🌳 **Prim** | Cây khung nhỏ nhất: chọn đỉnh xuất phát, bảng cạnh ứng viên từng bước, xem từng bước, tô cây khung (xóa cạnh thừa), hủy mô phỏng |
 | 🎨 **3 giao diện** | Light, Premium, Neon |
@@ -64,6 +65,8 @@ Dothi/
     │   └── kiem_tra.js     # Kiểm tra dữ liệu nhập
     ├── giao_dien/          # GIAO DIỆN: theme, màu, hiệu ứng
     │   ├── doi_giao_dien.js      # Chọn loại, đổi theme, áp dụng màu
+    │   ├── thanh_nut.js          # Thanh nút góc phải trên theo chức năng đang chọn
+    │   ├── luu_y_loai.js         # Dòng “📌 Lưu ý”: chức năng / bài tập nào dùng được cho loại đồ thị nào
     │   └── hieu_ung_phi_kiem.js  # Hiệu ứng nền phi kiếm bay (canvas)
     ├── loi/                # LÕI: dựng đồ thị, vẽ, lưu
     │   ├── chinh_sua_canh.js     # Tạo đồ thị, thêm / xóa / sửa cạnh
@@ -85,7 +88,7 @@ Dothi/
 > ⚠️ **Thứ tự nạp script trong `index.html` (không được đổi):**
 >
 > ```text
-> cau_hinh → trang_thai → kiem_tra → doi_giao_dien → chinh_sua_canh → ve_do_thi → ma_tran → danh_sach_ke → chu_trinh_euler → nguoi_phat_thu → kruskal → cach_giai → thong_tin → luu_tru → chinh
+> cau_hinh → trang_thai → kiem_tra → doi_giao_dien → chinh_sua_canh → ve_do_thi → ma_tran → danh_sach_ke → chu_trinh_euler → nguoi_phat_thu → kruskal → cach_giai → thanh_nut → luu_y_loai → thong_tin → luu_tru → chinh
 > ```
 
 ---
@@ -341,13 +344,22 @@ Tìm hành trình **ngắn nhất** đi qua mọi cạnh ít nhất 1 lần rồ
 | 1 | Tô cam các đỉnh bậc lẻ V<sub>o</sub>(G) (không có đỉnh lẻ thì dừng ở đây: đã có chu trình Euler) |
 | 2 | Chọn phân hoạch P<sub>i</sub> nhỏ nhất (hoặc phân hoạch đang xem) và d(P<sub>i</sub>) |
 | 3 … K+2 | Ghép từng cặp: cặp đang ghép viền hồng, thêm các cạnh sao chép (hồng khi vừa thêm, sau đó xanh lá), đỉnh đã ghép xong viền xanh lá |
-| K+3 | Xong: mọi đỉnh bậc chẵn, tổng = Σw(e) + m(G); dùng mục Chu trình Euler để đi hành trình |
+| K+3 | Xong: mọi đỉnh bậc chẵn, tổng = Σw(e) + m(G); bấm **🚶 Đi hành trình** ngay bên dưới để đi hành trình |
 
 - Mỗi bước dựng lại đồ thị = gốc (`npt.goc`) + cạnh sao chép của các cặp đã ghép, nên đi lùi / về đầu đều đúng; bảng bậc, ma trận, Euler... đổi theo từng bước.
 - Tô màu bằng biến `nptHL` (`trang_thai.js`), vẽ trong `ve_do_thi.js` (`mauVienNPT`, cạnh `vuaThem`). Lời giải thích hiện ở góc trên trái hình và dưới nút điều khiển.
 - **✖ Hủy mô phỏng** trả lại đồ thị gốc. Chuyển sang mô phỏng Euler / Kruskal / Prim khi đang dở dang cũng tự trả về đồ thị gốc.
 
-**CSS:** nhóm `.npt-wrap` / `.npt-card` / `.npt-best` / `.npt-m` / `.npt-total` / `.npt-btns`.
+**🚶 Đi hành trình ngay trong mục này** (không cần sang mục Chu trình Euler): ở cuối khung Điều khiển của mục *Bài toán người phát thư* có khối **🚶 Đi hành trình** gồm ô chọn **đỉnh bắt đầu**, nút **Tô cả hành trình** và 5 nút ⏮ ◀ ▶ ⏩ ⏸ (kiểu `"hanhtrinh"` trong `dieu_khien_buoc.js`).
+
+- Dùng lại thuật toán Hierholzer của `chu_trinh_euler.js` (`taoDKEuler("hanhtrinh")`, `hienEuler("hanhtrinh")`), nên hành trình giống hệt mục Euler; hai mục dùng chung đỉnh bắt đầu (`eulerStart`).
+- Chưa thêm cạnh lặp thì tự thêm theo phân hoạch nhỏ nhất (cạnh xanh lá). Đã bấm *Xem Pi* thì đi theo đúng Pi đang xem; đổi sang Pi khác khi đang đi thì hành trình bắt đầu lại từ bước 0.
+- Đồ thị đã có chu trình Euler (mọi đỉnh bậc chẵn) thì đi thẳng, không thêm cạnh. Đồ thị không liên thông, có trọng số âm hoặc quá 12 đỉnh lẻ thì khối này hiện lý do thay vì nút.
+- Lời giải thích từng bước hiện ở `#htStatus` và ở góc trên trái hình (`eulerHL.kenh = "hanhtrinh"`). Kết quả bên phải có thêm **mục 5. Hành trình** (dãy đỉnh – cạnh, cạnh lặp có dấu `*`).
+- Thanh nút góc phải trên của mục này có thêm **Tô cả hành trình**; **✖ Hủy mô phỏng** bỏ tô màu và trả đồ thị về gốc.
+- Chỉ dùng cho `loai 1–3`.
+
+**CSS:** nhóm `.npt-wrap` / `.npt-card` / `.npt-best` / `.npt-m` / `.npt-total` / `.npt-btns` / `.npt-ht`.
 
 ---
 
@@ -468,6 +480,23 @@ File: `js/chuc_nang/prim.js` (lời giải chi tiết: `giaiChiTietPrim()` trong
 
 ---
 
+## 📌 Lưu ý loại đồ thị dùng được
+
+**File `js/giao_dien/luu_y_loai.js`** + các dòng `<div class="note ap-dung" data-loai="...">` trong `index.html`. Mỗi chức năng và bài tập có một đoạn “📌 Lưu ý”; hàm `capNhatLuuY()` thêm dòng **✔ dùng được** (xanh) hoặc **✖ không dùng được** (đỏ) theo loại đang chọn, và chạy lại mỗi khi đổi loại.
+
+| Chức năng / bài tập | Loại dùng được |
+|---|---|
+| Lưu / Reset, Phiên đồ thị, Giao diện & màu, Tạo đồ thị, Thêm / xóa / sửa cạnh | Cả 5 loại |
+| 🔄 Chu trình Euler | Cả 5 loại (vô hướng: liên thông + bậc chẵn; có hướng: liên thông yếu + deg⁺ = deg⁻) |
+| 🛤️ Đường đi & chu trình | Cả 5 loại (có hướng thì đi đúng chiều mũi tên) |
+| 📮 Người phát thư (kể cả 🚶 Đi hành trình) | Chỉ loại 1, 2, 3 |
+| 🌲 Kruskal, 🌳 Prim | Chỉ loại 1, 2, 3 |
+| Ví dụ (6 đỉnh) / Bài tập (9 đỉnh) | Tự nạp thành loại 1 (có trọng số) nên dùng được với Kruskal, Prim, người phát thư, Euler, đường đi |
+
+Thêm chức năng mới: viết một dòng `note ap-dung` có `data-loai` liệt kê các loại được dùng, không cần sửa JS.
+
+---
+
 ## 🔤 Nhãn số / chữ
 
 Nút **🔢 Nhãn số / 🔤 Nhãn chữ** (khung Điều khiển, dưới nút đổi giao diện) chỉ đổi cách **hiển thị** nhãn đỉnh và cạnh; dữ liệu đồ thị bên trong vẫn là số 0…n−1.
@@ -483,13 +512,13 @@ Nút **🔢 Nhãn số / 🔤 Nhãn chữ** (khung Điều khiển, dưới nút
 - Mã nguồn: `kieuNhan`, `nhanDinh()`, `docDinh()` trong `js/dung_chung/cau_hinh.js`; `chonKieuNhan()` trong `js/giao_dien/doi_giao_dien.js`.
 
 
-## Bộ điều khiển từng bước (Euler · Kruskal · Prim)
+## Bộ điều khiển từng bước (Euler · Kruskal · Prim · Người phát thư · Đi hành trình)
 
 **File `js/loi/dieu_khien_buoc.js`** — 5 nút dùng chung: ⏮ Về đầu · ◀ Bước trước · Bước tiếp ▶ · ⏩ Tự chạy · ⏸ Dừng. Có dòng "Bước k/max" phía trên.
 
 | Hàm | Công dụng |
 |---|---|
-| `htmlDieuKhienBuoc(kieu)` | Sinh khung 5 nút (`kieu` = `euler` / `kruskal` / `prim`) |
+| `htmlDieuKhienBuoc(kieu)` | Sinh khung 5 nút (`kieu` = `euler` / `kruskal` / `prim` / `npt` / `hanhtrinh`) |
 | `dkLenh(kieu, act)` | Điểm vào của mọi nút (`dau` / `truoc` / `tiep` / `chay` / `dung`) |
 | `dkDen(j)` | Đi tới bước j: gọi `ap(j)` dựng lại toàn bộ phần tô màu rồi vẽ lại |
 | `dkHuy()` | Hủy mô phỏng (tự gọi từ `resetEuler()` / `resetKruskalHL()`, nên sửa đồ thị là tự dừng) |

@@ -131,6 +131,15 @@ function doiDinhPrim(v) {
     hienThiThongTin();   // dựng lại bảng và tự bỏ tô màu cũ
 }
 
+// Nút điều khiển Prim: đặt ở khung Điều khiển bên trái (#ctlPrim)
+function htmlDieuKhienPrim() {
+    if (coHuong()) return "";
+    return `<div class="euler-start">Đỉnh bắt đầu: <select onchange="doiDinhPrim(this.value)">${
+        dsDinh().map(i => `<option value="${i}"${i === dinhPrimHopLe() ? " selected" : ""}>${nhanDinh(i)}</option>`).join("")}</select></div>` +
+        htmlDieuKhienBuoc("prim") +   // nút “Tô cây khung” / “Hủy mô phỏng” nằm ở thanh nút góc phải trên (thanh_nut.js)
+        '<div class="euler-status" id="primStatus">' + (krHL && krHL.kieu === "prim" && krHL.msg ? krHL.msg : "") + "</div>";
+}
+
 // ---- Vẽ phần kết quả vào khung thông tin ----
 function htmlPrim() {
     let text = '<h3 class="adjacency-matrix-heading">Thuật toán Prim (cây khung nhỏ nhất)</h3>';
@@ -140,8 +149,7 @@ function htmlPrim() {
 
     const tp = ds => "{" + ds.map(nhanDinh).join(", ") + "}";
     text += '<div class="npt-wrap" id="primKetQua">';
-    text += `<div class="euler-start">Đỉnh bắt đầu: <select onchange="doiDinhPrim(this.value)">${
-        dsDinh().map(i => `<option value="${i}"${i === kq.start ? " selected" : ""}>${nhanDinh(i)}</option>`).join("")}</select></div>`;
+    text += `<div class="euler-start">Đỉnh bắt đầu: <b>${nhanDinh(kq.start)}</b> <small>(đổi ở khung Điều khiển bên trái)</small></div>`;
     text += `<div class="npt-step"><b>1. Chọn đỉnh ${nhanDinh(kq.start)}</b>: V<sub>T</sub> = ${tp([kq.start])}, F = Ø.</div>`;
     text += '<div class="npt-step"><b>2. Mỗi bước chọn cạnh ứng viên nhỏ nhất</b> (một đầu trong V<sub>T</sub>, một đầu ngoài V<sub>T</sub>):</div>';
 
@@ -161,11 +169,6 @@ function htmlPrim() {
         text += `<div class="euler-no">✖ Đồ thị không liên thông (${kq.soThanhPhan} thành phần) nên Prim chỉ phủ được thành phần chứa đỉnh ${nhanDinh(kq.start)}.</div>`;
         text += `<div class="npt-total">Cây khung của thành phần đó (${kq.chon.length} cạnh): ${kq.chon.map(i => fmt(trongSoCanh(edges[i]))).join(" + ") || "0"} = ${fmt(kq.tong)}</div>`;
     }
-    text += '<div class="npt-btns kr-btns">' +
-        '<button class="success" onclick="hienPrim()">Tô cây khung</button>' +
-        '<button class="danger" onclick="huyPrim()">✖ Hủy mô phỏng</button></div>';
-    text += htmlDieuKhienBuoc("prim");
-    text += '<div class="euler-status" id="primStatus">' + (krHL && krHL.kieu === "prim" && krHL.msg ? krHL.msg : "") + "</div>";
     if (edges.some(e => e.w === undefined)) text += ghiChu("Cạnh nhập không có trọng số được tính w = 1.");
     return text + "</div>";
 }

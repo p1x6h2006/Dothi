@@ -22,6 +22,8 @@
 
     <!-- ===== MÀN HÌNH 2: MÀN HÌNH CHÍNH (hiện sau khi chọn loại) ===== -->
     <div id="manHinhChinh">
+        <!-- Thanh nút góc phải trên (js/giao_dien/thanh_nut.js): hiện đúng nút của chức năng đang chọn (Euler / người phát thư / Kruskal / Prim) -->
+        <div id="thanhNut" class="thanh-nut" hidden></div>
         <h1> MÔ PHỎNG ĐỒ THỊ</h1>
         <div class="selected-type">
             Đang chọn: <span id="loaiDangChon">Chưa chọn</span>
@@ -37,19 +39,31 @@
                     <button class="danger" onclick="resetDoThi()">↺ Reset</button>
                 </div>
                 <div class="save-status" id="luuTrangThai">Đồ thị được tự động lưu</div>
+                <div class="note ap-dung" data-loai="1,2,3,4,5">📌 <b>Lưu ý:</b> dùng được cho <b>cả 5 loại</b> đồ thị (vô hướng và có hướng).<span class="ap-dung-tt"></span></div>
 
+                <label>Loại đồ thị:</label>
+                <select id="loai" onchange="hienThiThongTin()"></select>
+
+                <!-- [Mục] Phiên đồ thị: một ô, bấm tiêu đề mới xổ ra -->
+                <details class="giai mst-menu">
+                    <summary>🗂️ Phiên đồ thị</summary>
+                    <div class="giai-body mst-body">
+                <div class="note ap-dung" data-loai="1,2,3,4,5">📌 <b>Lưu ý:</b> dùng được cho <b>cả 5 loại</b> đồ thị (vô hướng và có hướng).<span class="ap-dung-tt"></span></div>
                 <!-- [Mục] Phiên đồ thị (luu_tru.js): mỗi phiên là 1 đồ thị riêng, bấm vào phiên nào thì đồ thị đó hiện ra -->
-                <h3>🗂️ Phiên đồ thị</h3>
                 <div class="phien-list" id="danhSachPhien"></div>
                 <div class="phien-btns">
                     <button class="success" onclick="phienMoi()">➕ Phiên mới</button>
                     <button class="info" onclick="doiTenPhien()">✏️ Đổi tên</button>
                     <button class="danger" onclick="xoaPhien()">🗑️ Xóa</button>
                 </div>
-                <hr>
-                <label>Loại đồ thị:</label>
-                <select id="loai" onchange="hienThiThongTin()"></select>
+                    </div>
+                </details>
 
+                <!-- [Mục] Giao diện, kiểu nhãn và màu: một ô, bấm tiêu đề mới xổ ra -->
+                <details class="giai mst-menu">
+                    <summary>🎨 Giao diện &amp; màu sắc</summary>
+                    <div class="giai-body mst-body">
+                <div class="note ap-dung" data-loai="1,2,3,4,5">📌 <b>Lưu ý:</b> dùng được cho <b>cả 5 loại</b> đồ thị (vô hướng và có hướng).<span class="ap-dung-tt"></span></div>
                 <!-- [Mục] Đổi giao diện: Light / Premium / Neon (chonGiaoDien trong doi_giao_dien.js) -->
                 <div class="theme-switch">
                     <button class="theme-btn active" id="lightThemeBtn" onclick="chonGiaoDien('light')">☀️ Light</button>
@@ -75,18 +89,28 @@
                 </div>
                 <button class="info" onclick="apDungMauDoThi()" style="margin-top: 12px;">🎨 Áp dụng màu đồ thị</button>
 
+                    </div>
+                </details>
+
                 <!-- [Mục] Tạo đồ thị mới: nhập số đỉnh, số cạnh (taoDoThi trong chinh_sua_canh.js) -->
                 <label>Số đỉnh:</label>
                 <input type="number" id="soDinh" min="1" value="5">
                 <label>Số cạnh:</label>
                 <input type="number" id="soCanh" min="0" value="5">
                 <button onclick="taoDoThi()">Tạo đồ thị</button>
+                <div class="note ap-dung" data-loai="1,2,3,4,5">📌 <b>Lưu ý:</b> dùng được cho <b>cả 5 loại</b> đồ thị (vô hướng và có hướng).<span class="ap-dung-tt"></span></div>
                 <div class="note tip">
                     Hướng dẫn: nhập cạnh dạng x y hoặc x y w (w là trọng số), đỉnh từ 0 đến n−1 (hoặc A, B, C… tương ứng). Nhập số hay chữ đều được.
                 </div>
                 <hr>
 
-                <!-- [Mục] Thêm cạnh (themCanh) -->
+                <!-- Mỗi chức năng là một ô <details>: bấm tiêu đề mới xổ ra -->
+                <!-- [Mục] Chỉnh sửa cạnh: Thêm (themCanh) / Xóa (xoaCanh) / Sửa (suaCanh) / Sắp xếp lại -->
+                <details class="giai mst-menu">
+                    <summary>✏️ Thêm / xóa / sửa cạnh</summary>
+                    <div class="giai-body mst-body">
+                <div class="note ap-dung" data-loai="1,2,3,4,5">📌 <b>Lưu ý:</b> dùng được cho <b>cả 5 loại</b> đồ thị (vô hướng và có hướng).<span class="ap-dung-tt"></span></div>
+                <div class="note hint">Luật cạnh theo loại: loại 1 không có vòng khuyên và cạnh song song · loại 2 cho cạnh song song · loại 3 cho cả cạnh song song và vòng khuyên · loại 4 (có hướng) mỗi chiều x→y chỉ một cạnh · loại 5 cho cạnh song song x→y. Loại 4, 5 không có vòng khuyên.</div>
                 <h3>➕ Thêm cạnh</h3>
                 <input type="text" autocomplete="off" id="themX" placeholder="Đỉnh x">
                 <input type="text" autocomplete="off" id="themY" placeholder="Đỉnh y">
@@ -110,33 +134,54 @@
                 <button onclick="suaCanh()">Sửa cạnh</button>
 
                 <button class="info" onclick="sapXep()">🔄 Sắp xếp lại</button>
-                <hr>
+                    </div>
+                </details>
+
+                <!-- [Mục] Chu trình Euler: nút điều khiển (htmlDieuKhienEuler trong chu_trinh_euler.js); kết quả hiện ở khung bên phải -->
+                <details class="giai mst-menu" data-cn="euler">
+                    <summary>🔄 Chu trình Euler</summary>
+                    <div class="giai-body mst-body">
+                <div class="note ap-dung" data-loai="1,2,3,4,5">📌 <b>Lưu ý:</b> dùng được cho <b>cả 5 loại</b> đồ thị. Vô hướng (loại 1–3): các cạnh liên thông và mọi đỉnh bậc chẵn. Có hướng (loại 4–5): liên thông yếu và mọi đỉnh có deg⁺ = deg⁻.<span class="ap-dung-tt"></span></div>
+                <div class="note hint">Chọn đỉnh bắt đầu, tô cả chu trình hoặc chạy từng bước. Kết quả xem ở khung bên phải.</div>
+                <div id="ctlEuler" class="ctl-kq"><div class="note">Tạo đồ thị để dùng mục này.</div></div>
+                    </div>
+                </details>
 
                 <!-- [Mục] Bài toán người phát thư (giaiNguoiPhatThu trong nguoi_phat_thu.js) -->
-                <h3>📮 Bài toán người phát thư</h3>
+                <details class="giai mst-menu" data-cn="npt">
+                    <summary>📮 Bài toán người phát thư</summary>
+                    <div class="giai-body mst-body">
+                <div class="note ap-dung" data-loai="1,2,3">📌 <b>Lưu ý:</b> chỉ dùng được cho <b>loại 1, 2, 3</b> (đồ thị vô hướng), gồm cả phần <b>Đi hành trình</b>; <b>không dùng</b> cho loại 4, 5 (có hướng).<span class="ap-dung-tt"></span></div>
                 <div class="note hint">Tìm hành trình ngắn nhất đi qua mọi cạnh rồi quay về (đồ thị vô hướng). Cạnh không có trọng số tính w = 1.</div>
                 <button class="success" onclick="giaiNguoiPhatThu()">📮 Phân tích &amp; giải bài toán</button>
                 <button class="info" onclick="moPhongNguoiPhatThu()">🎬 Mô phỏng từng bước</button>
-                <hr>
+                <div id="ctlNPT" class="ctl-kq"></div>   <!-- nút chọn phân hoạch / thêm cạnh / điều khiển từng bước (htmlDieuKhienNPT) -->
+                    </div>
+                </details>
 
                 <!-- [Mục] Thuật toán tìm cây khung nhỏ nhất: bấm tiêu đề mới xổ ra, trong đó chọn Kruskal (kruskal.js) hoặc Prim (prim.js) -->
                 <details class="giai mst-menu">
                     <summary>🌲 Thuật toán tìm cây khung nhỏ nhất</summary>
                     <div class="giai-body mst-body">
+                        <div class="note ap-dung" data-loai="1,2,3">📌 <b>Lưu ý:</b> chỉ dùng được (cả Kruskal và Prim) cho <b>loại 1, 2, 3</b> (đồ thị vô hướng); <b>không dùng</b> cho loại 4, 5 (có hướng).<span class="ap-dung-tt"></span></div>
                         <div class="note hint">Tìm cây khung nhỏ nhất của đồ thị vô hướng có trọng số. Cạnh không có trọng số tính w = 1. Chọn một thuật toán bên dưới.</div>
 
                         <!-- Kruskal (giaiKruskal trong kruskal.js) -->
-                        <div class="mst-algo">
+                        <div class="mst-algo" data-cn="kruskal">
                             <b>🌲 Kruskal</b>
                             <div class="note">Xếp cạnh tăng dần, thêm cạnh nào không tạo chu trình.</div>
+                            <div class="note ap-dung" data-loai="1,2,3">📌 <b>Lưu ý:</b> chỉ dùng được cho <b>loại 1, 2, 3</b> (đồ thị vô hướng); <b>không dùng</b> cho loại 4, 5 (có hướng).<span class="ap-dung-tt"></span></div>
                             <button class="success" onclick="giaiKruskal()">🌲 Phân tích &amp; giải Kruskal</button>
+                            <div id="ctlKruskal" class="ctl-kq"></div>
                         </div>
 
                         <!-- Prim (giaiPrim trong prim.js) -->
-                        <div class="mst-algo">
+                        <div class="mst-algo" data-cn="prim">
                             <b>🌳 Prim</b>
                             <div class="note">Xuất phát từ một đỉnh, mỗi bước thêm cạnh nhỏ nhất nối cây với một đỉnh chưa có trong cây. Ra kết quả sẽ xóa các cạnh thừa; bấm “Hủy mô phỏng” để trả đồ thị về bình thường.</div>
+                            <div class="note ap-dung" data-loai="1,2,3">📌 <b>Lưu ý:</b> chỉ dùng được cho <b>loại 1, 2, 3</b> (đồ thị vô hướng); <b>không dùng</b> cho loại 4, 5 (có hướng).<span class="ap-dung-tt"></span></div>
                             <button class="success" onclick="giaiPrim()">🌳 Phân tích &amp; giải Prim</button>
+                            <div id="ctlPrim" class="ctl-kq"></div>
                         </div>
 
                         <!-- Ví dụ dùng chung cho cả hai thuật toán (napViDuKruskal trong kruskal.js) -->
@@ -147,14 +192,16 @@
                                 <button class="info" onclick="napViDuKruskal(2)">Bài tập (9 đỉnh)</button>
                             </div>
                             <div class="note hint">Ví dụ 6 đỉnh: A, B, C, D, E, F được đánh số 0, 1, 2, 3, 4, 5.</div>
+                            <div class="note ap-dung">📌 <b>Lưu ý:</b> cả <b>Ví dụ (6 đỉnh)</b> và <b>Bài tập (9 đỉnh)</b> tự nạp thành <b>loại 1</b> (đơn đồ thị vô hướng, có trọng số) nên dùng được cho: <b>Kruskal, Prim</b>, người phát thư (và đi hành trình), Euler, đường đi &amp; chu trình. Nạp xong mà đổi sang loại 4, 5 (có hướng) thì Kruskal, Prim và người phát thư không còn dùng được.</div>
                         </div>
                     </div>
                 </details>
 
                 <!-- [Mục] Đường đi & chu trình (duong_di.js): chọn loại + đỉnh xuất phát / đích -> Tìm kiếm -> bấm một kết quả để tô lên đồ thị -->
-                <details class="giai mst-menu dd-menu" open>
+                <details class="giai mst-menu dd-menu">
                     <summary>🛤️ Đường đi &amp; chu trình</summary>
                     <div class="giai-body mst-body">
+                        <div class="note ap-dung" data-loai="1,2,3,4,5">📌 <b>Lưu ý:</b> dùng được cho <b>cả 5 loại</b> đồ thị. Với đồ thị có hướng, đường đi và chu trình phải đi đúng chiều mũi tên.<span class="ap-dung-tt"></span></div>
                         <label for="ddLoai">Loại đường đi / chu trình:</label>
                         <select id="ddLoai" onchange="ddDoiLoai()">
                             <optgroup label="Đường đi (từ đỉnh xuất phát đến đỉnh đích)">
@@ -201,7 +248,7 @@
         </div>
     </div>
 
-    <!-- ===== NẠP SCRIPT (KHÔNG ĐỔI THỨ TỰ): cau_hinh -> trang_thai -> kiem_tra -> doi_giao_dien -> chinh_sua_canh -> ve_do_thi -> dieu_khien_buoc -> ma_tran -> danh_sach_ke -> chu_trinh_euler -> nguoi_phat_thu -> kruskal -> prim -> duong_di -> cach_giai -> thong_tin -> luu_tru -> chinh ===== -->
+    <!-- ===== NẠP SCRIPT (KHÔNG ĐỔI THỨ TỰ): cau_hinh -> trang_thai -> kiem_tra -> doi_giao_dien -> chinh_sua_canh -> ve_do_thi -> dieu_khien_buoc -> ma_tran -> danh_sach_ke -> chu_trinh_euler -> nguoi_phat_thu -> kruskal -> prim -> duong_di -> cach_giai -> thanh_nut -> luu_y_loai -> thong_tin -> luu_tru -> chinh ===== -->
     <script src="js/dung_chung/cau_hinh.js"></script>
     <script src="js/dung_chung/trang_thai.js"></script>
     <script src="js/dung_chung/kiem_tra.js"></script>
@@ -217,6 +264,8 @@
     <script src="js/chuc_nang/prim.js"></script>
     <script src="js/chuc_nang/duong_di.js"></script>
     <script src="js/chuc_nang/cach_giai.js"></script>
+    <script src="js/giao_dien/thanh_nut.js"></script>
+    <script src="js/giao_dien/luu_y_loai.js"></script>
     <script src="js/chuc_nang/bieu_dien/thong_tin.js"></script>
     <script src="js/loi/luu_tru.js"></script>
     <script src="js/chinh.js"></script>   <!-- khởi động: khôi phục dữ liệu đã lưu (nạp sau cùng) -->

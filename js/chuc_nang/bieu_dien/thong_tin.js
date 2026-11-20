@@ -54,6 +54,13 @@ function hienThiThongTin() {
         htmlNguoiPhatThu() + giaiChiTietNPT() +
         htmlKruskal() + giaiChiTietKruskal() +
         htmlPrim() + giaiChiTietPrim();
+    // Các nút chức năng nằm hết ở khung Điều khiển bên trái; khung bên phải chỉ hiện kết quả
+    $("ctlEuler").innerHTML = htmlDieuKhienEuler();
+    $("ctlNPT").innerHTML = htmlDieuKhienNPT();
+    $("ctlKruskal").innerHTML = htmlDieuKhienKruskal();
+    $("ctlPrim").innerHTML = htmlDieuKhienPrim();
+    capNhatThanhNut();   // thanh nút góc phải trên (thanh_nut.js)
+    if (typeof capNhatLuuY === "function") capNhatLuuY();   // dòng “Lưu ý” loại đồ thị dùng được (luu_y_loai.js)
     document.querySelectorAll("#thongTin details.giai").forEach(d => { if (dangMo.has(d.dataset.key)) d.open = true; });
     if (typeof ddDongBo === "function") ddDongBo();   // đồ thị đổi thì bỏ kết quả "Đường đi & chu trình" cũ (duong_di.js)
     capNhatNutDK();   // số bước + bật/tắt 5 nút điều khiển (dieu_khien_buoc.js)

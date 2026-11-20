@@ -52,4 +52,5 @@ function chonLoaiDoThi(loai) {
     $("chonLoai").style.display = "none";
     $("manHinhChinh").style.display = "flex";
     $("loaiDangChon").textContent = $("loai").selectedOptions[0].textContent;
+    if (typeof capNhatLuuY === "function") capNhatLuuY();   // cập nhật dòng “Lưu ý” theo loại vừa chọn (luu_y_loai.js)
 }

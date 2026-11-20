@@ -15,6 +15,9 @@
 // Cạnh thêm vào là cạnh SONG SONG nên đơn đồ thị (loai 1) tự chuyển sang đa đồ thị (loai 2).
 // MÔ PHỎNG TỪNG BƯỚC (5 nút trong dieu_khien_buoc.js, kiểu "npt"): taoDKNPT() — gốc → đỉnh bậc lẻ → chọn phân hoạch → ghép từng cặp
 //   (thêm cạnh sao chép dọc đường đi ngắn nhất) → kết quả. Tô màu bằng nptHL (trang_thai.js), mỗi bước dựng lại đồ thị = gốc + cạnh đã thêm.
+// ĐI HÀNH TRÌNH (ngay trong mục này, không cần sang mục Chu trình Euler): htmlHanhTrinhNPT() — chọn đỉnh xuất phát, 5 nút từng bước (kiểu "hanhtrinh" trong
+//   dieu_khien_buoc.js) hoặc “Tô cả hành trình” (hienHanhTrinh). Dùng lại thuật toán Hierholzer của chu_trinh_euler.js (taoDKEuler("hanhtrinh")); chưa thêm cạnh lặp thì
+//   tự thêm theo phân hoạch nhỏ nhất (hoặc phân hoạch Pi đang xem). Tô màu bằng eulerHL (có eulerHL.kenh = "hanhtrinh" để lời giải thích hiện ở #htStatus).
 
 const MAU_THEM = "#16a34a";
 const MAU_NPT_LE = "#f59e0b";        // đỉnh bậc lẻ chưa được ghép (mô phỏng)
@@ -125,7 +128,7 @@ function canhThemTheoPhanHoach(goc, p) {
 // ---- Xem / áp dụng phân hoạch Pi: dựng lại đồ thị = gốc + các cạnh dọc đường đi ngắn nhất ----
 function apDungPhanHoach(i) {
     if (!npt || npt.loi || !npt.ds[i]) return;
-    const dangEuler = !!dk && dk.kieu === "euler";   // đang mô phỏng Euler thì nhớ lại để chạy tiếp trên đồ thị mới
+    const kieuDK = dk && (dk.kieu === "euler" || dk.kieu === "hanhtrinh") ? dk.kieu : null;   // đang mô phỏng Euler / đi hành trình thì nhớ lại để chạy tiếp trên đồ thị mới
     edges = npt.goc.map(e => ({ ...e }));
     canhThemNPT = new Set();
     canhThemTheoPhanHoach(npt.goc, npt.ds[i]).forEach(e => {
@@ -139,8 +142,8 @@ function apDungPhanHoach(i) {
     veDoThi();
     hienThiThongTin();
     cuonDenDoThi();       // nhảy lên chỗ đồ thị để xem luôn
-    // Đổi sang phân hoạch khác thì hành trình đổi theo: mô phỏng Euler bắt đầu lại từ bước 0 trên đồ thị mới (không để mất)
-    if (dangEuler) dkLenh("euler", "dau");
+    // Đổi sang phân hoạch khác thì hành trình đổi theo: mô phỏng Euler / đi hành trình bắt đầu lại từ bước 0 trên đồ thị mới (không để mất)
+    if (kieuDK) dkLenh(kieuDK, "dau");
 }
 
 function traLaiDoThiGoc(khongCuon) {
@@ -225,7 +228,7 @@ function taoDKNPT() {
             else if (j <= K + 2) {
                 const q = P.pairs[j - 3];
                 msg = `Ghép cặp ${j - 2}/${K}: ${cap(q)} đi qua [${q.path.map(nhanDinh).join("→")}], sao chép ${q.path.length - 1} cạnh (d = ${fmt(q.d)}).`;
-            } else msg = `Xong: mọi đỉnh bậc chẵn. m(G) = ${fmt(P.d)} ⇒ tổng = ${fmt(kq.tong)} + ${fmt(P.d)} = ${fmt(kq.tong + P.d)}. Xem mục Chu trình Euler để đi hành trình.`;
+            } else msg = `Xong: mọi đỉnh bậc chẵn. m(G) = ${fmt(P.d)} ⇒ tổng = ${fmt(kq.tong)} + ${fmt(P.d)} = ${fmt(kq.tong + P.d)}. Bấm “Đi hành trình” ở khung Điều khiển để đi theo hành trình này.`;
             nptHL.msg = msg;
             hienThiThongTin();   // bậc của đỉnh, ma trận, Euler... đổi theo đồ thị ở bước này
         }
@@ -240,15 +243,60 @@ function moPhongNguoiPhatThu() {
 
 // HỦY MÔ PHỎNG: dừng chạy, bỏ tô màu, trả lại đồ thị gốc (bỏ các cạnh sao chép đã thêm)
 function huyMoPhongNPT() {
-    dkHuy();
+    resetEuler();   // dừng chạy (dkHuy) và bỏ tô màu của cả mô phỏng lẫn hành trình đang đi
     if (npt && npt.daApDung !== null) traLaiDoThiGoc(true);
     else { nptThongBao = ""; veDoThi(); hienThiThongTin(); }
     cuonDenDoThi();
 }
 
+// Nút điều khiển người phát thư: đặt ở khung Điều khiển bên trái (#ctlNPT): chọn phân hoạch, thêm cạnh / trả đồ thị gốc, mô phỏng từng bước
+function htmlDieuKhienNPT() {
+    if (coHuong()) return "";
+    let text = "";
+    if (npt && !npt.loi && npt.le.length) {
+        const { ds, best } = npt, tatCa = ds.length <= 15, nhan = i => "P" + (i + 1);
+        if (tatCa && ds.length > 1) {
+            text += '<div class="note hint">Xem từng phân hoạch trên đồ thị:</div><div class="npt-btns npt-pick">' +
+                ds.map((_, i) => `<button onclick="apDungPhanHoach(${i})">${npt.daApDung === i ? "Đang xem " : "Xem "}${nhan(i)}</button>`).join("") + "</div>";
+        }
+        text += '<div class="npt-btns" style="grid-template-columns:1fr">' +   // “Trả lại đồ thị gốc” / “Hủy mô phỏng” nằm ở thanh nút góc phải trên (thanh_nut.js)
+            `<button class="success" onclick="apDungPhanHoach(${best})">Tự động thêm cạnh &amp; vẽ lại đồ thị</button></div>`;
+    }
+    return text + htmlMoPhongNPT() + htmlHanhTrinhNPT();
+}
+
+// ---- ĐI HÀNH TRÌNH ngay trong mục người phát thư ----
+function hienHanhTrinh() { hienEuler("hanhtrinh"); }
+
+// Khung Điều khiển: đỉnh bắt đầu + 5 nút từng bước + “Tô cả hành trình”; chỉ hiện nút khi đồ thị thật sự có hành trình để đi
+function htmlHanhTrinhNPT() {
+    if (coHuong()) return "";
+    const r = phanTichEuler();
+    let text = '<div class="npt-sim npt-ht"><div class="npt-step"><b>🚶 Đi hành trình</b></div>';
+    if (!r.ok) {
+        const lyDo = r.postmanLoi || r.lyDo[0] || "Đồ thị chưa có hành trình.";
+        return text + `<div class="note hint">Chưa đi được hành trình: ${lyDo}</div></div>`;
+    }
+    text += '<div class="note hint">Đi theo hành trình ngắn nhất qua mọi cạnh rồi quay về đỉnh xuất phát.' +
+        (r.postman ? " Chưa thêm cạnh lặp thì tự thêm theo phân hoạch nhỏ nhất (hoặc phân hoạch P đang xem)." : " Mọi đỉnh đều bậc chẵn nên đi thẳng, không cần thêm cạnh.") + "</div>";
+    text += `<div class="euler-start">Đỉnh bắt đầu: <select onchange="doiDinhEuler(this.value)">${
+        r.coCanh.map(i => `<option value="${i}"${i === r.start ? " selected" : ""}>${nhanDinh(i)}</option>`).join("")}</select></div>`;
+    text += '<div class="npt-btns" style="grid-template-columns:1fr"><button class="success" onclick="hienHanhTrinh()">Tô cả hành trình</button></div>';
+    text += htmlDieuKhienBuoc("hanhtrinh") + '<div class="euler-status" id="htStatus"></div></div>';
+    return text;
+}
+
+// Khung kết quả bên phải: dãy đỉnh – cạnh của hành trình (cạnh có dấu * là cạnh lặp vừa thêm)
+function htmlHanhTrinhKetQua() {
+    if (!npt || npt.loi || coHuong()) return "";
+    if (dk && dk.kieu === "npt" && dk.k < dk.max) return "";   // đang mô phỏng dở: đồ thị mới có một phần cạnh lặp, chưa có hành trình hoàn chỉnh
+    const r = phanTichEuler();
+    if (!r.ok) return "";
+    return `<div class="npt-step"><b>5. Hành trình</b> (xuất phát từ đỉnh ${nhanDinh(r.start)}, cạnh có dấu * là cạnh lặp):</div>` + htmlDayEuler(r, npt.goc.length);
+}
+
 function htmlMoPhongNPT() {
     return '<div class="npt-sim"><div class="npt-step"><b>🎬 Mô phỏng từng bước</b></div>' +
-        '<div class="npt-btns"><button class="danger" onclick="huyMoPhongNPT()">✖ Hủy mô phỏng</button></div>' +
         htmlDieuKhienBuoc("npt") +
         `<div class="euler-status" id="nptStatus">${nptHL && nptHL.msg ? nptHL.msg : ""}</div></div>`;
 }
@@ -257,7 +305,7 @@ function htmlMoPhongNPT() {
 function htmlNguoiPhatThu() {
     let text = '<h3 class="adjacency-matrix-heading">Bài toán người phát thư</h3>';
     if (coHuong()) return text + '<div class="npt-wrap" id="nptKetQua">' + NHAN_LOAI_NPT + "</div>";
-    if (!npt) return text + '<div class="npt-wrap" id="nptKetQua"><i>Bấm nút “Phân tích &amp; giải bài toán” ở khung Điều khiển để xem lời giải, hoặc “Mô phỏng từng bước” để xem từng bước.</i>' + htmlMoPhongNPT() + "</div>";
+    if (!npt) return text + '<div class="npt-wrap" id="nptKetQua"><i>Bấm nút “Phân tích &amp; giải bài toán” ở khung Điều khiển để xem lời giải, hoặc “Mô phỏng từng bước” để xem từng bước.</i></div>';
     if (npt.loi) return text + `<div class="npt-wrap" id="nptKetQua"><div class="euler-no">✖ ${npt.loi}</div></div>`;
 
     const { ds, best, le, m } = npt, tatCa = ds.length <= 15;
@@ -281,23 +329,21 @@ function htmlNguoiPhatThu() {
             return `<div class="npt-card${tot ? " npt-best" : ""}${dang ? " npt-on" : ""}"><div class="npt-card-main">` +
                 `<b>${sub(i)} = { ${cap} }</b> → d(${sub(i)}) = ${tinh}${p.pairs.length > 1 ? " = " + fmt(p.d) : ""}` +
                 `${tot ? ' <span class="npt-badge">nhỏ nhất</span>' : ""}<div class="npt-path">Nối qua: ${qua}</div></div>` +
-                `<button onclick="apDungPhanHoach(${i})">${dang ? "Đang xem" : "Xem " + sub(i)}</button></div>`;
+                (dang ? '<span class="npt-badge">đang xem</span>' : "") + "</div>";
         }).join("");
         const ten = tatCa && ds.length > 1 ? `min(${ds.map((_, i) => `d(${sub(i)})`).join(", ")})` : `d(${sub(best)})`;
         text += `<div class="npt-m">4. m(G) = ${ten} = ${fmt(m)}</div>`;
     }
     text += `<div class="npt-total">Tổng chiều dài = Σw(e) + m(G) = ${fmt(npt.tong)} + ${fmt(m)} = ${fmt(npt.tong + m)}</div>`;
+    text += htmlHanhTrinhKetQua();
 
     if (le.length) {
-        text += '<div class="npt-btns">' +
-            `<button class="success" onclick="apDungPhanHoach(${best})">Tự động thêm cạnh &amp; vẽ lại đồ thị</button>` +
-            `<button class="danger" onclick="traLaiDoThiGoc()"${npt.daApDung === null ? " disabled" : ""}>Trả lại đồ thị gốc</button></div>`;
+        text += ghiChu("Các nút “Xem P…”, “Tự động thêm cạnh” nằm ở khung Điều khiển bên trái; “Trả lại đồ thị gốc” ở thanh nút góc phải trên.");
         if (npt.daApDung !== null) {
-            text += ghiChu(`Đang hiển thị đồ thị sau khi thêm ${canhThemNPT.size} cạnh theo ${sub(npt.daApDung)} (màu xanh lá). Lúc này mọi đỉnh có bậc chẵn; xem mục Chu trình Euler ở trên để mô phỏng hành trình.`);
+            text += ghiChu(`Đang hiển thị đồ thị sau khi thêm ${canhThemNPT.size} cạnh theo ${sub(npt.daApDung)} (màu xanh lá). Lúc này mọi đỉnh có bậc chẵn; bấm “Đi hành trình” ở khung Điều khiển bên trái để đi hành trình ngay tại đây.`);
             if (npt.loaiGoc === 1) text += ghiChu("Đồ thị đơn có thêm cạnh song song nên tự chuyển sang loại 2 (đa đồ thị); bấm “Trả lại đồ thị gốc” sẽ về loại 1.");
         }
     }
-    text += htmlMoPhongNPT();
     if (npt.goc.some(e => e.w === undefined)) text += ghiChu("Cạnh nhập không có trọng số được tính w = 1.");
     return text + "</div>";
 }

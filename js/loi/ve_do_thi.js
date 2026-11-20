@@ -105,6 +105,7 @@ function taoNhan(x, y, text, hl) {
 //   - Vòng khuyên (x = y)      : hình elip phía trên đỉnh          (loai 3)
 //   - Cạnh thường              : đường cong bậc hai                 (loai 1-5)
 //   - Cạnh song song           : cong ra hai bên để không chồng nhau (loai 2, 3, 5)
+//   - Hai cạnh ngược chiều (loai 4): gộp thành 1 đường thẳng, 2 mũi tên
 //   - Có hướng (coHuong())     : thêm mũi tên ở đầu y               (loai 4, 5)
 function veCanh(x, y, index) {
     const p1 = nodes[x], p2 = nodes[y], P = graphPalette;
@@ -130,6 +131,20 @@ function veCanh(x, y, index) {
         if (kLoai) loop.setAttribute("stroke-dasharray", "8 6");
         if (coHuong()) loop.setAttribute("marker-end", mui);
         taoNhan(p1.x, p1.y - 90 - k * 50, nhan, buoc);
+        return;
+    }
+
+    // --- Đơn đồ thị có hướng (loai 4): hai cạnh ngược chiều x→y và y→x vẽ thành MỘT đường thẳng có 2 mũi tên ---
+    // Mỗi cạnh chỉ vẽ nửa đường từ trung điểm tới đỉnh đích (mũi tên ở đỉnh đích) nên hai nửa ghép lại thành một đường;
+    // khi chỉ một chiều được tô màu (đường đi, Euler...) thì chỉ nửa của chiều đó đổi màu.
+    if ($("loai").value === "4" && edges.some(e => e.x === y && e.y === x)) {
+        const dx = p2.x - p1.x, dy = p2.y - p1.y, len = Math.hypot(dx, dy) || 1, ux = dx / len, uy = dy / len;
+        const mx = (p1.x + p2.x) / 2, my = (p1.y + p2.y) / 2;
+        const d = `M ${mx} ${my} L ${p2.x - ux * 34} ${p2.y - uy * 34}`;
+        el("path", { d, fill: "none", stroke: mauGlow, "stroke-width": 14, opacity: 0.25, "stroke-linecap": "round" });   // quầng sáng
+        el("path", { d, class: "edge", stroke: mauCanh, "stroke-width": dayNet, fill: "none", "marker-end": mui });
+        const lech = Math.min(len * 0.14, 40);   // nhãn mỗi chiều lệch về phía đỉnh đích của chiều đó để hai nhãn không chồng nhau
+        taoNhan(mx + ux * lech, my + uy * lech, nhan, buoc);
         return;
     }
 

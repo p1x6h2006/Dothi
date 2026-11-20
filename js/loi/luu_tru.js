@@ -21,6 +21,12 @@ const taoIdPhien = () => Date.now().toString(36) + Math.random().toString(36).sl
 const phienHienTai = () => kho.phien.find(p => p.id === kho.hien);
 const coDoThi = () => Object.keys(nodes).length > 0;
 
+// Giờ + ngày tháng năm lúc lưu, vd: 20:53:41 ngày 20/11/2026
+function tenThoiGianLuu() {
+    const d = new Date();
+    return d.toLocaleTimeString("vi-VN") + " ngày " + d.toLocaleDateString("vi-VN", { day: "2-digit", month: "2-digit", year: "numeric" });
+}
+
 function ghiTrangThaiLuu(msg) {
     const t = $("luuTrangThai");
     if (t) t.textContent = msg;
@@ -52,7 +58,7 @@ function luuNgay(hienThongBao) {
         capNhatPhienHienTai();
         ghiKho();
         veDanhSachPhien();
-        ghiTrangThaiLuu((hienThongBao ? "✔ Đã lưu lúc " : "Tự động lưu lúc ") + new Date().toLocaleTimeString("vi-VN"));
+        ghiTrangThaiLuu((hienThongBao ? "✔ Đã lưu lúc " : "Tự động lưu lúc ") + tenThoiGianLuu());
     } catch (err) {
         ghiTrangThaiLuu("⚠ Không lưu được (trình duyệt chặn hoặc hết dung lượng)");
     }

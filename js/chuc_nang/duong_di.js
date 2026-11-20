@@ -232,6 +232,31 @@ function ddTim() {
     ddVeKetQua();
 }
 
+// ---------- Lọc đường đi nhanh ----------
+// Gõ dãy đỉnh vào ô "Lọc đường đi nhanh" để chỉ giữ lại các kết quả có đi qua đúng dãy đỉnh đó, liền nhau, theo thứ tự.
+//   Ví dụ gõ 12542 -> giữ các đường chứa 1 → 2 → 5 → 4 → 2 (không có dấu phân cách thì mỗi ký tự là một đỉnh).
+//   Đỉnh từ 10 trở lên (hoặc muốn rõ ràng) thì ngăn cách bằng khoảng trắng, dấu phẩy hoặc ->, vd: 10 2 11 hoặc 10->2->11.
+//   Nhãn chữ cũng được: ABD. Ô để trống = hiện tất cả. Dãy không hợp lệ -> không có kết quả nào khớp.
+function ddDocLoc() {
+    const v = ($("ddLoc") ? $("ddLoc").value : "").trim();
+    if (!v) return null;
+    const co = /[\s,;>\-]/.test(v);
+    const tok = co ? v.split(/[\s,;>\-]+/).filter(Boolean) : v.split("");
+    return tok.map(docDinh);    // NaN nếu sai
+}
+function ddKhop(p, loc) {
+    if (!loc) return true;
+    if (!loc.length || loc.some(x => Number.isNaN(x))) return false;
+    const vs = p.vs;
+    for (let i = 0; i + loc.length <= vs.length; i++) {
+        let ok = true;
+        for (let j = 0; j < loc.length; j++) if (vs[i + j] !== loc[j]) { ok = false; break; }
+        if (ok) return true;
+    }
+    return false;
+}
+function ddLocNhanh() { ddVeKetQua(); }
+
 // Vẽ danh sách kết quả (vẽ lại được bất cứ lúc nào, ví dụ khi đổi nhãn số / chữ)
 function ddVeKetQua() {
     const r = ddKq;
@@ -242,9 +267,12 @@ function ddVeKetQua() {
     if (!r.ds.length) {
         h = `<div class="dd-rong">Không tìm thấy ${r.loai.startsWith("ct:") ? "chu trình" : "đường đi"} nào (${ten.toLowerCase()}) từ ${nhanDinh(r.s)}${r.loai.startsWith("ct:") ? "" : " đến " + nhanDinh(r.t)}.</div>`;
     } else {
-        h = `<div class="dd-tieude">Tìm thấy ${r.tong} kết quả:</div>`;
+        const loc = ddDocLoc();
+        const hien = r.ds.map((p, k) => ({ p, k })).filter(o => ddKhop(o.p, loc));
+        h = `<div class="dd-tieude">Tìm thấy ${r.tong} kết quả${loc ? ` · ${hien.length} kết quả khớp bộ lọc` : ""}:</div>`;
         h += r.ghiChu.map(s => `<div class="dd-ghichu">${s}</div>`).join("");
-        h += r.ds.map((p, k) => {
+        if (loc && !hien.length) h += `<div class="dd-rong">Không có kết quả nào đi qua dãy đỉnh đã gõ.</div>`;
+        h += hien.map(({ p, k }) => {
             const meta = `${p.es.length} cạnh` + (coW ? ` · w = ${fmt(ddTongW(p))}` : "");
             const eid = nhanHeo ? ` <span class="dd-eid">[${p.es.map(i => "e" + (i + 1)).join(",")}]</span>` : "";
             return `<div class="dd-item${pathHL && pathHL.idx === k ? " dd-on" : ""}" data-k="${k}" onclick="ddChon(${k})" title="Bấm để tô đường này lên đồ thị">` +

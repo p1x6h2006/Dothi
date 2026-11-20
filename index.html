@@ -41,8 +41,24 @@
                 <div class="save-status" id="luuTrangThai">Đồ thị được tự động lưu</div>
                 <div class="note ap-dung" data-loai="1,2,3,4,5">📌 <b>Lưu ý:</b> dùng được cho <b>cả 5 loại</b> đồ thị (vô hướng và có hướng).<span class="ap-dung-tt"></span></div>
 
-                <label>Loại đồ thị:</label>
-                <select id="loai" onchange="hienThiThongTin()"></select>
+                <!-- [Mục] Loại đồ thị: một ô, bấm tiêu đề mới xổ ra (cùng kiểu Phiên đồ thị) -->
+                <details class="giai mst-menu">
+                    <summary>🧩 Loại đồ thị</summary>
+                    <div class="giai-body mst-body">
+                        <select id="loai" onchange="hienThiThongTin()"></select>
+                    </div>
+                </details>
+
+                <!-- [Mục] Tạo đồ thị mới: nhập số đỉnh, số cạnh (taoDoThi trong chinh_sua_canh.js) -->
+                <label>Số đỉnh:</label>
+                <input type="number" id="soDinh" min="1" value="5">
+                <label>Số cạnh:</label>
+                <input type="number" id="soCanh" min="0" value="5">
+                <button onclick="taoDoThi()">Tạo đồ thị</button>
+                <div class="note ap-dung" data-loai="1,2,3,4,5">📌 <b>Lưu ý:</b> dùng được cho <b>cả 5 loại</b> đồ thị (vô hướng và có hướng).<span class="ap-dung-tt"></span></div>
+                <div class="note tip">
+                    Hướng dẫn: nhập cạnh dạng x y hoặc x y w (w là trọng số), đỉnh từ 0 đến n−1 (hoặc A, B, C… tương ứng). Nhập số hay chữ đều được.
+                </div>
 
                 <!-- [Mục] Phiên đồ thị: một ô, bấm tiêu đề mới xổ ra -->
                 <details class="giai mst-menu">
@@ -91,17 +107,6 @@
 
                     </div>
                 </details>
-
-                <!-- [Mục] Tạo đồ thị mới: nhập số đỉnh, số cạnh (taoDoThi trong chinh_sua_canh.js) -->
-                <label>Số đỉnh:</label>
-                <input type="number" id="soDinh" min="1" value="5">
-                <label>Số cạnh:</label>
-                <input type="number" id="soCanh" min="0" value="5">
-                <button onclick="taoDoThi()">Tạo đồ thị</button>
-                <div class="note ap-dung" data-loai="1,2,3,4,5">📌 <b>Lưu ý:</b> dùng được cho <b>cả 5 loại</b> đồ thị (vô hướng và có hướng).<span class="ap-dung-tt"></span></div>
-                <div class="note tip">
-                    Hướng dẫn: nhập cạnh dạng x y hoặc x y w (w là trọng số), đỉnh từ 0 đến n−1 (hoặc A, B, C… tương ứng). Nhập số hay chữ đều được.
-                </div>
                 <hr>
 
                 <!-- Mỗi chức năng là một ô <details>: bấm tiêu đề mới xổ ra -->
@@ -227,6 +232,8 @@
                             <button class="success" onclick="ddTim()">🔍 Tìm kiếm</button>
                             <button class="danger" onclick="ddXoaTo()">✖ Xóa tô màu</button>
                         </div>
+                        <label for="ddLoc">Lọc đường đi nhanh</label>
+                        <input type="text" autocomplete="off" id="ddLoc" placeholder="Ví dụ: Nhập 12542 để tìm đường 1->2->5->4->2" oninput="ddLocNhanh()">
                         <label>Kết quả (bấm để xem trên đồ thị):</label>
                         <div class="dd-kq" id="ddKetQua"><div class="dd-rong">Chọn loại, nhập đỉnh rồi bấm “Tìm kiếm”. Với chu trình chỉ cần đỉnh xuất phát. Cạnh không có trọng số tính w = 1.</div></div>
                     </div>

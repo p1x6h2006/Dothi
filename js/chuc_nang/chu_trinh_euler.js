@@ -120,7 +120,7 @@ function cuonDenDoThi() {
 
 function trangThaiEuler(r, k) {
     if (k === 0) datThongBaoEuler(`Bắt đầu tại đỉnh ${nhanDinh(r.vs[0])}.`);
-    else if (k < r.es.length) datThongBaoEuler(`Bước ${k}/${r.es.length}: đi ${nhanDinh(r.vs[k - 1])} → ${nhanDinh(r.vs[k])} qua cạnh e${r.es[k - 1] + 1}.`);
+    else if (k < r.es.length) datThongBaoEuler(`Bước ${k}/${r.es.length}: đi ${nhanDinh(r.vs[k - 1])} → ${nhanDinh(r.vs[k])} qua cạnh e${r.es[k - 1] + 1}${canhThemNPT.has(r.es[k - 1]) ? "* (cạnh lặp)" : ""}.`);
     else datThongBaoEuler(`Xong: đã đi hết ${r.es.length} cạnh và quay về đỉnh ${nhanDinh(r.vs[k])}.`);
 }
 
@@ -239,8 +239,8 @@ function htmlEuler() {
     // --- Có chu trình Euler ---
     text += '<div class="euler-yes">✔ Có chu trình Euler</div>';
     text += chonDinh();
-    text += htmlDayEuler(r, edges.length);
     const daThem = npt && npt.daApDung !== null && canhThemNPT.size > 0;
+    text += htmlDayEuler(r, daThem ? npt.goc.length : edges.length);   // đã thêm cạnh lặp: cạnh từ số (gốc + 1) trở đi ghi dấu *
     text += daThem
         ? `<div class="npt-total">Độ dài ngắn nhất (đã thêm ${canhThemNPT.size} cạnh lặp) = ${fmt(r.tong)}</div>`
         : `<div class="npt-total">Độ dài hành trình = Σw(e) = ${fmt(r.tong)}</div>`;

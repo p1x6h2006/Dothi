@@ -23,7 +23,7 @@ function xayDanhSachKe() {
 function htmlDanhSachKe() {
     const ds = xayDanhSachKe(), huong = coHuong(), m = edges.length;
     const tong = ds.reduce((s, l) => s + l.length, 0);
-    const nut = p => `<span class="adj-node" title="cạnh e${p.e + 1}">${nhanDinh(p.v)}${p.w !== undefined ? `<small>w=${p.w}</small>` : ""}</span><span class="adj-arrow">→</span>`;
+    const nut = p => `<span class="adj-node" title="cạnh e${p.e + 1}${canhThemNPT.has(p.e) ? "* (cạnh lặp)" : ""}">${nhanDinh(p.v)}${canhThemNPT.has(p.e) ? "*" : ""}${p.w !== undefined ? `<small>w=${p.w}</small>` : ""}</span><span class="adj-arrow">→</span>`;
     const hang = ds.map((l, i) => `<div class="adj-row"><span class="adj-head">${nhanDinh(i)}</span><span class="adj-arrow">→</span>${l.map(nut).join("")}<span class="adj-null">NULL</span></div>`).join("");
 
     let text = `<h3>Danh sách kề (đồ thị ${loaiDoThi()})</h3><div class="adj-list-wrap">${hang}</div>`;

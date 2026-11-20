@@ -5,7 +5,10 @@
 // Danh sách đỉnh và cạnh
 function htmlDinhCanh() {
     const text = `<b>Đỉnh:</b> ${dsDinh().map(nhanDinh).join(", ")}<br><b>Cạnh:</b><br>`;
-    return text + (edges.length ? edges.map((e, i) => `e${i + 1}: (${nhanDinh(e.x)},${nhanDinh(e.y)})<br>`).join("") : "<i>(Không có cạnh)</i><br>");
+    // Cạnh lặp (do người phát thư / Euler thêm vào) ghi dấu *
+    const sao = i => canhThemNPT.has(i) ? "*" : "";
+    return text + (edges.length ? edges.map((e, i) => `e${i + 1}${sao(i)}: (${nhanDinh(e.x)},${nhanDinh(e.y)})${sao(i)}<br>`).join("") : "<i>(Không có cạnh)</i><br>") +
+        (canhThemNPT.size ? `<small>* = cạnh lặp (cạnh sao chép được thêm vào, ${canhThemNPT.size} cạnh)</small><br>` : "");
 }
 
 // Bậc của đỉnh
@@ -39,7 +42,7 @@ function htmlBac() {
 }
 
 // Ghép tất cả vào khung thông tin bên dưới đồ thị. Thứ tự hiển thị:
-//   1) Đỉnh/cạnh  2) Bậc  3) DANH SÁCH KỀ (danh_sach_ke.js)  4) Ma trận kề  5) Ma trận trọng số  6) CHU TRÌNH EULER (chu_trinh_euler.js)  7) NGƯỜI PHÁT THƯ (nguoi_phat_thu.js)  8) KRUSKAL (kruskal.js)  9) PRIM (prim.js)
+//   1) Đỉnh/cạnh  2) Bậc  2b) THÀNH PHẦN LIÊN THÔNG (thanh_phan_lien_thong.js)  3) DANH SÁCH KỀ (danh_sach_ke.js)  4) Ma trận kề  5) Ma trận trọng số  6) CHU TRÌNH EULER (chu_trinh_euler.js)  7) NGƯỜI PHÁT THƯ (nguoi_phat_thu.js)  8) KRUSKAL (kruskal.js)  9) PRIM (prim.js)
 function hienThiThongTin() {
     if (eulerHL) { resetEuler(); veDoThi(); }   // dựng lại thông tin thì bỏ tô màu Euler cũ
     // Nhớ các khung "Cách giải chi tiết" đang mở (cach_giai.js) để mở lại sau khi dựng lại
@@ -47,6 +50,7 @@ function hienThiThongTin() {
     $("thongTin").innerHTML =
         htmlDinhCanh() + giaiDinhCanh() +
         htmlBac() + giaiBac() +
+        htmlThanhPhanLienThong() +
         htmlDanhSachKe() + giaiDanhSachKe() +
         htmlMaTranKe() + giaiMaTranKe() +
         htmlMaTranTrongSo() + giaiMaTranTrongSo() +

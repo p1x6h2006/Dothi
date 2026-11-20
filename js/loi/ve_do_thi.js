@@ -59,10 +59,11 @@ function veDoThi() {
     if (typeof luuTuDong === "function") luuTuDong();   // tự động lưu (luu_tru.js)
 }
 
-// [Mục] Nhãn của cạnh: "(x,y)" hoặc "(x,y) · w"
+// [Mục] Nhãn của cạnh: "(x,y)" hoặc "(x,y) · w"; cạnh LẶP (cạnh sao chép do bài toán người phát thư / Euler thêm vào) ghi thêm dấu *: "(x,y)*" hoặc "(x,y)* · w"
 function nhanCanh(index) {
     const { x, y, w } = edges[index];
-    return w !== undefined ? `(${nhanDinh(x)},${nhanDinh(y)}) · ${w}` : `(${nhanDinh(x)},${nhanDinh(y)})`;
+    const sao = canhThemNPT.has(index) ? "*" : "";
+    return w !== undefined ? `(${nhanDinh(x)},${nhanDinh(y)})${sao} · ${w}` : `(${nhanDinh(x)},${nhanDinh(y)})${sao}`;
 }
 
 function taoNhan(x, y, text, hl) {

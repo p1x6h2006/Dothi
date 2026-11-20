@@ -1,7 +1,8 @@
 // =====================================================
 // ĐƯỜNG ĐI & CHU TRÌNH: chọn đỉnh xuất phát / đích -> Tìm kiếm -> danh sách kết quả -> bấm để tô lên đồ thị
 // =====================================================
-// Các loại (ô chọn #ddLoai, giá trị "nhóm:kiểu"):
+// Các loại (ô chọn #ddLoai, giá trị "nhóm:kiểu"; riêng "tatca" = liệt kê MỌI loại cùng lúc, mỗi dòng có nhãn loại sơ cấp/đơn/chung;
+//   s ≠ t -> đường đi, s = t (hoặc bỏ trống đích) -> chu trình):
 //   Đường đi (xuất phát s -> đích t, s ≠ t)        Chu trình (xuất phát và quay về cùng đỉnh s)
 //     duong:sc     sơ cấp  (không lặp đỉnh)           ct:sc     sơ cấp  (chỉ lặp đỉnh đầu = đỉnh cuối)
 //     duong:don    đơn     (không lặp cạnh)           ct:don    đơn     (không lặp cạnh)
@@ -22,6 +23,7 @@ const DD_TEN = {
     "duong:sc": "Đường đi sơ cấp", "duong:don": "Đường đi đơn", "duong:chung": "Đường đi chung",
     "duong:nncanh": "Đường đi ngắn nhất (số cạnh)", "duong:nnw": "Đường đi ngắn nhất (trọng số)",
     "ct:sc": "Chu trình sơ cấp", "ct:don": "Chu trình đơn", "ct:chung": "Chu trình chung",
+    "duong:tatca": "Đường đi (tất cả loại)", "ct:tatca": "Chu trình (tất cả loại)",
     "ct:nncanh": "Chu trình ngắn nhất (số cạnh)", "ct:nnw": "Chu trình ngắn nhất (trọng số)"
 };
 
@@ -171,9 +173,31 @@ function ddChuTrinhNganNhat(adj, radj, huong, s, c) {
 
 // ---------- Tính kết quả cho một yêu cầu ----------
 function ddTinh(loai, s, t) {
-    const [nhom, kieu] = loai.split(":"), dong = nhom === "ct";
+    const tatca = loai === "tatca";
+    const [nhom, kieu] = loai.split(":"), dong = tatca ? s === t : nhom === "ct";
     const { adj, radj, huong } = ddDungKe();
+    if (tatca) loai = (dong ? "ct:" : "duong:") + "tatca";
     const r = { loai, s, t, ds: [], tong: 0, cham: false, ghiChu: [] };
+
+    if (tatca) {
+        // gộp sơ cấp + đơn + chung, bỏ trùng (chu trình vô hướng: một chu trình đi 2 chiều chỉ tính 1)
+        const key = p => {
+            const a = p.es.join(","), b = [...p.es].reverse().join(",");
+            return dong && !huong && b < a ? b : a;
+        };
+        const gop = new Map();
+        const A = ddSoCap(adj, huong, s, t, dong), B = ddDon(adj, huong, s, t, dong), C = ddChung(adj, radj, s, t);
+        [A.ds, B.ds, C.ds].forEach(l => l.forEach(p => { if (!gop.has(key(p))) gop.set(key(p), p); }));
+        const all = [...gop.values()].sort((x, y) => x.es.length - y.es.length);
+        r.tong = all.length; r.ds = all.slice(0, DD_GIOI_HAN); r.cham = A.cham || B.cham;   // C.cham chỉ nghĩa là loại chung bị cắt ở 100 (đã có ghi chú riêng)
+        if (!r.ds.length) return r;
+        const dem = { sc: 0, don: 0, chung: 0 };
+        all.forEach(p => dem[ddPhanLoai(p.vs, p.es).cap]++);
+        r.ghiChu.push(`Gồm ${dem.sc} sơ cấp · ${dem.don} đơn · ${dem.chung} chung (chưa kể các đường chung dài hơn, vì loại chung có thể vô hạn).`);
+        if (r.tong > DD_GIOI_HAN) r.ghiChu.push(`Chỉ hiển thị ${DD_GIOI_HAN} kết quả có ít cạnh nhất.`);
+        if (r.cham) r.ghiChu.push("Đã dừng sớm vì quá nhiều khả năng: có thể còn nhiều kết quả khác.");
+        return r;
+    }
 
     if (kieu === "sc" || kieu === "don") {
         const k = kieu === "sc" ? ddSoCap(adj, huong, s, t, dong) : ddDon(adj, huong, s, t, dong);
@@ -217,12 +241,15 @@ const ddLoi = s => ddBao(`<div class="dd-loi">${s}</div>`);
 
 function ddTim() {
     if (!n || !Object.keys(nodes).length) return ddLoi("Chưa có đồ thị. Hãy tạo đồ thị trước.");
-    const loai = $("ddLoai").value, dong = ddLaChuTrinh();
-    const s = docDinh($("ddXuatPhat").value), t = dong ? s : docDinh($("ddDich").value);
+    const loai = $("ddLoai").value, tatca = loai === "tatca";
+    const s = docDinh($("ddXuatPhat").value);
+    const dichTrong = $("ddDich").value.trim() === "";
+    const dong = ddLaChuTrinh() || (tatca && dichTrong);
+    const t = dong ? s : docDinh($("ddDich").value);
     const khoang = `${nhanDinh(0)} đến ${nhanDinh(n - 1)}`;
     if (!kiemTraDinh(s)) return ddLoi(`Đỉnh xuất phát không hợp lệ (phải từ ${khoang}).`);
     if (!kiemTraDinh(t)) return ddLoi(`Đỉnh đích không hợp lệ (phải từ ${khoang}).`);
-    if (!dong && s === t) return ddLoi("Đỉnh xuất phát và đỉnh đích đang trùng nhau. Hãy chọn đỉnh đích khác, hoặc chọn loại “Chu trình” để đi và quay về cùng một đỉnh.");
+    if (!dong && !tatca && s === t) return ddLoi("Đỉnh xuất phát và đỉnh đích đang trùng nhau. Hãy chọn đỉnh đích khác, hoặc chọn loại “Chu trình” để đi và quay về cùng một đỉnh.");
 
     const r = ddTinh(loai, s, t);
     if (r.loi) return ddLoi(r.loi);
@@ -300,12 +327,12 @@ function ddVeKetQua() {
 }
 
 // Tô một đường/chu trình p lên đồ thị (idx = chỉ số dòng trong danh sách, -1 nếu không thuộc danh sách)
-function ddToDuong(p, ct, idx, xet) {
+function ddToDuong(p, ct, idx) {
     resetEuler();   // bỏ tô Euler / Kruskal / Prim / mô phỏng đang có (cũng bỏ pathHL cũ)
     const canh = {};
     p.es.forEach((id, i) => { canh[id] = canh[id] ? canh[id] + "," + (i + 1) : String(i + 1); });   // cạnh đi nhiều lần: nhãn "2,5"
     pathHL = {
-        canh, dinh: [...new Set(p.vs)], idx, xet: !!xet,
+        canh, dinh: [...new Set(p.vs)], idx,
         msg: `${ct ? "Chu trình" : "Đường đi"}: ${p.vs.map(nhanDinh).join(" → ")} (${p.es.length} cạnh${ddCoTrongSo() ? ", w = " + fmt(ddTongW(p)) : ""})`
     };
     veDoThi();
@@ -316,83 +343,7 @@ function ddToDuong(p, ct, idx, xet) {
 function ddChon(k) {
     if (!ddKq || !ddKq.ds[k]) return;
     if (ddKq.sig !== ddSig()) return ddXoaKetQua(true);
-    ddToDuong(ddKq.ds[k], ddKq.loai.startsWith("ct:"), k, false);
-}
-
-// ---------- Ô "Xét loại đường đi / chu trình" ----------
-// Gõ một dãy đỉnh (cách gõ như ô lọc) -> cho biết dãy đó có đi được trong đồ thị không, là đường đi hay chu trình,
-// và thuộc loại sơ cấp / đơn / chung. Không cần bấm "Tìm kiếm", gõ tới đâu xét tới đó.
-let ddXetP = null, ddXetSig = "";
-
-// Các cạnh nối u -> v (đồ thị có hướng: đúng chiều; vô hướng: cả hai chiều)
-function ddCanhGiua(u, v) {
-    const huong = coHuong(), r = [];
-    edges.forEach((e, id) => { if ((e.x === u && e.y === v) || (!huong && e.x === v && e.y === u)) r.push(id); });
-    return r;
-}
-
-// Chọn cạnh cụ thể cho từng bước. Có cạnh song song thì ưu tiên cách chọn không lặp cạnh (nếu có).
-function ddGanCanh(cs) {
-    const dung = new Set(), es = [];
-    let dem = 0;
-    (function thu(i) {
-        if (i === cs.length) return true;
-        for (const id of cs[i]) {
-            if (dung.has(id)) continue;
-            if (++dem > DD_MAX_BUOC) return false;
-            dung.add(id); es.push(id);
-            if (thu(i + 1)) return true;
-            dung.delete(id); es.pop();
-        }
-        return false;
-    })(0);
-    return es.length === cs.length ? es : cs.map(c => c[0]);   // không thể tránh lặp cạnh: lấy cạnh đầu tiên mỗi bước
-}
-
-function ddXetNhanh() {
-    const box = $("ddXetKq");
-    if (!box) return;
-    const v = $("ddXet").value.trim();
-    ddXetP = null; ddXetSig = "";
-    if (!v) { box.innerHTML = ""; return; }
-    const loi = s => { box.innerHTML = `<div class="dd-loi">${s}</div>`; };
-    if (!n || !Object.keys(nodes).length) return loi("Chưa có đồ thị. Hãy tạo đồ thị trước.");
-
-    const vs = ddTachDinh(v);
-    if (vs.some(x => !kiemTraDinh(x))) return loi(`Dãy đỉnh không hợp lệ (mỗi đỉnh phải từ ${nhanDinh(0)} đến ${nhanDinh(n - 1)}).`);
-    if (vs.length < 2) return loi("Cần ít nhất 2 đỉnh (ví dụ 1->2).");
-
-    const cs = [];
-    for (let i = 0; i + 1 < vs.length; i++) {
-        const c = ddCanhGiua(vs[i], vs[i + 1]);
-        if (!c.length) return loi(`Không đi được: không có cạnh ${coHuong() ? "đi từ" : "nối"} ${nhanDinh(vs[i])} ${coHuong() ? "đến" : "với"} ${nhanDinh(vs[i + 1])}.`);
-        cs.push(c);
-    }
-    const es = ddGanCanh(cs), p = { vs, es }, pl = ddPhanLoai(vs, es);
-    ddXetP = p; ddXetSig = ddSig();
-
-    // giải thích vì sao
-    const lap = a => [...new Set(a.filter((x, i) => a.indexOf(x) !== i))];
-    const dinhLap = lap(pl.ct ? vs.slice(0, -1) : vs).map(nhanDinh);
-    const canhLap = lap(es).map(id => `${nhanDinh(edges[id].x)}${coHuong() ? "→" : "–"}${nhanDinh(edges[id].y)}`);
-    const dong = (ok, ten, lyDo) => `<div class="dd-xet-dong ${ok ? "dd-ok" : "dd-sai"}"><b>${ok ? "✔" : "✖"} ${ten}</b> — ${lyDo}</div>`;
-    const h =
-        `<div class="dd-xet-kq" onclick="ddXetTo()" title="Bấm để tô lên đồ thị">` +
-        `<div class="dd-xet-duong">${vs.map(nhanDinh).join(" → ")}</div>` +
-        `<div>${ddNhan(pl.ct, pl.cap)} <span class="dd-meta">${es.length} cạnh${ddCoTrongSo() ? " · w = " + fmt(ddTongW(p)) : ""}</span></div>` +
-        `<div class="dd-xet-dong dd-xet-ct">${pl.ct ? "Đỉnh đầu trùng đỉnh cuối → <b>chu trình</b>." : "Đỉnh đầu khác đỉnh cuối → <b>đường đi</b>."}</div>` +
-        dong(true, "Chung", "mọi dãy đi được đều là loại chung (cho phép lặp)") +
-        dong(pl.donCanh, "Đơn", pl.donCanh ? "không lặp cạnh nào" : `lặp cạnh ${canhLap.join(", ")}`) +
-        dong(pl.cap === "sc", "Sơ cấp", pl.cap === "sc" ? (pl.ct ? "không lặp đỉnh nào (trừ đỉnh đầu = đỉnh cuối)" : "không lặp đỉnh nào")
-            : !pl.donCanh ? "đã lặp cạnh nên không thể sơ cấp" : `lặp đỉnh ${dinhLap.join(", ")}`) +
-        `<div class="dd-ghichu">Bấm vào khung này để tô lên đồ thị.</div></div>`;
-    box.innerHTML = h;
-}
-
-function ddXetTo() {
-    if (!ddXetP) return;
-    if (ddXetSig !== ddSig()) return ddXetNhanh();
-    ddToDuong(ddXetP, ddXetP.vs[0] === ddXetP.vs[ddXetP.vs.length - 1], -1, true);
+    ddToDuong(ddKq.ds[k], ddKq.loai.startsWith("ct:"), k);
 }
 
 // Nút "Xóa tô màu": chỉ bỏ phần tô trên hình, giữ nguyên danh sách kết quả
@@ -413,14 +364,11 @@ function ddXoaKetQua(thongBao) {
     ddKq = null;
     if (pathHL) { pathHL = null; veDoThi(); }
     const kv = $("ddKetQua");
-    ddXetNhanh();
     if (kv) kv.innerHTML = thongBao ? '<div class="dd-rong">Đồ thị đã thay đổi, kết quả cũ không còn đúng. Hãy bấm “Tìm kiếm” lại.</div>' : "";
 }
 
 // Gọi từ hienThiThongTin() (thong_tin.js): đồ thị đổi thì bỏ kết quả cũ; không đổi (vd. đổi nhãn số / chữ) thì chỉ vẽ lại danh sách
 function ddDongBo() {
-    if (ddXetP && ddXetSig !== ddSig() && pathHL && pathHL.xet) { pathHL = null; veDoThi(); }
-    ddXetNhanh();   // vẽ lại phần xét (đổi nhãn số / chữ hoặc đồ thị đổi)
     if (!ddKq) return;
     if (ddKq.sig !== ddSig()) ddXoaKetQua(true);
     else ddVeKetQua();

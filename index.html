@@ -210,6 +210,7 @@
                         <div class="note ap-dung" data-loai="1,2,3,4,5">📌 <b>Lưu ý:</b> dùng được cho <b>cả 5 loại</b> đồ thị. Với đồ thị có hướng, đường đi và chu trình phải đi đúng chiều mũi tên.<span class="ap-dung-tt"></span></div>
                         <label for="ddLoai">Loại đường đi / chu trình:</label>
                         <select id="ddLoai" onchange="ddDoiLoai()">
+                            <option value="tatca">Tất cả loại (liệt kê mọi đường, rồi xét từng loại)</option>
                             <optgroup label="Đường đi (từ đỉnh xuất phát đến đỉnh đích)">
                                 <option value="duong:sc">Đường đi sơ cấp (không lặp đỉnh)</option>
                                 <option value="duong:don">Đường đi đơn (không lặp cạnh)</option>
@@ -235,11 +236,8 @@
                         </div>
                         <label for="ddLoc">Lọc đường đi nhanh</label>
                         <input type="text" autocomplete="off" id="ddLoc" placeholder="Ví dụ: Nhập 12542 để tìm đường 1->2->5->4->2" oninput="ddLocNhanh()">
-                        <label for="ddXet">Xét loại đường đi / chu trình</label>
-                        <input type="text" autocomplete="off" id="ddXet" placeholder="Ví dụ: Nhập 12542 để xét đường 1->2->5->4->2" oninput="ddXetNhanh()">
-                        <div class="dd-xet" id="ddXetKq"></div>
                         <label>Kết quả (bấm để xem trên đồ thị):</label>
-                        <div class="dd-kq" id="ddKetQua"><div class="dd-rong">Chọn loại, nhập đỉnh rồi bấm “Tìm kiếm”. Với chu trình chỉ cần đỉnh xuất phát. Cạnh không có trọng số tính w = 1.</div></div>
+                        <div class="dd-kq" id="ddKetQua"><div class="dd-rong">Chọn loại, nhập đỉnh rồi bấm “Tìm kiếm”. Với chu trình chỉ cần đỉnh xuất phát. Chọn “Tất cả loại” để xem mọi đường nối 2 đỉnh (mỗi dòng có nhãn sơ cấp / đơn / chung); để trống đỉnh đích hoặc nhập trùng đỉnh xuất phát thì ra các chu trình. Cạnh không có trọng số tính w = 1.</div></div>
                     </div>
                 </details>
             </div>

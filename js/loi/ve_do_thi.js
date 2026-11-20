@@ -14,9 +14,34 @@ function sapXep() {
 }
 
 // =========================================
+// PHÓNG TO / THU NHỎ (nút nằm trên khung đồ thị: #zoomBar trong index.html)
+// =========================================
+let zoom = 1;                                   // 1 = 100%
+const ZOOM_MIN = 0.3, ZOOM_MAX = 3, ZOOM_BUOC = 1.2;
+const tamKhung = () => ({ x: svg.clientWidth / 2, y: svg.clientHeight / 2 });   // phóng to/nhỏ quanh tâm khung đồ thị
+// Đổi tọa độ chuột trong khung (px màn hình) -> tọa độ đồ thị (trước khi phóng to/nhỏ)
+function manHinhSangDoThi(sx, sy) {
+    const t = tamKhung();
+    return { x: (sx - t.x) / zoom + t.x, y: (sy - t.y) / zoom + t.y };
+}
+function datZoom(z) {
+    zoom = Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, z));
+    const nhan = $("zoomPhanTram");
+    if (nhan) nhan.textContent = Math.round(zoom * 100) + "%";
+    const a = $("zoomRa"), b = $("zoomVao");
+    if (a) a.disabled = zoom <= ZOOM_MIN + 1e-9;
+    if (b) b.disabled = zoom >= ZOOM_MAX - 1e-9;
+    veDoThi();
+}
+const phongTo = () => datZoom(zoom * ZOOM_BUOC);
+const thuNho = () => datZoom(zoom / ZOOM_BUOC);
+const datLaiZoom = () => datZoom(1);
+
+// =========================================
 // VẼ ĐỒ THỊ
 // =========================================
-function el(tag, attrs = {}, parent = svg) {
+let gocVe = svg;   // nơi el() vẽ vào mặc định: nhóm <g> có phóng to/nhỏ (đỉnh + cạnh), hoặc svg gốc (thông báo giữ nguyên cỡ)
+function el(tag, attrs = {}, parent = gocVe) {
     const e = document.createElementNS(NS, tag);
     for (const k in attrs) e.setAttribute(k, attrs[k]);
     parent.appendChild(e);
@@ -26,6 +51,7 @@ function el(tag, attrs = {}, parent = svg) {
 // [Mục] VẼ TOÀN BỘ: xóa svg -> tạo mũi tên -> vẽ cạnh (trước) -> vẽ đỉnh (sau, nằm đè lên)
 function veDoThi() {
     svg.innerHTML = "";
+    gocVe = svg;
     const defs = el("defs");
     const marker = el("marker", { id: "arrow", markerWidth: 10, markerHeight: 10, refX: 9, refY: 3, orient: "auto", fill: graphPalette.edge }, defs);
     el("path", { d: "M0,0 L0,6 L9,3 z", fill: graphPalette.edge }, marker);
@@ -33,9 +59,14 @@ function veDoThi() {
     const markerHL = el("marker", { id: "arrowHL", markerWidth: 10, markerHeight: 10, refX: 9, refY: 3, orient: "auto", fill: MAU_EULER }, defs);
     el("path", { d: "M0,0 L0,6 L9,3 z", fill: MAU_EULER }, markerHL);
 
+    // Đỉnh + cạnh nằm trong nhóm <g> được phóng to/nhỏ quanh tâm khung; thông báo bên dưới vẫn vẽ ngoài nhóm nên giữ nguyên cỡ chữ
+    const tam = tamKhung();
+    gocVe = el("g", { id: "noiDungDoThi", transform: `translate(${tam.x} ${tam.y}) scale(${zoom}) translate(${-tam.x} ${-tam.y})` });
+
     // Khi ra kết quả cây khung (krHL.an): chỉ vẽ các cạnh thuộc cây khung, các cạnh thừa không vẽ (dữ liệu vẫn còn; "Hủy mô phỏng" sẽ hiện lại)
     edges.forEach((e, index) => { if (krHL && krHL.an && !krHL.chon[index]) return; veCanh(e.x, e.y, index); });
     for (const i in nodes) veDinh(Number(i));
+    gocVe = svg;
 
     // Thông báo bước Euler đang chạy (chu_trinh_euler.js), đặt góc trên bên trái hình
     if (eulerHL && eulerHL.msg) el("text", { x: 16, y: 26, class: "edge-label", style: "text-anchor:start;font-size:15px" }).textContent = eulerHL.msg;
@@ -176,10 +207,11 @@ svg.addEventListener("mousedown", e => {
 svg.addEventListener("mousemove", e => {
     if (draggingNode !== null) {
         const rect = svg.getBoundingClientRect();
-        nodes[draggingNode].x = e.clientX - rect.left;
-        nodes[draggingNode].y = e.clientY - rect.top;
+        const w = manHinhSangDoThi(e.clientX - rect.left, e.clientY - rect.top);   // tính lại theo mức phóng to/nhỏ
+        nodes[draggingNode].x = w.x;
+        nodes[draggingNode].y = w.y;
     } else if (keoNen) {
-        const dx = e.clientX - keoNen.x, dy = e.clientY - keoNen.y;
+        const dx = (e.clientX - keoNen.x) / zoom, dy = (e.clientY - keoNen.y) / zoom;
         keoNen = { x: e.clientX, y: e.clientY };
         for (const i in nodes) { nodes[i].x += dx; nodes[i].y += dy; }
     } else return;

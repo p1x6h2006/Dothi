@@ -239,7 +239,13 @@ button:active { transform: translateY(0) scale(.97); }
 /* =====================================================
    KHU VỰC ĐỒ THỊ
 ===================================================== */
-svg { display: block; width: 100%; flex: 1 1 auto; min-height: 0; border-radius: 24px 24px 0 0; }
+/* Thanh phóng to / thu nhỏ: nằm ngay trên khung đồ thị */
+.zoom-bar { display: flex; align-items: center; justify-content: flex-end; gap: 8px; flex: 0 0 auto; padding: 10px 16px 6px; }
+.zoom-bar button { width: auto; margin: 0; min-width: 36px; padding: 6px 12px; font-size: 18px; font-weight: 800; line-height: 1; }
+.zoom-bar button:disabled { opacity: .45; cursor: not-allowed; }
+.zoom-bar .zoom-dat-lai { font-size: 13px; }
+.zoom-bar span { min-width: 52px; text-align: center; font-size: 14px; font-weight: 800; color: var(--text); }
+svg { display: block; width: 100%; flex: 1 1 auto; min-height: 0; border-radius: 0; }
 svg { cursor: grab; }
 svg.dang-keo, svg.dang-keo .node { cursor: grabbing; }
 .node { cursor: grab; transition: filter .2s ease; }

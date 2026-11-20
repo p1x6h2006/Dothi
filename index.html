@@ -236,6 +236,13 @@
             <!-- ---- CỘT GIỮA: VÙNG ĐỒ THỊ ----
                  svg = hình vẽ đồ thị (ve_do_thi.js) | #thongTin = đỉnh/cạnh, bậc, DANH SÁCH KỀ, ma trận (thong_tin.js) -->
             <div class="graph-area">
+                <!-- Thanh phóng to / thu nhỏ nằm ngay trên khung đồ thị (zoom trong ve_do_thi.js) -->
+                <div class="zoom-bar" id="zoomBar">
+                    <button type="button" id="zoomRa" title="Thu nhỏ" onclick="thuNho()">−</button>
+                    <span id="zoomPhanTram" title="Mức phóng to hiện tại">100%</span>
+                    <button type="button" id="zoomVao" title="Phóng to" onclick="phongTo()">+</button>
+                    <button type="button" class="zoom-dat-lai" title="Về 100%" onclick="datLaiZoom()">⟲ 100%</button>
+                </div>
                 <svg id="svg"></svg>
                 <div class="note foot">Có thể kéo trực tiếp các đỉnh trên màn hình.</div>
             </div>

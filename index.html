@@ -235,6 +235,9 @@
                         </div>
                         <label for="ddLoc">Lọc đường đi nhanh</label>
                         <input type="text" autocomplete="off" id="ddLoc" placeholder="Ví dụ: Nhập 12542 để tìm đường 1->2->5->4->2" oninput="ddLocNhanh()">
+                        <label for="ddXet">Xét loại đường đi / chu trình</label>
+                        <input type="text" autocomplete="off" id="ddXet" placeholder="Ví dụ: Nhập 12542 để xét đường 1->2->5->4->2" oninput="ddXetNhanh()">
+                        <div class="dd-xet" id="ddXetKq"></div>
                         <label>Kết quả (bấm để xem trên đồ thị):</label>
                         <div class="dd-kq" id="ddKetQua"><div class="dd-rong">Chọn loại, nhập đỉnh rồi bấm “Tìm kiếm”. Với chu trình chỉ cần đỉnh xuất phát. Cạnh không có trọng số tính w = 1.</div></div>
                     </div>

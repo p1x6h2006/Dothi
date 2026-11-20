@@ -482,6 +482,20 @@ button:disabled { opacity: .45; pointer-events: none; }
 .dd-duong { flex: 1; min-width: 0; word-break: break-word; font-weight: 700; }
 .dd-eid, .dd-meta { font-size: 11px; font-weight: 600; color: var(--muted); }
 .dd-meta { flex: none; white-space: nowrap; }
+.dd-phai { flex: none; display: flex; flex-direction: column; align-items: flex-end; gap: 3px; }
+.dd-tag { display: inline-block; padding: 1px 8px; border-radius: 6px; font-size: 11px; font-weight: 800; color: #fff; white-space: nowrap; }
+.dd-tag.dd-sc { background: #10b981; }
+.dd-tag.dd-don { background: #3b82f6; }
+.dd-tag.dd-chung { background: #64748b; }
+.dd-xet { margin-top: 6px; }
+.dd-xet:empty { display: none; }
+.dd-xet-kq { padding: 8px 10px; background: var(--chip); border: 1px solid var(--line); border-radius: 10px; font-size: 13px; line-height: 1.55; cursor: pointer; }
+.dd-xet-kq:hover { background: var(--chip-hover); }
+.dd-xet-duong { font-weight: 800; word-break: break-word; margin-bottom: 4px; }
+.dd-xet-dong { font-size: 12.5px; }
+.dd-xet-dong.dd-ok b { color: #10b981; }
+.dd-xet-dong.dd-sai b { color: #ef4444; }
+.dd-xet-ct { margin-top: 4px; color: var(--muted); }
 
 /* Nút điều khiển kết quả đặt ở khung Điều khiển bên trái (#ctlEuler / #ctlNPT / #ctlKruskal / #ctlPrim, do thong_tin.js điền) */
 .ctl-kq:empty { display: none; }

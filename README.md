@@ -35,7 +35,7 @@
 | 🎯 **5 loại đồ thị** | Đơn / đa / giả đồ thị vô hướng và đơn / đa đồ thị có hướng |
 | ✏️ **Chỉnh sửa cạnh** | Thêm, xóa, sửa cạnh (có hỗ trợ trọng số) |
 | 🖱️ **Kéo thả đỉnh** | Vẽ bằng SVG, kéo đỉnh bằng chuột |
-| 🔢 **Ma trận** | Ma trận kề và ma trận trọng số |
+| 🔢 **Ma trận** | Ma trận kề, ma trận liên thuộc (vô hướng: 0/1, có hướng: 1/−1/0) và ma trận trọng số |
 | 📋 **Danh sách kề** | Hiển thị dạng `[đỉnh] → [kề] → [kề] → NULL` |
 | 🔤 **Nhãn số / chữ** | Nút “Nhãn số / Nhãn chữ” đổi cách hiện đỉnh và cạnh: `(0,1)` ⇄ `(A,B)` ở hình vẽ, bảng, lời giải |
 | 🔄 **Chu trình Euler** | Kiểm tra, tìm và mô phỏng từng bước |
@@ -75,7 +75,7 @@ Dothi/
     │   └── luu_tru.js            # Phiên đồ thị + tự động lưu / khôi phục / reset (localStorage)
     └── chuc_nang/          # CHỨC NĂNG: các bài toán và cách hiển thị
         ├── bieu_dien/
-        │   ├── ma_tran.js        # Ma trận kề, ma trận trọng số
+        │   ├── ma_tran.js        # Ma trận kề, ma trận liên thuộc, ma trận trọng số
         │   ├── danh_sach_ke.js   # Danh sách kề
         │   └── thong_tin.js      # Danh sách đỉnh/cạnh, bậc của đỉnh
         ├── chu_trinh_euler.js    # Chu trình Euler (kiểm tra, tìm, mô phỏng)
@@ -207,6 +207,10 @@ Biến `loai` nhận giá trị từ `1` đến `5`.
 - `htmlMaTranKe()`: ma trận kề, ô `[i][j]` = số cạnh nối `i` với `j`.
   - Vô hướng: đối xứng; vòng khuyên ghi `1` trên đường chéo.
   - Có hướng: hàng = đỉnh xuất phát, cột = đỉnh đích.
+- `xayMaTranLienThuoc()` / `htmlMaTranLienThuoc()`: **ma trận liên thuộc** `n × m` (hàng = đỉnh, cột = cạnh e1…em theo thứ tự nhập; đầu cột ghi tên cạnh và hai đầu `(x,y)`).
+  - Vô hướng: `M[v][e] = 1` nếu `v` là đầu mút của `e`, ngược lại `0`. Mỗi cột có đúng hai số `1`; **vòng khuyên chỉ ghi một số `1`** (cùng quy ước với ma trận kề).
+  - Có hướng: `M[v][e] = 1` nếu `e` đi **ra** từ `v` (đỉnh đầu), `−1` nếu `e` đi **vào** `v` (đỉnh cuối), `0` nếu không liên thuộc. Mỗi cột có một số `1` và một số `−1` nên tổng cột = 0; số `1` trên hàng `v` là deg⁺(v), số `−1` là deg⁻(v).
+  - Ô `1` màu xanh, ô `−1` màu đỏ (`.cell-lit`, `.cell-neg`); cột đỉnh dính bên trái khi cuộn ngang. Hiển thị ngay sau Ma trận kề, kèm khung **📖 Cách giải chi tiết** (`giaiMaTranLienThuoc()` trong `cach_giai.js`).
 - `htmlMaTranTrongSo()`: `0` khi `i` trùng `j`; `w` nếu có cạnh; `∞` nếu không.
   - Cạnh không nhập trọng số tính `w = 1`.
   - Nhiều cạnh song song lấy trọng số nhỏ nhất.

@@ -3,7 +3,7 @@
 // =====================================================
 // Lời giải được viết trên CHÍNH đồ thị đang nhập (số liệu thật, không phải ví dụ mẫu).
 // Mỗi hàm giaiXxx() trả về HTML của khung <details>; thong_tin.js ghép ngay sau phần tương ứng:
-//   giaiDinhCanh | giaiBac | giaiDanhSachKe | giaiMaTranKe | giaiMaTranTrongSo | giaiEuler | giaiChiTietNPT | giaiChiTietKruskal
+//   giaiDinhCanh | giaiBac | giaiDanhSachKe | giaiMaTranKe | giaiMaTranLienThuoc | giaiMaTranTrongSo | giaiEuler | giaiChiTietNPT | giaiChiTietKruskal
 // Khi bảng thông tin dựng lại, thong_tin.js nhớ khung nào đang mở (data-key) để mở lại.
 
 const gv = v => `<span class="g-v">${nhanDinh(v)}</span>`;                                  // ô đỉnh
@@ -172,6 +172,52 @@ function giaiMaTranKe() {
     }
     s += gBuoc(4, "Kiểm tra", kt);
     return gKhung("mtke", s);
+}
+
+// =====================================================
+// 4b) MA TRẬN LIÊN THUỘC
+// =====================================================
+function giaiMaTranLienThuoc() {
+    const huong = coHuong(), m = edges.length;
+    const cot = i => `e<sub>${i + 1}</sub>`;
+    let s = gBuoc(1, "Khởi tạo",
+        gDong(`Lập ma trận M cỡ ${n} × ${m} (n = ${n} đỉnh là số hàng, m = ${m} cạnh là số cột), mọi ô bằng 0. Hàng v ứng với đỉnh v, cột j ứng với cạnh e<sub>j</sub> theo thứ tự nhập.`));
+    if (!m) return gKhung("mtlt", s + gBuoc(2, "Kết quả", gDong("<i>Chưa có cạnh nào nên chưa có cột nào.</i>")));
+
+    const M = xayMaTranLienThuoc();
+    const dong = edges.map((e, i) => {
+        const x = nhanDinh(e.x), y = nhanDinh(e.y);
+        if (huong) return gDong(`${gCanh(e, i)}: M[${x}][${cot(i)}] = 1 (cạnh đi <b>ra</b> từ ${x}) và M[${y}][${cot(i)}] = −1 (cạnh đi <b>vào</b> ${y}).`);
+        if (e.x === e.y) return gDong(`${gCanh(e, i)} là vòng khuyên: hai đầu cùng là ${x} nên chỉ có <b>một</b> ô M[${x}][${cot(i)}] = 1.`);
+        return gDong(`${gCanh(e, i)}: M[${x}][${cot(i)}] = 1 và M[${y}][${cot(i)}] = 1 (hai đầu mút của cạnh).`);
+    });
+    s += gBuoc(2, "Duyệt từng cạnh, mỗi cạnh điền đúng một cột",
+        gDong(huong ? "Có hướng: đỉnh đầu x của cạnh (x→y) ghi <b>1</b>, đỉnh cuối y ghi <b>−1</b>, các đỉnh khác trong cột ghi 0." : "Vô hướng: hai đầu mút của cạnh đều ghi <b>1</b>, các đỉnh khác trong cột ghi 0.") +
+        dong.join(""));
+
+    s += gBuoc(3, "Cách đọc kết quả (theo từng hàng)", M.map((row, v) => {
+        if (huong) {
+            const ra = row.map((c, j) => c === 1 ? cot(j) : null).filter(Boolean), vao = row.map((c, j) => c === -1 ? cot(j) : null).filter(Boolean);
+            return gDong(`Hàng ${nhanDinh(v)}: [ ${row.join(" ")} ] ⇒ đi ra: ${gDS(ra)}; đi vào: ${gDS(vao)}`);
+        }
+        const lt = row.map((c, j) => c ? cot(j) : null).filter(Boolean);
+        return gDong(`Hàng ${nhanDinh(v)}: [ ${row.join(" ")} ] ⇒ cạnh liên thuộc với ${nhanDinh(v)}: ${gDS(lt)}`);
+    }).join(""));
+
+    let kt = "";
+    if (huong) {
+        kt = gDong("Mỗi cột có đúng một số 1 và một số −1 nên <b>tổng mỗi cột = 0</b>.") +
+            M.map((row, v) => gDong(`Hàng ${nhanDinh(v)}: ${row.filter(c => c === 1).length} số 1 = deg⁺(${nhanDinh(v)}), ${row.filter(c => c === -1).length} số −1 = deg⁻(${nhanDinh(v)})`)).join("") +
+            gCT(`Tổng số 1 = tổng số −1 = ${m} = số cạnh`);
+    } else {
+        const loops = edges.filter(e => e.x === e.y).length;
+        kt = gDong(`Mỗi cột có đúng hai số 1${loops ? " (riêng cột của vòng khuyên chỉ có một số 1)" : ""}.`) +
+            gCT(`Tổng mọi ô = 2 × ${m}${loops ? ` − ${loops}` : ""} = ${2 * m - loops}`) +
+            M.map((row, v) => gDong(`Hàng ${nhanDinh(v)}: tổng = ${row.reduce((a, b) => a + b, 0)} = số cạnh liên thuộc với ${nhanDinh(v)}`)).join("") +
+            (loops ? gDong("Vì vòng khuyên chỉ ghi một số 1 nên tổng hàng của đỉnh có vòng khuyên nhỏ hơn bậc deg(v) (vòng khuyên tính bậc 2).") : gDong("Không có vòng khuyên nên tổng hàng v chính là bậc deg(v)."));
+    }
+    s += gBuoc(4, "Kiểm tra", kt);
+    return gKhung("mtlt", s);
 }
 
 // =====================================================

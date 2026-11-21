@@ -1,5 +1,5 @@
 // =====================================================
-// MA TRẬN: ma trận kề và ma trận trọng số
+// MA TRẬN: ma trận kề, ma trận liên thuộc và ma trận trọng số
 // =====================================================
 
 // [Mục] Hàm tiện ích dùng chung (ghiChu cũng được danh_sach_ke.js dùng lại)
@@ -33,6 +33,44 @@ function htmlMaTranKe() {
     if (huong) text += ghiChu("Hàng là đỉnh xuất phát, cột là đỉnh đích.");
     else if (edges.some(e => e.x === e.y)) text += ghiChu("Mỗi vòng khuyên ghi 1 trên đường chéo chính và đóng góp 2 vào bậc đỉnh.");
     if (loai === 2 || loai === 5) text += ghiChu("Mỗi ô ghi số cạnh song song giữa hai đỉnh.");
+    return text + "</div>";
+}
+
+// ---- Ma trận liên thuộc: hàng = đỉnh, cột = cạnh e1…em (theo thứ tự nhập) ----
+//   Vô hướng (loai 1-3): M[v][e] = 1 nếu v là đầu mút của e, ngược lại 0.
+//                        Mỗi cột có đúng hai số 1; vòng khuyên chỉ có MỘT số 1 (quy ước giống ma trận kề: vòng khuyên ghi 1).
+//   Có hướng (loai 4-5): M[v][e] = 1 nếu e đi RA từ v (v là đỉnh đầu), -1 nếu e đi VÀO v (v là đỉnh cuối), 0 còn lại.
+//                        Mỗi cột có đúng một số 1 và một số -1.
+function xayMaTranLienThuoc() {
+    const huong = coHuong();
+    const M = dsDinh().map(() => Array(edges.length).fill(0));
+    edges.forEach(({ x, y }, j) => {
+        if (huong) { if (x !== y) { M[x][j] = 1; M[y][j] = -1; } }   // loại 4, 5 không có vòng khuyên
+        else { M[x][j] = 1; M[y][j] = 1; }                            // vòng khuyên: x = y nên chỉ ghi 1 ô
+    });
+    return M;
+}
+
+function htmlMaTranLienThuoc() {
+    const huong = coHuong(), m = edges.length;
+    let text = `<h3 class="adjacency-matrix-heading">Ma trận liên thuộc (đồ thị ${loaiDoThi()})</h3><div class="adjacency-matrix-wrap">`;
+    if (!m) return text + ghiChu("Chưa có cạnh nào nên ma trận liên thuộc chưa có cột (cỡ n × 0).") + "</div>";
+
+    const M = xayMaTranLienThuoc();
+    const sao = j => canhThemNPT.has(j) ? "*" : "";
+    const head = edges.map((e, j) => `<th title="cạnh e${j + 1}${sao(j) ? " (cạnh lặp)" : ""}${e.w !== undefined ? `, w = ${e.w}` : ""}">e<sub>${j + 1}</sub>${sao(j)}<small>(${nhanDinh(e.x)},${nhanDinh(e.y)})</small></th>`).join("");
+    const rows = M.map((row, v) => `<tr><th>${nhanDinh(v)}</th>${row.map(c => `<td class="${c === 1 ? "cell-lit" : c === -1 ? "cell-neg" : ""}">${c}</td>`).join("")}</tr>`).join("");
+    text += `<table class="adjacency-matrix incidence"><thead><tr><th>Đỉnh / Cạnh</th>${head}</tr></thead><tbody>${rows}</tbody></table>`;
+
+    text += ghiChu(`Hàng là đỉnh (${nhanDinh(0)}–${nhanDinh(n - 1)}), cột là cạnh e<sub>1</sub>…e<sub>${m}</sub> theo thứ tự nhập; dưới tên cạnh là hai đầu (x,y).`);
+    if (huong) {
+        text += ghiChu("Có hướng: M[v][e] = <b>1</b> nếu cạnh e đi <b>ra</b> từ v (v là đỉnh đầu x), <b>−1</b> nếu e đi <b>vào</b> v (v là đỉnh cuối y), 0 nếu không liên thuộc.");
+        text += ghiChu("Mỗi cột có đúng một số 1 và một số −1 nên tổng mỗi cột bằng 0. Số 1 trên hàng v là deg⁺(v), số −1 trên hàng v là deg⁻(v).");
+    } else {
+        text += ghiChu(`Vô hướng: M[v][e] = <b>1</b> nếu v là đầu mút của cạnh e, ngược lại 0. Mỗi cột có đúng hai số 1 (hai đầu của cạnh)${edges.some(e => e.x === e.y) ? ", trừ cột của vòng khuyên" : ""}.`);
+        if (edges.some(e => e.x === e.y)) text += ghiChu("Vòng khuyên chỉ có <b>một</b> số 1 trong cột của nó (hai đầu trùng nhau, giống quy ước ghi 1 trên đường chéo của ma trận kề).");
+    }
+    if (canhThemNPT.size) text += ghiChu("* = cạnh lặp (cạnh sao chép được thêm vào).");
     return text + "</div>";
 }
 

@@ -28,7 +28,7 @@ function htmlMaTranKe() {
     });
 
     let text = `<h3 class="adjacency-matrix-heading">Ma trận kề (đồ thị ${loaiDoThi()})</h3><div class="adjacency-matrix-wrap">`;
-    text += bangMa(adj, v => `<td class="${v !== 0 ? "cell-hover" : ""}">${v}</td>`);
+    text += bangMa(adj, v => `<td>${v}</td>`);
     text += ghiChu(`Hàng và cột sử dụng cùng số hiệu đỉnh trên đồ thị (${nhanDinh(0)}–${nhanDinh(n - 1)}).`);
     if (huong) text += ghiChu("Hàng là đỉnh xuất phát, cột là đỉnh đích.");
     else if (edges.some(e => e.x === e.y)) text += ghiChu("Mỗi vòng khuyên ghi 1 trên đường chéo chính và đóng góp 2 vào bậc đỉnh.");
@@ -47,7 +47,7 @@ function htmlMaTranTrongSo() {
     });
 
     let text = `<h3 class="adjacency-matrix-heading">Ma trận trọng số (đồ thị ${loaiDoThi()})</h3><div class="adjacency-matrix-wrap">`;
-    text += bangMa(D, (v, r, c) => v === Infinity ? '<td class="weight-inf">∞</td>' : `<td class="${[r === c ? "weight-diag" : "", v !== 0 ? "cell-hover" : ""].filter(Boolean).join(" ")}">${v}</td>`);
+    text += bangMa(D, (v, r, c) => v === Infinity ? '<td class="weight-inf">∞</td>' : `<td class="${r === c ? "weight-diag" : ""}">${v}</td>`);
     text += ghiChu("d(i,j) = 0 khi i trùng j; = w(i,j) là trọng số cạnh nối hai đỉnh; = ∞ nếu không có cạnh nối.");
     text += ghiChu("Cạnh nhập không có trọng số được tính w = 1. Nếu có nhiều cạnh song song, lấy trọng số nhỏ nhất.");
     text += ghiChu(huong ? "Hàng là đỉnh xuất phát, cột là đỉnh đích." : "Đồ thị vô hướng nên ma trận đối xứng qua đường chéo chính.");

@@ -22,7 +22,7 @@
 
     <!-- ===== MÀN HÌNH 2: MÀN HÌNH CHÍNH (hiện sau khi chọn loại) ===== -->
     <div id="manHinhChinh">
-        <!-- Thanh nút góc phải trên (js/giao_dien/thanh_nut.js): hiện đúng nút của chức năng đang chọn (Euler / người phát thư / Kruskal / Prim) -->
+        <!-- Thanh nút góc phải trên (js/giao_dien/thanh_nut.js): hiện đúng nút của chức năng đang chọn (Euler / người phát thư / Kruskal / Prim / Dijkstra) -->
         <div id="thanhNut" class="thanh-nut" hidden></div>
         <h1> MÔ PHỎNG ĐỒ THỊ</h1>
         <div class="selected-type">
@@ -203,6 +203,22 @@
                     </div>
                 </details>
 
+                <!-- [Mục] Đường đi ngắn nhất Dijkstra (dijkstra.js): chọn đỉnh nguồn (và đỉnh đích) -> bấm Bước tiếp / Tự chạy; bảng từng bước + cách giải chi tiết ở khung bên phải -->
+                <details class="giai mst-menu" data-cn="dijkstra" data-kq="dijkstra">
+                    <summary>🛣️ Đường đi ngắn nhất (Dijkstra)</summary>
+                    <div class="giai-body mst-body">
+                        <div class="note ap-dung" data-loai="1,2,3,4,5">📌 <b>Lưu ý:</b> dùng được cho <b>cả 5 loại</b> đồ thị. Vô hướng đi được cả hai chiều cạnh; có hướng chỉ đi đúng chiều mũi tên. Cần mọi trọng số ≥ 0 (cạnh không có trọng số tính w = 1).<span class="ap-dung-tt"></span></div>
+                        <div class="note hint">Từ một đỉnh nguồn, mỗi bước chốt đỉnh chưa chốt có khoảng cách nhỏ nhất rồi cập nhật các đỉnh kề. Mỗi đỉnh hiện ô (d, p) ngay trên hình; kết quả, bảng các bước và “Cách giải chi tiết” xem ở khung bên phải.</div>
+                        <div id="ctlDijkstra" class="ctl-kq"><div class="note">Tạo đồ thị để dùng mục này.</div></div>
+                        <div class="mst-algo">
+                            <b>📥 Nạp ví dụ</b>
+                            <button class="info" onclick="napViDuDijkstra()">Ví dụ trong file Word (8 đỉnh)</button>
+                            <div class="note hint">Đỉnh u₀, r, s, t, x, y, z, w được đánh số 0, 1, 2, 3, 4, 5, 6, 7 (bấm “Nhãn chữ” thì hiện A…H). Nguồn là đỉnh 0; kết quả mong đợi: y=1, r=3, z=4, t=6, x=7, s=8, w=9.</div>
+                            <div class="note ap-dung">📌 <b>Lưu ý:</b> ví dụ tự nạp thành <b>loại 1</b> (đơn đồ thị vô hướng, có trọng số). Đổi sang loại 4, 5 thì Dijkstra vẫn dùng được nhưng chỉ đi đúng chiều mũi tên.</div>
+                        </div>
+                    </div>
+                </details>
+
                 <!-- [Mục] Đường đi & chu trình (duong_di.js): chọn loại + đỉnh xuất phát / đích -> Tìm kiếm -> bấm một kết quả để tô lên đồ thị -->
                 <details class="giai mst-menu dd-menu">
                     <summary>🛤️ Đường đi &amp; chu trình</summary>
@@ -264,7 +280,7 @@
         </div>
     </div>
 
-    <!-- ===== NẠP SCRIPT (KHÔNG ĐỔI THỨ TỰ): cau_hinh -> trang_thai -> kiem_tra -> doi_giao_dien -> chinh_sua_canh -> ve_do_thi -> dieu_khien_buoc -> ma_tran -> danh_sach_ke -> thanh_phan_lien_thong -> chu_trinh_euler -> nguoi_phat_thu -> kruskal -> prim -> duong_di -> cach_giai -> thanh_nut -> luu_y_loai -> thong_tin -> luu_tru -> chinh ===== -->
+    <!-- ===== NẠP SCRIPT (KHÔNG ĐỔI THỨ TỰ): cau_hinh -> trang_thai -> kiem_tra -> doi_giao_dien -> chinh_sua_canh -> ve_do_thi -> dieu_khien_buoc -> ma_tran -> danh_sach_ke -> thanh_phan_lien_thong -> chu_trinh_euler -> nguoi_phat_thu -> kruskal -> prim -> dijkstra -> duong_di -> cach_giai -> thanh_nut -> luu_y_loai -> thong_tin -> luu_tru -> chinh ===== -->
     <script src="js/dung_chung/cau_hinh.js"></script>
     <script src="js/dung_chung/trang_thai.js"></script>
     <script src="js/dung_chung/kiem_tra.js"></script>
@@ -279,6 +295,7 @@
     <script src="js/chuc_nang/nguoi_phat_thu.js"></script>
     <script src="js/chuc_nang/kruskal.js"></script>
     <script src="js/chuc_nang/prim.js"></script>
+    <script src="js/chuc_nang/dijkstra.js"></script>
     <script src="js/chuc_nang/duong_di.js"></script>
     <script src="js/chuc_nang/cach_giai.js"></script>
     <script src="js/giao_dien/thanh_nut.js"></script>

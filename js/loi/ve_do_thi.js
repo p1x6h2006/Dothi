@@ -114,10 +114,12 @@ function veCanh(x, y, index) {
     const them = canhThemNPT.has(index);                           // cạnh do bài toán người phát thư thêm vào (xanh lá)
     const kBuoc = krHL ? krHL.chon[index] : undefined;              // thứ tự chọn của cạnh trong cây khung Kruskal (nếu đang tô)
     const kLoai = krHL ? krHL.loai.includes(index) : false;         // cạnh bị Kruskal loại (tạo chu trình): đỏ, nét đứt
+    const kTam = !!(krHL && krHL.tam && krHL.tam.includes(index));  // Dijkstra: cạnh p tạm thời của đỉnh chưa chốt (cam)
+    const kXam = !!(krHL && krHL.xam && !kBuoc && !kTam);           // Dijkstra khi xong: cạnh không thuộc cây đường đi ngắn nhất (xám, nét đứt)
     const vuaThem = !!(nptHL && nptHL.canhCur && nptHL.canhCur.includes(index));   // cạnh sao chép vừa thêm ở bước mô phỏng người phát thư hiện tại (hồng)
-    const mauCanh = buoc ? MAU_EULER : kBuoc ? MAU_KRUSKAL : kLoai ? MAU_KRUSKAL_LOAI : vuaThem ? MAU_NPT_HIENTAI : them ? MAU_THEM : P.edge;
-    const mauGlow = buoc ? MAU_EULER : kBuoc ? MAU_KRUSKAL : kLoai ? MAU_KRUSKAL_LOAI : vuaThem ? MAU_NPT_HIENTAI : them ? MAU_THEM : P.glow;
-    const dayNet = buoc ? 6 : kBuoc ? 7 : kLoai ? 4 : vuaThem ? 7 : them ? 5 : 4;
+    const mauCanh = buoc ? MAU_EULER : kBuoc ? MAU_KRUSKAL : kTam ? MAU_DIJKSTRA_TAM : kXam ? MAU_DIJKSTRA_XAM : kLoai ? MAU_KRUSKAL_LOAI : vuaThem ? MAU_NPT_HIENTAI : them ? MAU_THEM : P.edge;
+    const mauGlow = buoc ? MAU_EULER : kBuoc ? MAU_KRUSKAL : kTam ? MAU_DIJKSTRA_TAM : kXam ? MAU_DIJKSTRA_XAM : kLoai ? MAU_KRUSKAL_LOAI : vuaThem ? MAU_NPT_HIENTAI : them ? MAU_THEM : P.glow;
+    const dayNet = buoc ? 6 : kBuoc ? 7 : kTam ? 6 : kXam ? 3 : kLoai ? 4 : vuaThem ? 7 : them ? 5 : 4;
     const nhan = (buoc ? `#${buoc} ` : kBuoc ? `✔${kBuoc} ` : kLoai ? "✖ " : vuaThem ? "＋ " : "") + nhanCanh(index);
     const mui = buoc ? "url(#arrowHL)" : "url(#arrow)";
 
@@ -128,7 +130,7 @@ function veCanh(x, y, index) {
         const cy = p1.y - 35 - k * 25, ex = k * 15, ey = k * 25;
         el("ellipse", { cx: p1.x, cy, rx: 39 + ex, ry: 54 + ey, fill: "none", stroke: mauGlow, "stroke-width": 15, opacity: 0.25 });   // quầng sáng: nét to mờ, không dùng filter
         const loop = el("ellipse", { cx: p1.x, cy, rx: 35 + ex, ry: 50 + ey, class: "edge", stroke: mauCanh, "stroke-width": dayNet, fill: "none" });
-        if (kLoai) loop.setAttribute("stroke-dasharray", "8 6");
+        if (kLoai || kXam) loop.setAttribute("stroke-dasharray", "8 6");
         if (coHuong()) loop.setAttribute("marker-end", mui);
         taoNhan(p1.x, p1.y - 90 - k * 50, nhan, buoc);
         return;
@@ -166,7 +168,7 @@ function veCanh(x, y, index) {
 
     el("path", { d, fill: "none", stroke: mauGlow, "stroke-width": 14, opacity: 0.25, "stroke-linecap": "round" });   // quầng sáng: nét to mờ, không dùng filter
     const path = el("path", { d, class: "edge", stroke: mauCanh, "stroke-width": dayNet, fill: "none" });
-    if (kLoai) path.setAttribute("stroke-dasharray", "8 6");
+    if (kLoai || kXam) path.setAttribute("stroke-dasharray", "8 6");
 
     // --- Mũi tên cho đồ thị có hướng (loai 4, 5) ---
     if (coHuong()) {
@@ -201,10 +203,19 @@ function mauVienNPT(i) {
 function veDinh(i) {
     const p = nodes[i], g = el("g");
     el("circle", { cx: p.x, cy: p.y + 7, r: 32, fill: "rgba(59, 130, 246, 0.22)", "pointer-events": "none" }, g);   // bóng đổ nhẹ, thay cho drop-shadow
-    const dd = pathDangHien(), vienCam = (eulerHL && eulerHL.cur === i) || (dd && dd.dinh.includes(i));   // đỉnh hiện tại của Euler / đỉnh nằm trên đường đi đang tô: viền cam
+    const dd = pathDangHien(), vienCam = (eulerHL && eulerHL.cur === i) || (dd && dd.dinh.includes(i)) || (krHL && krHL.cur === i);   // đỉnh hiện tại của Euler / đỉnh nằm trên đường đi đang tô: viền cam
     const c = el("circle", { cx: p.x, cy: p.y, r: 30, class: "node", fill: graphPalette.node, stroke: vienCam ? MAU_EULER : krHL && krHL.tham && krHL.tham.includes(i) ? MAU_KRUSKAL : mauVienNPT(i) || graphPalette.border, "stroke-width": vienCam ? 7 : krHL && krHL.tham && krHL.tham.includes(i) ? 6 : mauVienNPT(i) ? 7 : 3 }, g);   // đỉnh đã vào cây Prim: viền xanh ngọc
     c.addEventListener("mousedown", e => { draggingNode = i; e.preventDefault(); });
     el("text", { x: p.x, y: p.y, class: "node-text" }, g).textContent = nhanDinh(i);
+    if (krHL && krHL.nhan && krHL.nhan[i]) veNhanDijkstra(p, krHL.nhan[i], g);   // ô (d, p) của Dijkstra ngay dưới đỉnh
+}
+
+// Ô (d, p) của thuật toán Dijkstra dưới mỗi đỉnh (dijkstra.js): vàng = đã chốt, trắng viền cam = đã có đường tạm, xám = chưa có đường (∞)
+function veNhanDijkstra(p, nh, g) {
+    const t = nh.t, w = Math.max(34, t.length * 8.5 + 14), h = 22, x = p.x - w / 2, y = p.y + 37;
+    const mau = { chot: ["#fde68a", "#78350f", "#f59e0b"], tam: ["#ffffff", "#0f172a", "#f59e0b"], vo: ["#e2e8f0", "#64748b", "#94a3b8"] }[nh.c] || ["#ffffff", "#0f172a", "#94a3b8"];
+    el("rect", { x, y, width: w, height: h, rx: 7, fill: mau[0], stroke: mau[2], "stroke-width": nh.c === "chot" ? 2.5 : 1.5, "pointer-events": "none" }, g);
+    el("text", { x: p.x, y: y + h / 2, "text-anchor": "middle", "dominant-baseline": "central", style: `font-size:13px;font-weight:800;fill:${mau[1]};stroke:none;pointer-events:none` }, g).textContent = t;
 }
 
 // Kéo bằng chuột: kéo 1 đỉnh (bấm trúng đỉnh) hoặc kéo CẢ ĐỒ THỊ (bấm vào chỗ trống / cạnh trong khung đồ thị)

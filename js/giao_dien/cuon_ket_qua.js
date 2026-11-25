@@ -9,7 +9,8 @@ const KQ_DICH = {
     euler: "Chu trình Euler",
     npt: "Bài toán người phát thư",
     kruskal: "Thuật toán Kruskal",
-    prim: "Thuật toán Prim"
+    prim: "Thuật toán Prim",
+    dijkstra: "Thuật toán Dijkstra"
 };
 
 // Cuộn mượt khung phải tới phần kết quả của khóa `kq`, rồi nháy sáng tiêu đề cho dễ thấy

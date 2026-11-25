@@ -6,12 +6,13 @@
 //   npt     : Tô cả hành trình · Trả lại đồ thị gốc · Hủy mô phỏng
 //   kruskal : Tô cây khung · Trả lại đồ thị gốc · Hủy mô phỏng
 //   prim    : Tô cây khung · Trả lại đồ thị gốc · Hủy mô phỏng
+//   dijkstra: Tô kết quả · Trả lại đồ thị gốc · Hủy mô phỏng (dùng được cả đồ thị có hướng)
 // “Trả lại đồ thị gốc” (traLaiGocChung): bỏ mọi tô màu + hiện lại cạnh đã ẩn + bỏ cạnh lặp (*) đã thêm. “Hủy mô phỏng” chỉ dừng và bỏ tô màu của chức năng đó.
 // Đóng ô thì thanh nút ẩn đi. capNhatThanhNut() được gọi mỗi lần dựng lại thông tin (thong_tin.js) để bật/tắt nút đúng trạng thái.
 
 let chucNangHien = null;
 
-const TN_TIEU_DE = { euler: "🔄 Chu trình Euler", npt: "📮 Người phát thư", kruskal: "🌲 Kruskal", prim: "🌳 Prim" };
+const TN_TIEU_DE = { euler: "🔄 Chu trình Euler", npt: "📮 Người phát thư", kruskal: "🌲 Kruskal", prim: "🌳 Prim", dijkstra: "🛣️ Dijkstra" };
 
 // TRẢ LẠI ĐỒ THỊ GỐC (dùng chung cho mọi chức năng có mô phỏng): dừng chạy, bỏ mọi tô màu (Euler / hành trình / Kruskal / Prim / đường đi),
 // hiện lại các cạnh Kruskal / Prim đã ẩn, và bỏ các cạnh lặp (*) do người phát thư / Euler thêm vào -> đồ thị đúng như lúc người dùng nhập.
@@ -31,7 +32,7 @@ function capNhatThanhNut() {
     const tn = $("thanhNut");
     if (!tn) return;
     const cn = chucNangHien;
-    if (!cn || !Object.keys(nodes).length || (coHuong() && cn !== "euler")) { tn.hidden = true; tn.innerHTML = ""; return; }
+    if (!cn || !Object.keys(nodes).length || (coHuong() && cn !== "euler" && cn !== "dijkstra")) { tn.hidden = true; tn.innerHTML = ""; return; }
     const nut = (cls, txt, fn, tat) => `<button class="${cls}" onclick="${fn}"${tat ? " disabled" : ""}>${txt}</button>`;
     let h = `<span class="tn-ten">${TN_TIEU_DE[cn]}</span>`;
     const goc = nut("info", "↩ Trả lại đồ thị gốc", "traLaiGocChung()");
@@ -39,6 +40,7 @@ function capNhatThanhNut() {
     else if (cn === "npt") h += nut("success", "Tô cả hành trình", "hienHanhTrinh()", !phanTichEuler().ok) + goc + nut("danger", "✖ Hủy mô phỏng", "huyMoPhongNPT()");
     else if (cn === "kruskal") h += nut("success", "Tô cây khung", "hienKruskal()") + goc + nut("danger", "✖ Hủy mô phỏng", "boKruskal()");
     else if (cn === "prim") h += nut("success", "Tô cây khung", "hienPrim()") + goc + nut("danger", "✖ Hủy mô phỏng", "huyPrim()");
+    else if (cn === "dijkstra") h += nut("success", "Tô kết quả", "hienDijkstra()") + goc + nut("danger", "✖ Hủy mô phỏng", "huyDijkstra()");
     tn.innerHTML = h;
     tn.hidden = false;
 }

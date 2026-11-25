@@ -1,5 +1,5 @@
 // =====================================================
-// BỘ ĐIỀU KHIỂN TỪNG BƯỚC (dùng chung cho Euler, Kruskal, Prim, Người phát thư và Đi hành trình)
+// BỘ ĐIỀU KHIỂN TỪNG BƯỚC (dùng chung cho Euler, Kruskal, Prim, Dijkstra, Người phát thư và Đi hành trình)
 // =====================================================
 // 5 nút: ⏮ Về đầu · ◀ Bước trước · Bước tiếp ▶ · ⏩ Tự chạy · ⏸ Dừng
 // Mỗi thuật toán chỉ cần đưa ra:  { max, delay, k0(), ap(j) }
@@ -17,6 +17,7 @@ const DK_CAU_HINH = {
     hanhtrinh: () => taoDKEuler("hanhtrinh"),   // đi hành trình ngay trong mục Người phát thư (nguoi_phat_thu.js)
     kruskal: () => taoDKKruskal(),
     prim:    () => taoDKPrim(),
+    dijkstra: () => taoDKDijkstra(),
     npt:     () => taoDKNPT()
 };
 

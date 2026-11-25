@@ -173,7 +173,7 @@ function htmlDieuKhienKruskal() {
     if (coHuong()) return "";
     // Nút “Tô cây khung” / “Hủy mô phỏng” nằm ở thanh nút góc phải trên (thanh_nut.js)
     return htmlDieuKhienBuoc("kruskal") +
-        '<div class="euler-status" id="krStatus">' + (krHL && krHL.kieu !== "prim" && krHL.msg ? krHL.msg : "") + "</div>";
+        '<div class="euler-status" id="krStatus">' + (krHL && krHL.kieu === "kruskal" && krHL.msg ? krHL.msg : "") + "</div>";
 }
 
 // ---- Vẽ phần kết quả vào khung thông tin ----

@@ -540,3 +540,15 @@ button:disabled { opacity: .45; pointer-events: none; }
 /* Nháy sáng tiêu đề kết quả khi khung phải cuộn tới (js/giao_dien/cuon_ket_qua.js) */
 @keyframes kqNhay { 0%, 100% { background: transparent; } 25%, 60% { background: color-mix(in srgb, var(--a1) 28%, transparent); } }
 #thongTin h3.kq-nhay { animation: kqNhay 1.4s ease; border-radius: 8px; }
+
+
+/* =====================================================
+   THUẬT TOÁN DIJKSTRA (dijkstra.js) - dùng lại .kr-table
+   .dj-chot : ô được chốt (vàng, có dấu *) | .dj-xam : ô đã chốt từ trước (xám, “-”) | .dj-tam : đã có đường tạm | .dj-vo : chưa có đường (∞)
+   .dj-click : dòng bảng kết quả bấm được để tô đường đi lên đồ thị
+   ===================================================== */
+.kr-table td.dj-chot { background: color-mix(in srgb, #f59e0b 34%, transparent); font-weight: 800; }
+.kr-table td.dj-xam { color: var(--muted); background: color-mix(in srgb, #94a3b8 24%, transparent); }
+.kr-table td.dj-vo { color: var(--muted); opacity: .85; }
+.kr-table tr.dj-click { cursor: pointer; }
+.kr-table tr.dj-click:hover td { background: color-mix(in srgb, #059669 20%, transparent); }

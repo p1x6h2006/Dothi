@@ -90,13 +90,13 @@ function apDungPhien(d) {
         krHL = d.krHL || null;                   // và phần tô màu Kruskal
         veDoThi();
         if (eulerHL && eulerHL.msg) { const t = $(eulerHL.kenh === "hanhtrinh" ? "htStatus" : "eulerStatus"); if (t) t.textContent = eulerHL.msg; }
-        if (krHL && krHL.msg) { const t = $(krHL.kieu === "prim" ? "primStatus" : "krStatus"); if (t) t.textContent = krHL.msg; }
+        if (krHL && krHL.msg) { const t = $({ prim: "primStatus", dijkstra: "djStatus" }[krHL.kieu] || "krStatus"); if (t) t.textContent = krHL.msg; }
     } else {
         n = 5; edges = []; nodes = {};
         $("soDinh").value = 5; $("soCanh").value = 5;
         svg.innerHTML = "";
         $("thongTin").textContent = "Chưa có đồ thị";
-        ["ctlEuler", "ctlNPT", "ctlKruskal", "ctlPrim"].forEach(id => { $(id).innerHTML = ""; });   // nút điều khiển kết quả (thong_tin.js)
+        ["ctlEuler", "ctlNPT", "ctlKruskal", "ctlPrim", "ctlDijkstra"].forEach(id => { $(id).innerHTML = ""; });   // nút điều khiển kết quả (thong_tin.js)
         capNhatThanhNut();
     }
 }

@@ -501,3 +501,104 @@ function giaiChiTietPrim() {
         gDong("Bấm “Xem từng bước” hoặc “Tô cây khung”: khi ra kết quả, các cạnh thừa sẽ bị xóa khỏi hình. Bấm “Hủy mô phỏng” để trả đồ thị về bình thường."));
     return gKhung("prim", s);
 }
+
+// =====================================================
+// DIJKSTRA: cách giải chi tiết, trình bày giống file Word “Dijkstra_giai_thich.docx”
+//   1) Ý tưởng chính  2) Cách đọc bảng  3) Bảng các bước  4) Diễn giải từng bước  5) Kết quả  6) Cách lần ngược  7) Cây khung đường đi ngắn nhất
+// =====================================================
+function giaiChiTietDijkstra() {
+    const k = tinhDijkstra();
+    if (k.loi) return gKhung("dijkstra", gBuoc(1, "Không giải được", gDong(gXau(k.loi))));
+
+    const ten = nhanDinh, s = k.start, gach = gachDijkstra();
+    const dp = dpDijkstra, soDo = (v, d) => `${gv(v)} = ${fmt(d)}`;
+    const muc = (tieuDe, noiDung) => `<div class="giai-step"><b>${tieuDe}</b>${noiDung}</div>`;
+    const dsTen = a => a.map(v => gv(v)).join(", ");
+    const L = k.buoc.length;
+
+    // 1) Ý tưởng chính
+    let h = muc("💡 Ý tưởng chính",
+        gDong(`Bài toán: từ ${gv(s)}, đi đến mỗi đỉnh khác bằng con đường có <b>tổng độ dài nhỏ nhất</b>. Con số trên mỗi cạnh là độ dài cạnh đó (cạnh không có w tính w = 1)${coHuong() ? "; đồ thị có hướng nên chỉ đi đúng chiều mũi tên" : "; đồ thị vô hướng nên đi được cả hai chiều"}.`) +
+        gDong("• Mỗi lần, chọn đỉnh <b>chưa chốt</b> đang có số nhỏ nhất, rồi <b>chốt</b> nó. Số đó không thể nhỏ hơn được nữa vì mọi đường khác đều dài hơn.") +
+        gDong("• Sau khi chốt một đỉnh, thử đi qua nó để đến các đỉnh kề. Nếu (số của đỉnh vừa chốt + độ dài cạnh) nhỏ hơn số hiện có của đỉnh kề thì cập nhật số mới.") +
+        gDong("• Lặp lại cho đến khi chốt hết các đỉnh.") +
+        gDong("Điều kiện: mọi độ dài cạnh phải ≥ 0 (nếu có cạnh âm thì Dijkstra cho kết quả sai)."));
+
+    // 2) Cách đọc bảng
+    h += muc("📖 Cách đọc bảng",
+        gDong("• Mỗi ô có dạng <b>(d, p)</b>: d là độ dài đường đi ngắn nhất tìm được tới đỉnh đó cho đến lúc này, p là đỉnh đứng ngay trước nó trên đường đi.") +
+        gDong("• <b>(∞, -)</b> nghĩa là chưa tìm được đường tới đỉnh đó.") +
+        gDong("• Dấu <b>*</b> (ô tô vàng) là đỉnh được chốt ở bước đó. Riêng đỉnh nguồn ghi <b>0*</b> vì cách chính nó 0.") +
+        gDong("• Dấu <b>“-”</b> (ô xám) là đỉnh đã chốt từ các bước trước, không xét nữa."));
+
+    // 3) Bảng các bước
+    h += muc("📊 Bảng các bước", gDong(`Mỗi cột là một đỉnh, mỗi dòng là một bước (đỉnh nguồn là ${gv(s)}):`) + htmlBangBuocDijkstra(k));
+
+    // 4) Diễn giải từng bước
+    h += muc("🧭 Diễn giải từng bước", gDong("Đọc từng bước, đối chiếu với từng dòng của bảng ở trên."));
+    k.buoc.forEach(b => {
+        let nd = "";
+        if (b.tu === null) {
+            nd += gDong(`${gv(s)} cách chính nó 0, nên ta chốt ${gv(s)} luôn.`);
+            nd += gDong("Các đỉnh còn lại chưa biết đường đi nên tạm ghi ∞.");
+        } else {
+            const dtu = b.d[b.tu];
+            nd += gDong(`Vừa chốt ${gv(b.tu)} với d = ${fmt(dtu)}. Thử đi qua ${gv(b.tu)} để đến các đỉnh kề chưa chốt:`);
+            b.capNhat.forEach(c => {
+                const dau = `Đến ${gv(c.v)}: ${fmt(dtu)} + ${fmt(c.w)} = ${fmt(c.tong)}`;
+                if (c.moi && c.cu === Infinity) nd += gDong(`${dau}, trước đó là ∞ → ` + gOk(`ghi ${ten(c.v)} = ${dp(c.tong, b.tu)}`));
+                else if (c.moi) nd += gDong(`${dau}, rẻ hơn ${fmt(c.cu)} (${c.pCu === s ? `đi thẳng từ ${ten(s)}` : `đang đi qua ${ten(c.pCu)}`}) → ` + gOk(`đổi ${ten(c.v)} thành ${dp(c.tong, b.tu)}`));
+                else nd += gDong(`${dau}, không rẻ hơn ${fmt(c.cu)} → giữ nguyên ${ten(c.v)} = ${dp(c.cu, c.pCu)}`);
+            });
+            if (b.daChot.length && !b.capNhat.length) nd += gDong(`Các đỉnh kề ${gv(b.tu)} (${b.daChot.map(ten).join(", ")}) đều đã chốt nên không còn gì để cập nhật.`);
+            else if (b.daChot.length) nd += gDong(`Các đỉnh kề đã chốt (${b.daChot.map(ten).join(", ")}) không xét nữa.`);
+            else if (!b.capNhat.length) nd += gDong(`${gv(b.tu)} không có cạnh nào đi tới đỉnh khác nên không cập nhật được gì.`);
+        }
+        if (b.tu !== null) {
+            if (b.chuaChot.length === 1) nd += gDong(`Chỉ còn ${soDo(b.chon, b.d[b.chon])} → ` + gOk(`chốt ${ten(b.chon)}`));
+            else nd += gDong(`Chưa chốt: ${b.chuaChot.map(c => soDo(c.v, c.d)).join(", ")} → ${gv(b.chon)} nhỏ nhất${b.hoa ? " (có đỉnh bằng nhau thì lấy đỉnh có số hiệu nhỏ hơn)" : ""}, ` + gOk(`chốt ${ten(b.chon)}`));
+        }
+        if (b.k === L) nd += gDong(k.khongToi.length
+            ? `Các đỉnh còn lại (${dsTen(k.khongToi)}) vẫn là ∞, tức không có đường đi tới chúng từ ${gv(s)}. Không còn đỉnh nào để chốt, thuật toán dừng.`
+            : "Mọi đỉnh đã được chốt, thuật toán dừng.");
+        const tieuDe = b.tu === null ? `Xuất phát từ ${ten(s)}`
+            : b.k === 2 ? `Nhìn các đỉnh kề ${ten(s)}`
+            : `Thử đi qua ${ten(b.tu)} (đã đi tốn ${fmt(b.d[b.tu])})`;
+        h += gBuoc(b.k, tieuDe, nd);
+    });
+
+    // 5) Kết quả
+    const ds = k.thuTu.filter(v => v !== s);
+    h += muc("✅ Kết quả",
+        gDong(`Khoảng cách và đường đi ngắn nhất từ ${gv(s)} (sắp theo thứ tự được chốt):`) + htmlBangKetQuaDijkstra(k, false) +
+        (k.khongToi.length ? gDong(gXau(`Không có đường đi từ ${ten(s)} tới ${k.khongToi.map(ten).join(", ")}.`)) : ""));
+
+    // 6) Cách lần ngược ra đường đi (ví dụ: đỉnh được chọn làm đích, nếu không thì đỉnh có đường đi dài nhất)
+    const dich = dichDijkstraHopLe();
+    let vd = dich !== null && dich !== s && k.d[dich] < Infinity ? dich : null;
+    if (vd === null && ds.length) vd = ds.reduce((best, v) => k.duong(v).length >= k.duong(best).length ? v : best, ds[0]);
+    if (vd !== null) {
+        const dg = k.duong(vd);
+        const ngc = [];
+        for (let i = dg.length - 1; i >= 1; i--) ngc.push(gDong(`${gv(dg[i])} = ${dp(k.d[dg[i]], k.p[dg[i]])} → đỉnh trước ${ten(dg[i])} là ${gv(k.p[dg[i]])}`));
+        const trongSo = dg.slice(1).map(v => fmt(trongSoCanh(edges[k.cp[v]])));
+        h += muc("🔙 Cách lần ngược ra đường đi",
+            gDong(`Đứng ở đỉnh cần tìm, nhìn ô cuối cùng của nó để biết đỉnh đứng trước, rồi cứ lần ngược đến ${gv(s)}. Ví dụ với ${gv(vd)}:`) + ngc.join("") +
+            gDong(`Đọc ngược lại ta được đường đi ${dg.map(ten).join(" → ")}, tổng độ dài ` + gCT(`${trongSo.join(" + ")} = ${fmt(k.d[vd])}`)));
+    }
+
+    // 7) Cây khung đường đi ngắn nhất
+    if (ds.length) {
+        h += muc("🌳 Cây khung đường đi ngắn nhất",
+            gDong(`Mỗi đỉnh (trừ ${gv(s)}) chỉ giữ lại <b>một cạnh</b> nối nó với đỉnh đứng trước (cột p trong bảng). Các cạnh được giữ lại tạo thành cây gồm ${ds.length} cạnh nối ${ds.length + 1} đỉnh, với gốc là ${gv(s)}${k.khongToi.length ? " (chỉ gồm các đỉnh tới được)" : ""}. Đi theo cây từ ${gv(s)} đến bất kỳ đỉnh nào cũng là đường đi ngắn nhất.`) +
+            gDong("Các cạnh của cây:") + htmlBangCayDijkstra(k) +
+            gDong(`Tổng độ dài các cạnh của cây: ` + gCT(`${k.canhCay.map(i => fmt(trongSoCanh(edges[i]))).join(" + ")} = ${fmt(k.tongCay)}`)) +
+            gDong("Bấm “Bước tiếp” hoặc “Tô kết quả” để xem trên đồ thị: cạnh của cây tô xanh ngọc (số sau dấu ✔ là thứ tự chốt đỉnh), cạnh không được chọn là nét đứt xám. Bấm “Hủy mô phỏng” để trả đồ thị về bình thường."));
+    }
+
+    // Kết luận
+    h += muc("📝 Kết luận", ds.length
+        ? gDong(gOk(`Khoảng cách ngắn nhất từ ${ten(s)} đến ${ds.map(ten).join(", ")} lần lượt là ${ds.map(v => fmt(k.d[v])).join(", ")}.`))
+        : gDong(gXau(`Từ ${ten(s)} không đi được tới đỉnh nào khác.`)));
+    return gKhung("dijkstra", h);
+}

@@ -43,6 +43,7 @@
 | 📌 **Lưu ý loại đồ thị** | Mỗi chức năng và bài tập có một dòng “Lưu ý” cho biết loại đồ thị nào dùng được, kèm trạng thái ✔ / ✖ theo loại đang chọn |
 | 🌲 **Kruskal** | Cây khung nhỏ nhất: bảng cạnh đã sắp xếp, cạnh chọn/loại, xem từng bước, tô cây khung, nạp ví dụ 33 và bài tập 37 |
 | 🌳 **Prim** | Cây khung nhỏ nhất: chọn đỉnh xuất phát, bảng cạnh ứng viên từng bước, xem từng bước, tô cây khung (xóa cạnh thừa), hủy mô phỏng |
+| 🛣️ **Dijkstra** | Đường đi ngắn nhất từ một đỉnh nguồn (cả 5 loại đồ thị): ô (d, p) hiện ngay dưới mỗi đỉnh, xem từng bước, bảng các bước như file Word, chọn đỉnh đích để tô riêng một đường đi, “Cách giải chi tiết” từng bước, nạp ví dụ 8 đỉnh |
 | 🎨 **3 giao diện** | Light, Premium, Neon |
 | 💾 **Tự động lưu** | Lưu vào `localStorage`, mở lại là có ngay |
 | 🗂️ **Phiên đồ thị** | Mỗi phiên là 1 đồ thị riêng (➕ Phiên mới, ✏️ Đổi tên, 🗑️ Xóa); bấm vào phiên nào thì đồ thị đó hiện ra |
@@ -82,6 +83,7 @@ Dothi/
         ├── nguoi_phat_thu.js     # Bài toán người phát thư
         ├── kruskal.js            # Thuật toán Kruskal (cây khung nhỏ nhất, vô hướng)
         ├── prim.js               # Thuật toán Prim (cây khung nhỏ nhất, vô hướng)
+        ├── dijkstra.js           # Thuật toán Dijkstra (đường đi ngắn nhất từ một đỉnh, cả 5 loại)
         ├── duong_di.js           # Đường đi & chu trình: tìm theo đỉnh xuất phát / đích, bấm kết quả để tô lên đồ thị
         └── cach_giai.js          # Cách giải chi tiết (khung bấm mới xổ ra) cho từng mục
 ```
@@ -89,7 +91,7 @@ Dothi/
 > ⚠️ **Thứ tự nạp script trong `index.html` (không được đổi):**
 >
 > ```text
-> cau_hinh → trang_thai → kiem_tra → doi_giao_dien → chinh_sua_canh → ve_do_thi → ma_tran → danh_sach_ke → chu_trinh_euler → nguoi_phat_thu → kruskal → cach_giai → thanh_nut → luu_y_loai → thong_tin → luu_tru → chinh
+> cau_hinh → trang_thai → kiem_tra → doi_giao_dien → chinh_sua_canh → ve_do_thi → ma_tran → danh_sach_ke → chu_trinh_euler → nguoi_phat_thu → kruskal → prim → dijkstra → cach_giai → thanh_nut → luu_y_loai → thong_tin → luu_tru → chinh
 > ```
 
 ---
@@ -485,6 +487,29 @@ File: `js/chuc_nang/prim.js` (lời giải chi tiết: `giaiChiTietPrim()` trong
 
 ---
 
+## 🛣️ Thuật toán Dijkstra
+
+File: `js/chuc_nang/dijkstra.js` (lời giải chi tiết: `giaiChiTietDijkstra()` trong `cach_giai.js`). Dùng được cho **cả 5 loại** đồ thị: vô hướng đi được hai chiều, có hướng chỉ đi đúng chiều mũi tên. Cần mọi trọng số ≥ 0 (cạnh không có `w` tính `w = 1`); có cạnh âm thì báo lỗi. Dùng chung `krHL` với Kruskal / Prim.
+
+1. Chọn đỉnh nguồn `s` (ô “Đỉnh nguồn”): `d(s) = 0` và chốt luôn, các đỉnh khác tạm ghi `(∞, -)`.
+2. Mỗi bước: trong các đỉnh **chưa chốt** chọn đỉnh có `d` nhỏ nhất rồi **chốt** nó (bằng nhau thì lấy số hiệu nhỏ hơn).
+3. Thử đi qua đỉnh vừa chốt `u` tới mỗi đỉnh kề `v` chưa chốt: nếu `d(u) + w < d(v)` thì cập nhật `(d(v), p(v)) = (d(u) + w, u)`.
+4. Lặp đến khi hết đỉnh có thể chốt. Đỉnh còn `∞` là đỉnh không có đường đi từ `s`.
+
+| Phần giao diện | Tác dụng |
+|---|---|
+| Đỉnh nguồn / Đỉnh đích (tùy chọn) | Chọn nguồn; chọn đích thì bước cuối chỉ tô đường đi tới đích đó (bấm một dòng trong bảng kết quả cũng được) |
+| ⏮ ◀ ▶ ⏩ ⏸ | Bộ nút từng bước dùng chung: mỗi bước chốt một đỉnh, ô `(d, p)` hiện dưới mỗi đỉnh (vàng = đã chốt, trắng viền cam = đã có đường tạm, xám = ∞) |
+| Tô kết quả | Tô ngay cây đường đi ngắn nhất, cạnh không thuộc cây vẽ nét đứt xám (như hình trong file Word) |
+| ✖ Hủy mô phỏng / ↩ Trả lại đồ thị gốc | Bỏ tô màu, đồ thị trở về bình thường |
+| Ví dụ trong file Word (8 đỉnh) | Nạp đồ thị `u₀, r, s, t, x, y, z, w` (đánh số 0…7): khoảng cách 1, 3, 4, 6, 7, 8, 9; cây nặng 16 |
+
+Khung kết quả bên phải có bảng các bước (ô vàng `*` = chốt, ô xám `-` = đã chốt từ trước), bảng khoảng cách / đường đi, và **📖 Cách giải chi tiết** gồm: ý tưởng chính, cách đọc bảng, bảng các bước, diễn giải từng bước (“Thử đi qua y (đã đi tốn 1)…”), kết quả, cách lần ngược ra đường đi, cây khung đường đi ngắn nhất.
+
+Trạng thái tô màu: `krHL` có thêm `buoc`, `tam` (cạnh p tạm), `cur` (đỉnh vừa chốt), `xam` (vẽ cạnh thừa nét đứt xám), `nhan` (ô `(d, p)` từng đỉnh, vẽ bởi `veNhanDijkstra()` trong `ve_do_thi.js`).
+
+---
+
 ## 📌 Lưu ý loại đồ thị dùng được
 
 **File `js/giao_dien/luu_y_loai.js`** + các dòng `<div class="note ap-dung" data-loai="...">` trong `index.html`. Mỗi chức năng và bài tập có một đoạn “📌 Lưu ý”; hàm `capNhatLuuY()` thêm dòng **✔ dùng được** (xanh) hoặc **✖ không dùng được** (đỏ) theo loại đang chọn, và chạy lại mỗi khi đổi loại.
@@ -496,6 +521,7 @@ File: `js/chuc_nang/prim.js` (lời giải chi tiết: `giaiChiTietPrim()` trong
 | 🛤️ Đường đi & chu trình | Cả 5 loại (có hướng thì đi đúng chiều mũi tên) |
 | 📮 Người phát thư (kể cả 🚶 Đi hành trình) | Chỉ loại 1, 2, 3 |
 | 🌲 Kruskal, 🌳 Prim | Chỉ loại 1, 2, 3 |
+| 🛣️ Dijkstra | Cả 5 loại (trọng số ≥ 0; có hướng thì đi đúng chiều mũi tên) |
 | Ví dụ (6 đỉnh) / Bài tập (9 đỉnh) | Tự nạp thành loại 1 (có trọng số) nên dùng được với Kruskal, Prim, người phát thư, Euler, đường đi |
 
 Thêm chức năng mới: viết một dòng `note ap-dung` có `data-loai` liệt kê các loại được dùng, không cần sửa JS.
@@ -517,15 +543,15 @@ Nút **🔢 Nhãn số / 🔤 Nhãn chữ** (khung Điều khiển, dưới nút
 - Mã nguồn: `kieuNhan`, `nhanDinh()`, `docDinh()` trong `js/dung_chung/cau_hinh.js`; `chonKieuNhan()` trong `js/giao_dien/doi_giao_dien.js`.
 
 
-## Bộ điều khiển từng bước (Euler · Kruskal · Prim · Người phát thư · Đi hành trình)
+## Bộ điều khiển từng bước (Euler · Kruskal · Prim · Dijkstra · Người phát thư · Đi hành trình)
 
 **File `js/loi/dieu_khien_buoc.js`** — 5 nút dùng chung: ⏮ Về đầu · ◀ Bước trước · Bước tiếp ▶ · ⏩ Tự chạy · ⏸ Dừng. Có dòng "Bước k/max" phía trên.
 
 | Hàm | Công dụng |
 |---|---|
-| `htmlDieuKhienBuoc(kieu)` | Sinh khung 5 nút (`kieu` = `euler` / `kruskal` / `prim` / `npt` / `hanhtrinh`) |
+| `htmlDieuKhienBuoc(kieu)` | Sinh khung 5 nút (`kieu` = `euler` / `kruskal` / `prim` / `dijkstra` / `npt` / `hanhtrinh`) |
 | `dkLenh(kieu, act)` | Điểm vào của mọi nút (`dau` / `truoc` / `tiep` / `chay` / `dung`) |
 | `dkDen(j)` | Đi tới bước j: gọi `ap(j)` dựng lại toàn bộ phần tô màu rồi vẽ lại |
 | `dkHuy()` | Hủy mô phỏng (tự gọi từ `resetEuler()` / `resetKruskalHL()`, nên sửa đồ thị là tự dừng) |
 
-Mỗi thuật toán chỉ cần cung cấp `taoDKEuler()` / `taoDKKruskal()` / `taoDKPrim()` trả về `{ max, delay, k0(), ap(j) }`. Vì `ap(j)` dựng lại từ đầu nên đi lùi hay nhảy về đầu đều dùng chung một hàm. Tự chạy khi đã xong sẽ chạy lại từ đầu; "Tô cả chu trình / Tô cây khung" đưa bộ đếm tới bước cuối. Nút cũ "Xem từng bước" / "Mô phỏng" đã được thay bằng bộ nút này.
+Mỗi thuật toán chỉ cần cung cấp `taoDKEuler()` / `taoDKKruskal()` / `taoDKPrim()` / `taoDKDijkstra()` trả về `{ max, delay, k0(), ap(j) }`. Vì `ap(j)` dựng lại từ đầu nên đi lùi hay nhảy về đầu đều dùng chung một hàm. Tự chạy khi đã xong sẽ chạy lại từ đầu; "Tô cả chu trình / Tô cây khung" đưa bộ đếm tới bước cuối. Nút cũ "Xem từng bước" / "Mô phỏng" đã được thay bằng bộ nút này.
